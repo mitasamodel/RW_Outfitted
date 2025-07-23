@@ -1,22 +1,34 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-  <packageId>notfood.Outfitted</packageId>
-  <name>Outfitted</name>
-  <author>notfood</author>
-  <supportedVersions>
-    <li>1.4</li>
-  </supportedVersions>
-  <description>
-    Outfit management
+	<packageId>mitasamodel.Outfitted</packageId>
+	<name>Outfitted 1.6</name>
+	<author>mitasamodel</author>
+	<supportedVersions>
+		<li>1.6</li>
+	</supportedVersions>
+	<description>Outfit management
     
-    Finetune the assigned apparel sets with any Stat under the assigments tab.
-    Includes an overlay to see all apparel scores for the selected colonist.
+    Set the desired weights for buffs and penalties for each outfit type, and watch your Pawns choose their gear automatically - no more micromanagement.
+	In addition to the classic allow/disallow selection, you can now define which parameters a Pawn should prioritize.
+	
+	Is it battle time, where sharp or blunt protection is the priority?
+	Should a miner focus on mining yield or speed?
+	Or is it a hauler, where carry capacity and movement speed matter most?
+		
+	Makes a perfect combo with Combat Extended, Better Pawn Control, and Gear Up And Go.
     
     Thanks to:
     - Killface
     - Fluffy
     - Soulkata
-
-    Multiplayer enabled!
-  </description>
+	- homiru
+	</description>
+	<modDependencies>
+		<li>
+			<packageId>brrainz.harmony</packageId>
+			<displayName>Harmony</displayName>
+			<steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+			<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+		</li>
+	</modDependencies>
 </ModMetaData>

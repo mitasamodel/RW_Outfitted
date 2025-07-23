@@ -1,47 +1,44 @@
-﻿using RimWorld;
+﻿// Decompiled with JetBrains decompiler
+// Type: Outfitted.StatPriority
+// Assembly: Outfitted, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: 7FA0F5BF-790B-428D-866C-5D33983FFC76
+// Assembly location: D:\SteamLibrary\steamapps\workshop\content\294100\3454809174\1.5\Assemblies\Outfitted.dll
+
+using RimWorld;
 using Verse;
 
 namespace Outfitted
 {
-    public class StatPriority : IExposable
-    {
-        public StatPriority(StatDef stat, float weight, float defaultWeight = float.NaN)
-        {
-            this.stat = stat;
-            this.Weight = weight;
-            this.Default = defaultWeight;
-        }
+	public class StatPriority : IExposable
+	{
+		private StatDef stat;
+		public float Weight;
+		public float Default;
 
-        public StatPriority()
-        {
-            // Used by ExposeData
-        }
+		public StatPriority(StatDef stat, float weight, float defaultWeight = float.NaN)
+		{
+			this.stat = stat;
+			this.Weight = weight;
+			this.Default = defaultWeight;
+		}
 
-        StatDef stat;
+		public StatPriority()
+		{
+		}
 
-        public float Weight;
+		public StatDef Stat => this.stat;
 
-        public float Default;
+		public bool IsDefault => (double)this.Default == (double)this.Weight;
 
-        public StatDef Stat => stat;
+		public bool IsManual => float.IsNaN(this.Default);
 
-        public bool IsDefault => Default == Weight;
-        public bool IsManual => float.IsNaN(Default);
-        public bool IsOverride => !IsManual && !IsDefault;
+		public bool IsOverride => !this.IsManual && !this.IsDefault;
 
-        //public bool Inverted => stat.GetModExtension<OutfittedModExtension>()?.inverted ?? false;
-
-        public void ExposeData()
-        {
-            Scribe_Defs.Look(ref stat, "Stat");
-            Scribe_Values.Look(ref Weight, "Weight");
-            Scribe_Values.Look(ref Default, "Default", float.NaN);
-        }
-    }
-
-    /*public class OutfittedModExtension : DefModExtension
-    {
-        // Signals Outfitted to invert the slider. Less is More, more is less.
-        public bool inverted;
-    }*/
+		public void ExposeData()
+		{
+			Scribe_Defs.Look<StatDef>(ref this.stat, "Stat");
+			Scribe_Values.Look<float>(ref this.Weight, "Weight");
+			Scribe_Values.Look<float>(ref this.Default, "Default", float.NaN);
+		}
+	}
 }

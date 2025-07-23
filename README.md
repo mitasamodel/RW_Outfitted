@@ -1,15 +1,18 @@
 # RimWorld-Outfitted
 
-[![Version](https://img.shields.io/badge/Rimworld-1.0-green.svg)](http://rimworldgame.com/)
 [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-blue.svg)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 Outfit management
 
 ## Features
-Finetune the assigned apparel sets with any Stat under the assigments tab.
-Includes an overlay to see all apparel scores for the selected colonist.
+Set the desired weights for buffs and penalties for each outfit type, and watch your Pawns choose their gear automatically - no more micromanagement.
+In addition to the classic allow/disallow selection, you can now define which parameters a Pawn should prioritize.
 
-Multiplayer enabled!
+Is it battle time, where sharp or blunt protection is the priority?
+Should a miner focus on mining yield or speed?
+Or is it a hauler, where carry capacity and movement speed matter most?
+	
+Makes a perfect combo with Combat Extended, Better Pawn Control, and Gear Up And Go.
 
 ## F.A.Q.
 ### Can I install this on existing colonies?
@@ -26,3 +29,4 @@ Code is derivate from Ludeon Studio
 - Killface
 - Fluffy
 - Soulkata
+- homiru
