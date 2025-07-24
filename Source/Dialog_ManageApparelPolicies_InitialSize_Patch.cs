@@ -9,7 +9,6 @@ using RimWorld;
 using UnityEngine;
 using Verse;
 
-#nullable disable
 namespace Outfitted
 {
 	[HarmonyPatch(typeof(Dialog_ManageApparelPolicies), "get_InitialSize")]

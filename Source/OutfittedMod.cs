@@ -77,7 +77,7 @@ namespace Outfitted
 		{
 			OutfittedMod.isSaveStorageSettingsEnabled = ModLister.GetActiveModWithIdentifier("savestoragesettings.kv.rw") != null;
 			new Harmony("rimworld.outfitted").PatchAll();
-			Log.Message("Outfitted loaded");
+			Log.Message("[Outfitted] loaded");
 		}
 
 		public static float ApparelScoreExtra(Pawn pawn, Apparel apparel, NeededWarmth neededWarmth)
