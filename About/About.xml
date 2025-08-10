@@ -8,20 +8,20 @@
 	</supportedVersions>
 	<description>Outfit management
     
-    Set the desired weights for buffs and penalties for each outfit type, and watch your Pawns choose their gear automatically - no more micromanagement.
-	In addition to the classic allow/disallow selection, you can now define which parameters a Pawn should prioritize.
+Set the desired weights for buffs and penalties for each outfit type, and watch your Pawns choose their gear automatically - no more micromanagement.
+In addition to the classic allow/disallow selection, you can now define which parameters a Pawn should prioritize.
 	
-	Is it battle time, where sharp or blunt protection is the priority?
-	Should a miner focus on mining yield or speed?
-	Or is it a hauler, where carry capacity and movement speed matter most?
+Is it battle time, where sharp or blunt protection is the priority?
+Should a miner focus on mining yield or speed?
+Or is it a hauler, where carry capacity and movement speed matter most?
 		
-	Makes a perfect combo with Combat Extended, Better Pawn Control, and Gear Up And Go.
+Makes a perfect combo with Combat Extended, Better Pawn Control, and Gear Up And Go.
     
-    Thanks to:
-    - Killface
-    - Fluffy
-    - Soulkata
-	- homiru
+Thanks to:
+ - Killface
+ - Fluffy
+ - Soulkata
+ - homiru
 	</description>
 	<modDependencies>
 		<li>
