@@ -31,7 +31,7 @@ namespace Outfitted
 				);
 			listing.CheckboxLabeled("Disable score offset", ref Settings.disableScoreOffset,
 				"Disable score offset defined for Apparel\n\n" +
-				"Some Apparel (e.g. Apparel_PackJump) has contant positive offset."
+				"Some Apparel (e.g. Apparel_PackJump) has constant positive offset."
 				);
 
 

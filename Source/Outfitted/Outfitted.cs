@@ -90,23 +90,21 @@ namespace Outfitted
 
 			num1 += Outfitted.ApparelScoreRawPriorities(apparel, currentApparelPolicy);
 
-
-			//if (currentApparelPolicy.AutoWorkPriorities)
-			//	num1 += Outfitted.ApparelScoreAutoWorkPriorities(pawn, apparel);
-			//if (apparel.def.useHitPoints)
-			//	num1 *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate((float)apparel.HitPoints / (float)apparel.MaxHitPoints);
-			//float num2 = num1 + apparel.GetSpecialApparelScoreOffset();
-			//if (pawn != null && currentApparelPolicy != null)
-			//	num2 += Outfitted.ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
-			//if (currentApparelPolicy.PenaltyWornByCorpse && apparel.WornByCorpse && ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.DeadMansApparel, true))
-			//{
-			//	num2 -= 0.5f;
-			//	if ((double)num2 > 0.0)
-			//		num2 *= 0.1f;
-			//}
-			//return num2;
-			return num1;
-
+			if (currentApparelPolicy.AutoWorkPriorities)
+				num1 += Outfitted.ApparelScoreAutoWorkPriorities(pawn, apparel);
+			if (apparel.def.useHitPoints)
+				num1 *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate((float)apparel.HitPoints / (float)apparel.MaxHitPoints);
+			float num2 = OutfittedMod.Settings.disableScoreOffset ? num1 : num1 + apparel.GetSpecialApparelScoreOffset();
+			if (pawn != null && currentApparelPolicy != null)
+				num2 += Outfitted.ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
+			if (currentApparelPolicy.PenaltyWornByCorpse && apparel.WornByCorpse && ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.DeadMansApparel, true))
+			{
+				num2 -= 0.5f;
+				if ((double)num2 > 0.0)
+					num2 *= 0.1f;
+			}
+			return num2;
+			//return num1;
 		}
 
 		private static float ApparelScoreRawPriorities(Apparel apparel, ExtendedOutfit outfit)
@@ -153,7 +151,7 @@ namespace Outfitted
 		/// <returns></returns>
 		public static float ApparelScore(Apparel apparel, StatDef stat, bool basedOnQuality = true)
 		{
-			float result = 0f;
+			float result;
 			// Apparel provides gear offset for this stat.
 			if (DefHasEquippedOffset(apparel.def, stat))
 			{
@@ -169,10 +167,13 @@ namespace Outfitted
 				result = basedOnQuality ? apparel.GetStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
 
 			// CE
-			if (stat.defName == "CarryBulk")
-				result -= apparel.GetStatValue(CE_StatDefOf.WornBulk);
-			else if (stat.defName == "CarryWeight")
-				result -= apparel.GetStatValue(RimWorld.StatDefOf.Mass);
+			if (ModsConfig.IsActive("CETeam.CombatExtended"))
+			{
+				if (stat == CE_StatDefOf.CarryBulk)
+					result -= apparel.GetStatValue(CE_StatDefOf.WornBulk);
+				else if (stat == CE_StatDefOf.CarryWeight)
+					result -= apparel.GetStatValue(RimWorld.StatDefOf.Mass);
+			}
 
 			return result;
 		}

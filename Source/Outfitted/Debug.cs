@@ -149,38 +149,13 @@ namespace Outfitted
 	[HarmonyPatch(typeof(Selector), nameof(Selector.Select), new[] { typeof(object), typeof(bool), typeof(bool) })]
 	internal static class Selector_Select_Patch
 	{
-		// Was this object newly selected by this call?
-		//private static void Prefix(Selector __instance, object obj, ref bool __state)
-		//{
-		//	__state = obj != null && !__instance.SelectedObjects.Contains(obj);
-		//}
-
 		private static int _lastLoggedFrame;
 		private static void Postfix(object obj, bool __state)
 		{
-			//if (!__state) return;
 			if (UnityEngine.Time.frameCount == _lastLoggedFrame) return;
 			_lastLoggedFrame = UnityEngine.Time.frameCount;
 
 			if (obj is ISelectable s) ScoreDebug.ClickedOn(s);
 		}
 	}
-
-	//[HarmonyPatch(typeof(Selector), nameof(Selector.Select), new[] { typeof(object), typeof(bool), typeof(bool) })]
-	//internal static class Selector_Select_Patch
-	//{
-	//	[HarmonyPostfix]
-	//	private static void Postfix(object obj)
-	//	{
-	//		// If it's an ISelectable on the map, log via your existing helper
-	//		if (obj is ISelectable selectable)
-	//		{
-	//			ScoreDebug.ClickedOn(selectable);
-	//			return;
-	//		}
-
-	//		// (Optional) If you want to see unexpected types:
-	//		// if (obj != null) Log.Message($"[DebugSelection] Selected non-ISelectable: {obj.GetType().FullName}");
-	//	}
-	//}
 }
