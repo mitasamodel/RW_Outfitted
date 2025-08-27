@@ -10,18 +10,22 @@ namespace Outfitted
 	public class OutfittedSettigs : ModSettings
 	{
 		public const bool disableStartScore_default = false;
+		public const bool disableScoreOffset_default = false;
 
 		public bool disableStartScore = disableStartScore_default;
+		public bool disableScoreOffset = disableScoreOffset_default;
 
 		public override void ExposeData()
 		{
 			base.ExposeData();
 			Scribe_Values.Look(ref disableStartScore, "disableStartScore", disableStartScore_default);
+			Scribe_Values.Look(ref disableScoreOffset, "disableScoreOffset", disableScoreOffset_default);
 		}
 
 		public void ResetDefault()
 		{
 			disableStartScore = disableStartScore_default;
+			disableScoreOffset = disableScoreOffset_default;
 		}
 	}
 }

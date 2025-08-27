@@ -45,6 +45,9 @@
       <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="CombatExtended">
+      <HintPath>..\..\..\..\..\..\SteamLibrary\steamapps\common\RimWorld\Mods\CombatExtended\Assemblies\CombatExtended.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="UnityEngine">
@@ -71,6 +74,7 @@
     <Compile Include="Debug.cs" />
     <Compile Include="Dialog_ManageApparelPolicies_InitialSize_Patch.cs" />
     <Compile Include="Dialog_ManageApparelPolicies_DoContentsRect_Patch.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="OutfittedSettigs.cs" />
     <Compile Include="SettingsWindow.cs" />
     <Compile Include="StatDefOf.cs" />

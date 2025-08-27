@@ -18,9 +18,6 @@ namespace Outfitted
 		{
 			if (__instance is Dialog_ManageApparelPolicies)
 			{
-#if DEBUG
-				Log.Message("[Outfitted] Resized Dialog_ManageApparelPolicies to 900x700");
-#endif
 				__result = new Vector2(900f, 700f);
 				return false;
 			}

@@ -1,9 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: Outfitted.OutfittedMod
-// Assembly: Outfitted, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 7FA0F5BF-790B-428D-866C-5D33983FFC76
-// Assembly location: D:\SteamLibrary\steamapps\workshop\content\294100\3454809174\1.5\Assemblies\Outfitted.dll
-
+﻿using CombatExtended;
 using HarmonyLib;
 using RimWorld;
 using System;
@@ -11,7 +6,6 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-#nullable disable
 namespace Outfitted
 {
 	[StaticConstructorOnStartup]
@@ -87,33 +81,114 @@ namespace Outfitted
 				Log.ErrorOnce("Outfitted :: Not an ExtendedOutfit, something went wrong.", 399441);
 				return 0.0f;
 			}
-			float num1 = OutfittedMod.Settings.disableStartScore ? 0 : 0.1f;
-			num1 += apparel.def.apparel.scoreOffset + Outfitted.ApparelScoreRawPriorities(apparel, currentApparelPolicy);
-			if (currentApparelPolicy.AutoWorkPriorities)
-				num1 += Outfitted.ApparelScoreAutoWorkPriorities(pawn, apparel);
-			if (apparel.def.useHitPoints)
-				num1 *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate((float)apparel.HitPoints / (float)apparel.MaxHitPoints);
-			float num2 = num1 + apparel.GetSpecialApparelScoreOffset();
-			if (pawn != null && currentApparelPolicy != null)
-				num2 += Outfitted.ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
-			if (currentApparelPolicy.PenaltyWornByCorpse && apparel.WornByCorpse && ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.DeadMansApparel, true))
-			{
-				num2 -= 0.5f;
-				if ((double)num2 > 0.0)
-					num2 *= 0.1f;
-			}
-			return num2;
+
+			// Starting score.
+			float num1 = OutfittedMod.Settings.disableStartScore ? 0f : 0.1f;
+
+			// Score offset.
+			num1 += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.def.apparel.scoreOffset;
+
+			num1 += Outfitted.ApparelScoreRawPriorities(apparel, currentApparelPolicy);
+
+
+			//if (currentApparelPolicy.AutoWorkPriorities)
+			//	num1 += Outfitted.ApparelScoreAutoWorkPriorities(pawn, apparel);
+			//if (apparel.def.useHitPoints)
+			//	num1 *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate((float)apparel.HitPoints / (float)apparel.MaxHitPoints);
+			//float num2 = num1 + apparel.GetSpecialApparelScoreOffset();
+			//if (pawn != null && currentApparelPolicy != null)
+			//	num2 += Outfitted.ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
+			//if (currentApparelPolicy.PenaltyWornByCorpse && apparel.WornByCorpse && ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.DeadMansApparel, true))
+			//{
+			//	num2 -= 0.5f;
+			//	if ((double)num2 > 0.0)
+			//		num2 *= 0.1f;
+			//}
+			//return num2;
+			return num1;
 
 		}
 
 		private static float ApparelScoreRawPriorities(Apparel apparel, ExtendedOutfit outfit)
 		{
-			return !outfit.StatPriorities.Any<StatPriority>() ? 0.0f : outfit.StatPriorities.Select(sp => new
+			if (!outfit.StatPriorities.Any<StatPriority>()) return 0f;
+
+			return outfit.StatPriorities.Average(sp =>
 			{
-				weight = sp.Weight,
-				value = apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetStatValue(sp.Stat),
-				def = sp.Stat.defaultBaseValue
-			}).Average(sp => ((double)Math.Abs(sp.def) < 0.001 ? sp.value : (sp.value - sp.def) / sp.def) * Mathf.Pow(sp.weight, 3f));
+				float weight = sp.Weight;
+				float baseValue = Math.Max(Math.Abs(sp.Stat.defaultBaseValue), 0.001f);
+				bool hasEquippedOffset = DefHasEquippedOffset(apparel.def, sp.Stat);
+
+				float raw = ApparelScore(apparel, sp.Stat);
+
+				float delta;
+				if (hasEquippedOffset)
+					delta = raw / baseValue;
+				else
+					delta = (Math.Abs(sp.Stat.defaultBaseValue) < 0.001f) ? raw : (raw - sp.Stat.defaultBaseValue) / baseValue;
+
+				return delta * (float)Math.Pow(weight, 3f);
+			});
+
+
+			//return !outfit.StatPriorities.Any<StatPriority>() ? 0.0f : outfit.StatPriorities.Select(sp => new
+			//{
+			//	weight = sp.Weight,
+			//	value = apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetStatValue(sp.Stat),
+			//	def = sp.Stat.defaultBaseValue
+			//})
+			//	.Average(sp => (
+			//		(double)Math.Abs(sp.def) < 0.001 ? sp.value : (sp.value - sp.def) / Math.Abs(sp.def)) * Mathf.Pow(sp.weight, 3f)
+			//	);
+		}
+
+		/// <summary>
+		/// Score based on effect of apparel.
+		/// Example: CE's default CarryBulk is never 0 (it is 20) and "normal" formula will return higher than 20 for all "good" items
+		/// even if this item does not modify CarryBulk (it is checked in StatOffsetFromGear instead).
+		/// </summary>
+		/// <param name="apparel"></param>
+		/// <param name="stat"></param>
+		/// <param name="basedOnQuality"></param>
+		/// <returns></returns>
+		public static float ApparelScore(Apparel apparel, StatDef stat, bool basedOnQuality = true)
+		{
+			float result = 0f;
+			// Apparel provides gear offset for this stat.
+			if (DefHasEquippedOffset(apparel.def, stat))
+			{
+				result = basedOnQuality ? StatWorker.StatOffsetFromGear(apparel, stat) : apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat);
+			}
+
+			// Pawn-category stats with no equipped offset (example: CarryBulk with no offset).
+			else if (stat.category == StatCategoryDefOf.BasicsPawn)
+				result = apparel.def.GetStatValueAbstract(stat, null);
+
+			// All other. Example: armor, cold/warm insulation. Depends on gear itsef, not modifying Pawn's stats.
+			else
+				result = basedOnQuality ? apparel.GetStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
+
+			// CE
+			if (stat.defName == "CarryBulk")
+				result -= apparel.GetStatValue(CE_StatDefOf.WornBulk);
+			else if (stat.defName == "CarryWeight")
+				result -= apparel.GetStatValue(RimWorld.StatDefOf.Mass);
+
+			return result;
+		}
+
+		// Check if ThingDef has stat modifier applied when equipped.
+		private static bool DefHasEquippedOffset(ThingDef def, StatDef stat)
+		{
+			var list = def.equippedStatOffsets;
+			if (list != null)
+			{
+				foreach (var statApparel in list)
+				{
+					if (statApparel.stat == stat && statApparel.value > float.Epsilon) return true;
+				}
+			}
+			return false;
 		}
 
 		private static float ApparelScoreAutoWorkPriorities(Pawn pawn, Apparel apparel)

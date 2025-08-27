@@ -25,7 +25,14 @@ namespace Outfitted
 
 			var listing = new Listing_Standard();
 			listing.Begin(inRect);
-			listing.CheckboxLabeled("Disable base score", ref Settings.disableStartScore, "Disable base 1.0 score");
+			listing.CheckboxLabeled("Disable base score", ref Settings.disableStartScore, 
+				"Disable base 1.0 score\n\n" +
+				"By default each Apparel gets 1.0 starting score."
+				);
+			listing.CheckboxLabeled("Disable score offset", ref Settings.disableScoreOffset,
+				"Disable score offset defined for Apparel\n\n" +
+				"Some Apparel (e.g. Apparel_PackJump) has contant positive offset."
+				);
 
 
 			listing.End();
