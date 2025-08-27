@@ -38,7 +38,7 @@ namespace Outfitted
 			if (extendedOutfit == null)
 				return;
 			float num1 = 0.0f;
-			if (OutfittedMod.isSaveStorageSettingsEnabled)
+			if (Outfitted.isSaveStorageSettingsEnabled)
 			{
 				float num2 = num1 + 40f;
 			}
@@ -56,7 +56,7 @@ namespace Outfitted
 			zero.y += 10f;
 			Dialog_ManageApparelPolicies_DoContentsRect_Patch.DrawApparelStats(extendedOutfit, zero, rect1);
 			if (Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged && extendedOutfit != null)
-				OutfittedMod.Notify_OutfitChanged(extendedOutfit.id);
+				Outfitted.Notify_OutfitChanged(extendedOutfit.id);
 			GUI.EndGroup();
 			GUI.color = Color.white;
 			Text.Anchor = TextAnchor.UpperLeft;

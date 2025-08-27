@@ -18,7 +18,7 @@ namespace Outfitted
     {
       if (worldView)
         return;
-      row.ToggleableIcon(ref OutfittedMod.showApparelScores, ResourceBank.Textures.ShirtBasic, ResourceBank.Strings.OutfitShow, SoundDefOf.Mouseover_ButtonToggle);
+      row.ToggleableIcon(ref Outfitted.showApparelScores, ResourceBank.Textures.ShirtBasic, ResourceBank.Strings.OutfitShow, SoundDefOf.Mouseover_ButtonToggle);
     }
   }
 }

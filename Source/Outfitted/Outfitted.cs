@@ -15,7 +15,7 @@ using Verse;
 namespace Outfitted
 {
 	[StaticConstructorOnStartup]
-	public static class OutfittedMod
+	public static class Outfitted
 	{
 		internal static bool showApparelScores;
 		internal static bool isSaveStorageSettingsEnabled;
@@ -73,9 +73,9 @@ namespace Outfitted
 	  }
 	};
 
-		static OutfittedMod()
+		static Outfitted()
 		{
-			OutfittedMod.isSaveStorageSettingsEnabled = ModLister.GetActiveModWithIdentifier("savestoragesettings.kv.rw") != null;
+			Outfitted.isSaveStorageSettingsEnabled = ModLister.GetActiveModWithIdentifier("savestoragesettings.kv.rw") != null;
 			new Harmony("rimworld.outfitted").PatchAll();
 			Log.Message("[Outfitted] loaded");
 		}
@@ -87,14 +87,15 @@ namespace Outfitted
 				Log.ErrorOnce("Outfitted :: Not an ExtendedOutfit, something went wrong.", 399441);
 				return 0.0f;
 			}
-			float num1 = 0.1f + apparel.def.apparel.scoreOffset + OutfittedMod.ApparelScoreRawPriorities(apparel, currentApparelPolicy);
+			float num1 = OutfittedMod.Settings.disableStartScore ? 0 : 0.1f;
+			num1 += apparel.def.apparel.scoreOffset + Outfitted.ApparelScoreRawPriorities(apparel, currentApparelPolicy);
 			if (currentApparelPolicy.AutoWorkPriorities)
-				num1 += OutfittedMod.ApparelScoreAutoWorkPriorities(pawn, apparel);
+				num1 += Outfitted.ApparelScoreAutoWorkPriorities(pawn, apparel);
 			if (apparel.def.useHitPoints)
-				num1 *= OutfittedMod.HitPointsPercentScoreFactorCurve.Evaluate((float)apparel.HitPoints / (float)apparel.MaxHitPoints);
+				num1 *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate((float)apparel.HitPoints / (float)apparel.MaxHitPoints);
 			float num2 = num1 + apparel.GetSpecialApparelScoreOffset();
 			if (pawn != null && currentApparelPolicy != null)
-				num2 += OutfittedMod.ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
+				num2 += Outfitted.ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
 			if (currentApparelPolicy.PenaltyWornByCorpse && apparel.WornByCorpse && ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.DeadMansApparel, true))
 			{
 				num2 -= 0.5f;
@@ -102,6 +103,7 @@ namespace Outfitted
 					num2 *= 0.1f;
 			}
 			return num2;
+
 		}
 
 		private static float ApparelScoreRawPriorities(Apparel apparel, ExtendedOutfit outfit)
@@ -137,7 +139,7 @@ namespace Outfitted
 					outfit.targetTemperatures = new FloatRange(seasonalTemp - (float)outfit.autoTempOffset, seasonalTemp + (float)outfit.autoTempOffset);
 				}
 				FloatRange targetTemperatures = outfit.targetTemperatures;
-				FloatRange insulationStats1 = OutfittedMod.GetInsulationStats(apparel);
+				FloatRange insulationStats1 = Outfitted.GetInsulationStats(apparel);
 				floatRange2.min += insulationStats1.min;
 				floatRange2.max += insulationStats1.max;
 				if (num2 == 0)
@@ -146,7 +148,7 @@ namespace Outfitted
 					{
 						if (!ApparelUtility.CanWearTogether(apparel.def, apparel1.def, pawn.RaceProps.body))
 						{
-							FloatRange insulationStats2 = OutfittedMod.GetInsulationStats(apparel1);
+							FloatRange insulationStats2 = Outfitted.GetInsulationStats(apparel1);
 							floatRange2.min -= insulationStats2.min;
 							floatRange2.max -= insulationStats2.max;
 						}
@@ -154,7 +156,7 @@ namespace Outfitted
 				}
 				FloatRange floatRange3 = new FloatRange(Mathf.Max(floatRange1.min - targetTemperatures.min, 0.0f), Mathf.Max(targetTemperatures.max - floatRange1.max, 0.0f));
 				FloatRange floatRange4 = new FloatRange(Mathf.Max(floatRange2.min - targetTemperatures.min, 0.0f), Mathf.Max(targetTemperatures.max - floatRange2.max, 0.0f));
-				num1 = OutfittedMod.InsulationFactorCurve.Evaluate(floatRange3.min - floatRange4.min) + OutfittedMod.InsulationFactorCurve.Evaluate(floatRange3.max - floatRange4.max);
+				num1 = Outfitted.InsulationFactorCurve.Evaluate(floatRange3.min - floatRange4.min) + Outfitted.InsulationFactorCurve.Evaluate(floatRange3.max - floatRange4.max);
 			}
 			else
 			{
@@ -162,11 +164,11 @@ namespace Outfitted
 				{
 					case NeededWarmth.Warm:
 						float statValue1 = apparel.GetStatValue(StatDefOf.Insulation_Heat);
-						num1 = OutfittedMod.InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue1);
+						num1 = Outfitted.InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue1);
 						break;
 					case NeededWarmth.Cool:
 						float statValue2 = apparel.GetStatValue(StatDefOf.Insulation_Cold);
-						num1 = OutfittedMod.InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue2);
+						num1 = Outfitted.InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue2);
 						break;
 					default:
 						num1 = 1f;

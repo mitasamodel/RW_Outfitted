@@ -37,40 +37,40 @@ namespace Outfitted.Database
         case "Worker":
           extendedOutfit.AddRange((IEnumerable<StatPriority>) new List<StatPriority>()
           {
-            new StatPriority(Outfitted.StatDefOf.MoveSpeed, 0.0f),
-            new StatPriority(Outfitted.StatDefOf.WorkSpeedGlobal, 1f)
+            new StatPriority(global::Outfitted.StatDefOf.MoveSpeed, 0.0f),
+            new StatPriority(global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f)
           });
           break;
         case "Soldier":
           extendedOutfit.AddRange((IEnumerable<StatPriority>) new List<StatPriority>()
           {
-            new StatPriority(Outfitted.StatDefOf.ShootingAccuracyPawn, 2f),
-            new StatPriority(Outfitted.StatDefOf.AccuracyShort, 1f),
-            new StatPriority(Outfitted.StatDefOf.AccuracyMedium, 1f),
-            new StatPriority(Outfitted.StatDefOf.AccuracyLong, 1f),
-            new StatPriority(Outfitted.StatDefOf.MoveSpeed, 1f),
-            new StatPriority(Outfitted.StatDefOf.ArmorRating_Blunt, 0.0f),
-            new StatPriority(Outfitted.StatDefOf.ArmorRating_Sharp, 1f),
-            new StatPriority(Outfitted.StatDefOf.MeleeDodgeChance, 0.0f),
-            new StatPriority(Outfitted.StatDefOf.AimingDelayFactor, -2f),
-            new StatPriority(Outfitted.StatDefOf.RangedWeapon_Cooldown, -2f),
-            new StatPriority(Outfitted.StatDefOf.PainShockThreshold, 2f)
+            new StatPriority(global::Outfitted.StatDefOf.ShootingAccuracyPawn, 2f),
+            new StatPriority(global::Outfitted.StatDefOf.AccuracyShort, 1f),
+            new StatPriority(global::Outfitted.StatDefOf.AccuracyMedium, 1f),
+            new StatPriority(global::Outfitted.StatDefOf.AccuracyLong, 1f),
+            new StatPriority(global::Outfitted.StatDefOf.MoveSpeed, 1f),
+            new StatPriority(global::Outfitted.StatDefOf.ArmorRating_Blunt, 0.0f),
+            new StatPriority(global::Outfitted.StatDefOf.ArmorRating_Sharp, 1f),
+            new StatPriority(global::Outfitted.StatDefOf.MeleeDodgeChance, 0.0f),
+            new StatPriority(global::Outfitted.StatDefOf.AimingDelayFactor, -2f),
+            new StatPriority(global::Outfitted.StatDefOf.RangedWeapon_Cooldown, -2f),
+            new StatPriority(global::Outfitted.StatDefOf.PainShockThreshold, 2f)
           });
           break;
         case "Nudist":
           extendedOutfit.AddRange((IEnumerable<StatPriority>) new List<StatPriority>()
           {
-            new StatPriority(Outfitted.StatDefOf.MoveSpeed, 1f),
-            new StatPriority(Outfitted.StatDefOf.WorkSpeedGlobal, 2f)
+            new StatPriority(global::Outfitted.StatDefOf.MoveSpeed, 1f),
+            new StatPriority(global::Outfitted.StatDefOf.WorkSpeedGlobal, 2f)
           });
           break;
         default:
           extendedOutfit.AddRange((IEnumerable<StatPriority>) new List<StatPriority>()
           {
-            new StatPriority(Outfitted.StatDefOf.MoveSpeed, 1f),
-            new StatPriority(Outfitted.StatDefOf.WorkSpeedGlobal, 2f),
-            new StatPriority(Outfitted.StatDefOf.ArmorRating_Blunt, 1f),
-            new StatPriority(Outfitted.StatDefOf.ArmorRating_Sharp, 1f)
+            new StatPriority(global::Outfitted.StatDefOf.MoveSpeed, 1f),
+            new StatPriority(global::Outfitted.StatDefOf.WorkSpeedGlobal, 2f),
+            new StatPriority(global::Outfitted.StatDefOf.ArmorRating_Blunt, 1f),
+            new StatPriority(global::Outfitted.StatDefOf.ArmorRating_Sharp, 1f)
           });
           break;
       }

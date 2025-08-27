@@ -22,7 +22,7 @@ namespace Outfitted
 
     private static void Postfix(Thing __instance)
     {
-      if (!OutfittedMod.showApparelScores || !(Find.Selector.SingleSelectedThing is Pawn singleSelectedThing) || !singleSelectedThing.IsColonistPlayerControlled || !(__instance is Apparel apparel) || !(singleSelectedThing.outfits.CurrentApparelPolicy is ExtendedOutfit currentApparelPolicy) || !currentApparelPolicy.filter.Allows((Thing) apparel))
+      if (!Outfitted.showApparelScores || !(Find.Selector.SingleSelectedThing is Pawn singleSelectedThing) || !singleSelectedThing.IsColonistPlayerControlled || !(__instance is Apparel apparel) || !(singleSelectedThing.outfits.CurrentApparelPolicy is ExtendedOutfit currentApparelPolicy) || !currentApparelPolicy.filter.Allows((Thing) apparel))
         return;
       List<float> wornScoresCache = Thing_DrawGUIOverlay_Patch.CachedScoresForPawn(singleSelectedThing);
       float beauty = JobGiver_OptimizeApparel.ApparelScoreGain(singleSelectedThing, apparel, wornScoresCache);
