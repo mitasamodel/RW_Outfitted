@@ -15,32 +15,32 @@ using Verse;
 #nullable disable
 namespace Outfitted
 {
-  [HarmonyPatch(typeof (JobGiver_OptimizeApparel), "ApparelScoreRaw")]
-  internal static class JobGiver_OptimizeApparel_ApparelScoreRaw_Patch
-  {
-    private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
-    {
-      MethodInfo add = AccessTools.Method(typeof (JobGiver_OptimizeApparel_ApparelScoreRaw_Patch), "ApparelScoreExtra", (System.Type[]) null, (System.Type[]) null);
-      MethodInfo find = AccessTools.PropertyGetter(typeof (Thing), "Stuff");
-      FieldInfo fld = AccessTools.Field(typeof (JobGiver_OptimizeApparel), "neededWarmth");
-      foreach (CodeInstruction ins in instructions)
-      {
-        if (ins.opcode == OpCodes.Callvirt && find.Equals(ins.operand))
-        {
-          yield return new CodeInstruction(OpCodes.Ldarg_0, (object) null);
-          yield return new CodeInstruction(OpCodes.Ldsfld, (object) fld);
-          yield return new CodeInstruction(OpCodes.Call, (object) add);
-          yield return new CodeInstruction(OpCodes.Stloc_0, (object) null);
-          yield return new CodeInstruction(OpCodes.Ldarg_1, (object) null);
-        }
-        yield return ins;
-      }
-    }
+	[HarmonyPatch(typeof(JobGiver_OptimizeApparel), "ApparelScoreRaw")]
+	internal static class JobGiver_OptimizeApparel_ApparelScoreRaw_Patch
+	{
+		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+		{
+			MethodInfo add = AccessTools.Method(typeof(JobGiver_OptimizeApparel_ApparelScoreRaw_Patch), "ApparelScoreExtra", (System.Type[])null, (System.Type[])null);
+			MethodInfo find = AccessTools.PropertyGetter(typeof(Thing), "Stuff");
+			FieldInfo fld = AccessTools.Field(typeof(JobGiver_OptimizeApparel), "neededWarmth");
+			foreach (CodeInstruction ins in instructions)
+			{
+				if (ins.opcode == OpCodes.Callvirt && find.Equals(ins.operand))     // if (ap.Stuff == ThingDefOf.Human.race.leatherDef)
+				{
+					yield return new CodeInstruction(OpCodes.Ldarg_0, (object)null);	// push Pawn
+					yield return new CodeInstruction(OpCodes.Ldsfld, (object)fld);      // push neededWarmth
+					yield return new CodeInstruction(OpCodes.Call, (object)add);        // call ApparelScoreExtra
+					yield return new CodeInstruction(OpCodes.Stloc_0, (object)null);	// store result in "num" (overwrite)
+					yield return new CodeInstruction(OpCodes.Ldarg_1, (object)null);	// push ap (was previously on the stack; used by original code)
+				}
+				yield return ins;
+			}
+		}
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static float ApparelScoreExtra(Apparel ap, Pawn pawn, NeededWarmth neededWarmth)
-    {
-      return OutfittedMod.ApparelScoreExtra(pawn, ap, neededWarmth);
-    }
-  }
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static float ApparelScoreExtra(Apparel ap, Pawn pawn, NeededWarmth neededWarmth)
+		{
+			return OutfittedMod.ApparelScoreExtra(pawn, ap, neededWarmth);
+		}
+	}
 }
