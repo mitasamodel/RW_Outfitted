@@ -10,6 +10,7 @@ using UnityEngine;
 using Verse;
 using CombatExtended;
 
+#if DEBUG
 namespace Outfitted
 {
 	[StaticConstructorOnStartup]
@@ -17,14 +18,14 @@ namespace Outfitted
 	{
 		static LogSomeStuff()
 		{
-			var stats = DefDatabase<StatDef>.AllDefsListForReading;
-			foreach (var stat in stats)
-			{
-				//if (stat.defaultBaseValue != 0)
-				{
-					Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Def[{stat.defaultBaseValue}] ");
-				}
-			}
+			//var stats = DefDatabase<StatDef>.AllDefsListForReading;
+			//foreach (var stat in stats)
+			//{
+			//	//if (stat.defaultBaseValue != 0)
+			//	{
+			//		Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Def[{stat.defaultBaseValue}] ");
+			//	}
+			//}
 		}
 	}
 
@@ -70,7 +71,9 @@ namespace Outfitted
 					$"Sum_Q[{baseStat + wearStatQ}] "
 				);
 				if (stat.Stat.defName == "CarryWeight")
-					Logger.LogNL($"Score: {Outfitted.ApparelScore(_apparel, stat.Stat)}");
+					Logger.LogNL($"\tScore: {Outfitted.ApparelScore(_apparel, stat.Stat)}");
+				else if (stat.Stat.defName == "CarryBulk")
+					Logger.LogNL($"\tScore: {Outfitted.ApparelScore(_apparel, stat.Stat)}");
 			}
 		}
 	}
@@ -159,3 +162,4 @@ namespace Outfitted
 		}
 	}
 }
+#endif
