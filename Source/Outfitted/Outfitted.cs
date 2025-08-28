@@ -169,9 +169,9 @@ namespace Outfitted
 			// CE
 			if (ModsConfig.IsActive("CETeam.CombatExtended"))
 			{
-				if (stat == CE_StatDefOf.CarryBulk)
-					result -= apparel.GetStatValue(CE_StatDefOf.WornBulk);
-				else if (stat == CE_StatDefOf.CarryWeight)
+				if (stat == CE_CompatDefOf.CarryBulk)
+					result -= apparel.GetStatValue(CE_CompatDefOf.WornBulk);
+				else if (stat == CE_CompatDefOf.CarryWeight)
 					result -= apparel.GetStatValue(RimWorld.StatDefOf.Mass);
 			}
 
@@ -186,7 +186,7 @@ namespace Outfitted
 			{
 				foreach (var statApparel in list)
 				{
-					if (statApparel.stat == stat && statApparel.value > float.Epsilon) return true;
+					if (statApparel.stat == stat && Math.Abs(statApparel.value) > float.Epsilon) return true;
 				}
 			}
 			return false;
@@ -270,7 +270,7 @@ namespace Outfitted
 			}
 			catch (Exception ex)
 			{
-				Log.Error(string.Format("OutfittedMod.Notify_OutfitChanged: {0}", (object)ex));
+				Log.Error(string.Format("Outfitted.Notify_OutfitChanged: {0}", (object)ex));
 			}
 		}
 	}

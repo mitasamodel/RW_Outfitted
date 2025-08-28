@@ -18,14 +18,14 @@ namespace Outfitted
 	{
 		static LogSomeStuff()
 		{
-			//var stats = DefDatabase<StatDef>.AllDefsListForReading;
-			//foreach (var stat in stats)
-			//{
-			//	//if (stat.defaultBaseValue != 0)
-			//	{
-			//		Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Def[{stat.defaultBaseValue}] ");
-			//	}
-			//}
+			var stats = DefDatabase<StatDef>.AllDefsListForReading;
+			foreach (var stat in stats)
+			{
+				//if (stat.defaultBaseValue != 0)
+				{
+					Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Def[{stat.defaultBaseValue}] ");
+				}
+			}
 		}
 	}
 
@@ -50,8 +50,14 @@ namespace Outfitted
 
 			if (_apparel == null || _outfit == null || _pawn == null) return;
 
-			float CE_Bulk = _apparel.GetStatValue(CE_StatDefOf.Bulk);
-			Logger.LogNL($"Ap[{_apparel.def.defName}] CE_Bulk[{CE_Bulk}] Out[{_outfit.label}] Pawn[{_pawn.Name}]");
+			if (ModsConfig.IsActive("CETeam.CombatExtended"))
+			{
+				float CE_Bulk = _apparel.GetStatValue(CE_CompatDefOf.Bulk);
+				Logger.LogNL($"Ap[{_apparel.def.defName}] CE_Bulk[{CE_Bulk}] Out[{_outfit.label}] Pawn[{_pawn.Name}]");
+			}
+			else
+				Logger.LogNL($"Ap[{_apparel.def.defName}] Out[{_outfit.label}] Pawn[{_pawn.Name}]");
+
 			foreach (var stat in _outfit.StatPriorities)
 			{
 				var baseStatQ = _apparel.GetStatValue(stat.Stat);
@@ -70,20 +76,8 @@ namespace Outfitted
 					$"SumQ[{baseStatQ + wearStat}] " +
 					$"Sum_Q[{baseStat + wearStatQ}] "
 				);
-				if (stat.Stat.defName == "CarryWeight")
-					Logger.LogNL($"\tScore: {Outfitted.ApparelScore(_apparel, stat.Stat)}");
-				else if (stat.Stat.defName == "CarryBulk")
-					Logger.LogNL($"\tScore: {Outfitted.ApparelScore(_apparel, stat.Stat)}");
+				Logger.LogNL($"\tScore: {Outfitted.ApparelScore(_apparel, stat.Stat)}");
 			}
-		}
-	}
-
-	public sealed class DebugSelectionMod : Mod
-	{
-		public DebugSelectionMod(ModContentPack content) : base(content)
-		{
-			var harmony = new Harmony("yourname.rw.debugselection");
-			harmony.PatchAll();
 		}
 	}
 

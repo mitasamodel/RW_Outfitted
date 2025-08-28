@@ -3,6 +3,15 @@
 namespace Outfitted
 {
 	[DefOf]
+	public static class CE_CompatDefOf
+	{
+		[MayRequire("CETeam.CombatExtended")] public static StatDef CarryBulk;
+		[MayRequire("CETeam.CombatExtended")] public static StatDef CarryWeight;
+		[MayRequire("CETeam.CombatExtended")] public static StatDef WornBulk;
+		[MayRequire("CETeam.CombatExtended")] public static StatDef Bulk;
+	}
+
+	[DefOf]
 	public static class StatDefOf
 	{
 		public static StatDef ArmorRating_Sharp;
