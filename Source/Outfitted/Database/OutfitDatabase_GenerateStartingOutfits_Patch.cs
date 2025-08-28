@@ -269,7 +269,8 @@ namespace Outfitted.Database
 			ExtendedOutfit outfit,
 			Dictionary<StatDef, float> priorities)
 		{
-			outfit.AddRange(priorities.Select(i => new StatPriority(i.Key, i.Value, i.Value)));
+			//outfit.AddRange(priorities.Select(i => new StatPriority(i.Key, i.Value, i.Value)));
+			outfit.AddRange(priorities.Select(i => new StatPriority(i.Key, i.Value)));		// Leave stats unlocked (can be deleted).
 		}
 
 		private static void ConfigureOutfitFiltered(
