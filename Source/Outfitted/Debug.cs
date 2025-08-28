@@ -18,14 +18,14 @@ namespace Outfitted
 	{
 		static LogSomeStuff()
 		{
-			var stats = DefDatabase<StatDef>.AllDefsListForReading;
-			foreach (var stat in stats)
-			{
-				//if (stat.defaultBaseValue != 0)
-				{
-					Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Def[{stat.defaultBaseValue}] ");
-				}
-			}
+			//var stats = DefDatabase<StatDef>.AllDefsListForReading;
+			//foreach (var stat in stats)
+			//{
+			//	//if (stat.defaultBaseValue != 0)
+			//	{
+			//		Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Def[{stat.defaultBaseValue}] ");
+			//	}
+			//}
 		}
 	}
 

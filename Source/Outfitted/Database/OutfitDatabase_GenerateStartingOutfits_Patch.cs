@@ -3,6 +3,7 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Verse;
 
 namespace Outfitted.Database
@@ -270,7 +271,7 @@ namespace Outfitted.Database
 			Dictionary<StatDef, float> priorities)
 		{
 			//outfit.AddRange(priorities.Select(i => new StatPriority(i.Key, i.Value, i.Value)));
-			outfit.AddRange(priorities.Select(i => new StatPriority(i.Key, i.Value)));		// Leave stats unlocked (can be deleted).
+			outfit.AddRange(priorities.Select(i => new StatPriority(i.Key, i.Value)));      // Leave stats unlocked (can be deleted).
 		}
 
 		private static void ConfigureOutfitFiltered(

@@ -4,10 +4,9 @@ using System;
 using System.Collections.Generic;
 using Verse;
 
-#nullable disable
 namespace Outfitted
 {
-	[HarmonyPatch(typeof(Thing), "DrawGUIOverlay")]
+	[HarmonyPatch(typeof(Thing), nameof(Thing.DrawGUIOverlay))]
 	internal static class Thing_DrawGUIOverlay_Patch
 	{
 		private static int cachedId = -1;
@@ -16,13 +15,19 @@ namespace Outfitted
 
 		private static void Postfix(Thing __instance)
 		{
-			if (!Outfitted.showApparelScores || !(Find.Selector.SingleSelectedThing is Pawn singleSelectedThing) || !singleSelectedThing.IsColonistPlayerControlled || !(__instance is Apparel apparel) || !(singleSelectedThing.outfits.CurrentApparelPolicy is ExtendedOutfit currentApparelPolicy) || !currentApparelPolicy.filter.Allows((Thing)apparel))
+			if (!Outfitted.showApparelScores ||
+				!(Find.Selector.SingleSelectedThing is Pawn singleSelectedThing)
+				|| !singleSelectedThing.IsColonistPlayerControlled ||
+				!(__instance is Apparel apparel) ||
+				!(singleSelectedThing.outfits.CurrentApparelPolicy is ExtendedOutfit currentApparelPolicy)
+				|| !currentApparelPolicy.filter.Allows(apparel))
 				return;
-			List<float> wornScoresCache = Thing_DrawGUIOverlay_Patch.CachedScoresForPawn(singleSelectedThing);
+
+			List<float> wornScoresCache = CachedScoresForPawn(singleSelectedThing);
 			float beauty = JobGiver_OptimizeApparel.ApparelScoreGain(singleSelectedThing, apparel, wornScoresCache);
-			if ((double)Math.Abs(beauty) <= 0.0099999997764825821)
-				return;
-			GenMapUI.DrawThingLabel(GenMapUI.LabelDrawPosFor((Thing)apparel, 0.0f), beauty.ToString("F1"), BeautyDrawer.BeautyColor(beauty, 3f));
+			//if ((double)Math.Abs(beauty) <= 0.0099999997764825821)
+			//	return;
+			GenMapUI.DrawThingLabel(GenMapUI.LabelDrawPosFor(apparel, 0.0f), beauty.ToString("F1"), BeautyDrawer.BeautyColor(beauty, 3f));
 		}
 
 		private static List<float> CachedScoresForPawn(Pawn pawn)

@@ -2,6 +2,9 @@
 
 namespace Outfitted
 {
+	/// <summary>
+	/// Allows to use checks in code without causing referencing undefined StatDefs (if CE is not active).
+	/// </summary>
 	[DefOf]
 	public static class CE_CompatDefOf
 	{

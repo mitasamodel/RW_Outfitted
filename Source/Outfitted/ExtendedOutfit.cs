@@ -97,16 +97,16 @@ namespace Outfitted
 
 		void IExposable.ExposeData()
 		{
-			Scribe_Values.Look<int>(ref this.id, "id");
-			Scribe_Values.Look<string>(ref this.label, "label");
-			Scribe_Deep.Look<ThingFilter>(ref this.filter, "filter");
-			Scribe_Values.Look<bool>(ref this.targetTemperaturesOverride, "targetTemperaturesOverride");
-			Scribe_Values.Look<FloatRange>(ref this.targetTemperatures, "targetTemperatures");
-			Scribe_Values.Look<bool>(ref this.PenaltyWornByCorpse, "PenaltyWornByCorpse", true);
-			Scribe_Collections.Look<StatPriority>(ref this.statPriorities, "statPriorities", LookMode.Deep);
-			Scribe_Values.Look<bool>(ref this.AutoWorkPriorities, "AutoWorkPriorities");
-			Scribe_Values.Look<bool>(ref this._autoTemp, "AutoTemp");
-			Scribe_Values.Look<int>(ref this.autoTempOffset, "autoTempOffset");
+			Scribe_Values.Look(ref id, "id");
+			Scribe_Values.Look(ref label, "label");
+			Scribe_Deep.Look(ref filter, "filter");
+			Scribe_Values.Look(ref targetTemperaturesOverride, "targetTemperaturesOverride");
+			Scribe_Values.Look(ref targetTemperatures, "targetTemperatures");
+			Scribe_Values.Look(ref PenaltyWornByCorpse, "PenaltyWornByCorpse", true);
+			Scribe_Collections.Look(ref statPriorities, "statPriorities", LookMode.Deep);
+			Scribe_Values.Look(ref AutoWorkPriorities, "AutoWorkPriorities");
+			Scribe_Values.Look(ref _autoTemp, "AutoTemp");
+			Scribe_Values.Look(ref autoTempOffset, "autoTempOffset");
 		}
 
 		public void CopyFrom(ExtendedOutfit outfit)

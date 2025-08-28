@@ -69,6 +69,9 @@ namespace Outfitted
 
 		static Outfitted()
 		{
+#if DEBUG
+			Logger.Init();
+#endif
 			Outfitted.isSaveStorageSettingsEnabled = ModLister.GetActiveModWithIdentifier("savestoragesettings.kv.rw") != null;
 			new Harmony("rimworld.outfitted").PatchAll();
 			Log.Message("[Outfitted] loaded");
