@@ -25,15 +25,21 @@ namespace Outfitted
 
 			var listing = new Listing_Standard();
 			listing.Begin(inRect);
-			listing.CheckboxLabeled("Disable base score", ref Settings.disableStartScore, 
+			listing.Label("Outfit window");
+			listing.CheckboxLabeled("Draggable window", ref Settings.draggableWindow, "Allows to drag the outfit manager window.\n\n" +
+				"When it is not a good option: if you intend to use \"drag\" across selections. Obviously, instead of dragging the setting, the window will be dragged."
+				);
+			listing.GapLine();
+			listing.Label("Score options");
+			listing.CheckboxLabeled("Disable base score", ref Settings.disableStartScore,
 				"Disable base 1.0 score\n\n" +
-				"By default each Apparel gets 1.0 starting score."
+				"By default all Apparels gets 1.0 starting score."
 				);
 			listing.CheckboxLabeled("Disable score offset", ref Settings.disableScoreOffset,
 				"Disable score offset defined for Apparel\n\n" +
-				"Some Apparel (e.g. Apparel_PackJump) has constant positive offset."
+				"Some Apparel has constant positive offset.\n\n" +
+				"Example: Apparel_PackJump has +4 constant offset. All shields - too."
 				);
-
 
 			listing.End();
 

@@ -25,7 +25,7 @@ namespace Outfitted
 	{
 		public static void Postfix(Dialog_ManageApparelPolicies __instance)
 		{
-			__instance.draggable = true;
+			if ( OutfittedMod.Settings.draggableWindow) __instance.draggable = true;
 		}
 	}
 
