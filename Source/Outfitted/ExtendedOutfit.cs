@@ -56,7 +56,7 @@ namespace Outfitted
 		{
 			get
 			{
-				return ExtendedOutfit.AllAvailableStats.Except<StatDef>(this.StatPriorities.Select<StatPriority, StatDef>((Func<StatPriority, StatDef>)(i => i.Stat)));
+				return AllAvailableStats.Except(StatPriorities.Select(i => i.Stat));
 			}
 		}
 

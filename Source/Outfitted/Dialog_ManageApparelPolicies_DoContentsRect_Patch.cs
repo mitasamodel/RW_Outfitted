@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using RimWorld;
+using RW_JustUtils;
 using RW_Utils;
 using System;
 using System.Collections.Generic;
@@ -189,6 +190,29 @@ namespace Outfitted
 			TooltipHandler.TipRegion(rect2, new TipSignal(ResourceBank.Strings.TemperatureRangeReset));
 		}
 
+		// Prefered order of mods displayed. All other mods will go after.
+		private static readonly string[] PreferredModOrder =
+		{
+			"ludeon.rimworld",
+			"ludeon.rimWorld.royalty",
+			"ludeon.rimWorld.ideology",
+			"ludeon.rimWorld.biotech",
+			"ludeon.rimWorld.anomaly",
+			"ludeon.rimWorld.odyssey"
+		};
+
+		// Dict for faster access.
+		private static readonly Dictionary<string, int> PreferredModIndex = PreferredModOrder
+			.Select((id, idx) => new { id, idx })
+			.ToDictionary(x => x.id, x => x.idx, StringComparer.OrdinalIgnoreCase);
+
+		// Get priority.
+		private static int GetModPriority(Def def)
+		{
+			var id = def?.modContentPack?.PackageId ?? "ludeon.rimworld";
+			return PreferredModIndex.TryGetValue(id, out var idx) ? idx : int.MaxValue;
+		}
+
 		private static void DrawApparelStats(ExtendedOutfit selectedOutfit, Vector2 cur, Rect canvas)
 		{
 			Rect rect1 = new Rect(cur.x, cur.y, canvas.width, 22f);
@@ -214,28 +238,71 @@ namespace Outfitted
 			Rect rect3 = new Rect(rect1.xMax - 16f, rect1.yMin + 10f, 16f, 16f);
 			if (Widgets.ButtonImage(rect3, ResourceBank.Textures.AddButton))
 			{
-				List<FloatMenuOption> options = new List<FloatMenuOption>();
-				foreach (StatDef statDef in selectedOutfit.UnassignedStats
+				// Filtered list.
+				var raw = selectedOutfit.UnassignedStats
 					.Where(i => !i.alwaysHide)
-					.Where(i => 
-						string.IsNullOrEmpty(statFilterBuffer) || 
-						i.label.ContainsIgnoreCase(statFilterBuffer) || 
-						i.description.ContainsIgnoreCase(statFilterBuffer))
-					.OrderBy(i => i.label)
-					.OrderBy(i => i.category.displayOrder))
+					.Where(i =>
+						string.IsNullOrEmpty(statFilterBuffer) ||
+						i.label.ContainsIgnoreCase(statFilterBuffer) ||
+						i.description.ContainsIgnoreCase(statFilterBuffer));
+
+				// Create tmp list with applied priorities. They will be calculated here.
+				var projected = raw.Select(i => new
 				{
-					StatDef def = statDef;
+					Stat = i,
+					ModId = i.modContentPack?.PackageId ?? "ludeon.rimworld",
+					ModName = i.modContentPack?.Name ?? "Core",
+					ModPri = GetModPriority(i),
+					Cat = i.category,
+					LabelCap = i.LabelCap
+				});
+
+				// Final list.
+				var ordered = projected
+					.OrderBy(x => x.ModPri)					// Pre-defined order for some mods.
+					.ThenBy(x => x.ModId)                   // All other mods simple alphabetically.
+					.ThenBy(x => x.Cat.displayOrder)        // Then - by category
+					.ThenBy(x => x.Stat.label);             // Finally - by the label
+
+				StatCategoryDef category = null;
+				string modId = null;
+				string modName = null;
+				List<FloatMenuOption> options = new List<FloatMenuOption>();
+				foreach (var item in ordered)
+				{
+					// Add mod name on top of each group.
+					if (OutfittedMod.Settings.displayModName)
+					{
+						if (modId == null || modId != item.ModId)
+						{
+							modId = item.ModId;
+							modName = item.ModName;
+							options.Add(new FloatMenuOption($"<color=orange>{modName}</color>", null));
+							category = null;    // Reset category, to display it in next mod section.
+						}
+					}
+
+					// Add category on top of each group.
+					if (OutfittedMod.Settings.displayCatName)
+					{
+						if (category == null || category != item.Cat)
+						{
+							category = item.Cat;
+							options.Add(new FloatMenuOption($"{category.LabelCap}", null));
+						}
+					}
+
 					FloatMenuOption floatMenuOption = new FloatMenuOption(
-						def.LabelCap, 
+						item.LabelCap,
 						() =>
 						{
-							selectedOutfit.AddStatPriority(def, 0.0f);
+							selectedOutfit.AddStatPriority(item.Stat, 0.0f);
 							guiChanged = true;
 						});
 					options.Add(floatMenuOption);
 				}
 				if (options.Count > 0)
-					Find.WindowStack.Add(new FloatMenu(options));
+					Find.WindowStack.Add(new FloatMenuPreserveOrder(options));
 				else
 					Messages.Message((string)"NoStatOptionsToShow".Translate(), MessageTypeDefOf.RejectInput, false);
 			}
