@@ -111,16 +111,17 @@ namespace Outfitted
 
 		public void CopyFrom(ExtendedOutfit outfit)
 		{
-			this.filter.CopyAllowancesFrom(outfit.filter);
-			this.targetTemperaturesOverride = outfit.targetTemperaturesOverride;
-			this.targetTemperatures = outfit.targetTemperatures;
-			this.PenaltyWornByCorpse = outfit.PenaltyWornByCorpse;
-			this.statPriorities.Clear();
+			filter.CopyAllowancesFrom(outfit.filter);
+			targetTemperaturesOverride = outfit.targetTemperaturesOverride;
+			targetTemperatures = outfit.targetTemperatures;
+			PenaltyWornByCorpse = outfit.PenaltyWornByCorpse;
+			statPriorities.Clear();
 			foreach (StatPriority statPriority in outfit.statPriorities)
-				this.statPriorities.Add(new StatPriority(statPriority.Stat, statPriority.Weight, statPriority.Default));
-			this.AutoWorkPriorities = outfit.AutoWorkPriorities;
-			this._autoTemp = outfit._autoTemp;
-			this.autoTempOffset = outfit.autoTempOffset;
+				statPriorities.Add(new StatPriority(statPriority.Stat, statPriority.Weight));
+			//statPriorities.Add(new StatPriority(statPriority.Stat, statPriority.Weight, statPriority.Default));
+			AutoWorkPriorities = outfit.AutoWorkPriorities;
+			_autoTemp = outfit._autoTemp;
+			autoTempOffset = outfit.autoTempOffset;
 		}
 	}
 }
