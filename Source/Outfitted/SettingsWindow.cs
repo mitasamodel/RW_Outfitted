@@ -26,11 +26,14 @@ namespace Outfitted
 			var listing = new Listing_Standard();
 			listing.Begin(inRect);
 			listing.Label("UI options");
-			listing.CheckboxLabeled("Draggable outfit window", ref Settings.draggableWindow, "Allows to drag the outfit manager window.\n\n" +
+			listing.CheckboxLabeled("Draggable outfit window", ref Settings.draggableWindow, "Allow to drag the outfit manager window.\n\n" +
 				"When it is not a good option: if you intend to use \"drag\" across selections. Obviously, instead of dragging the setting, the window will be dragged."
 				);
-			listing.CheckboxLabeled("Mod names in stat selection", ref Settings.displayModName, "Display mod name on top of each stat list.");
+			listing.CheckboxLabeled("Window does not block iteractions", ref Settings.nonBlockingWindow, "Allow to iteract with objects in background.");
+			listing.CheckboxLabeled("Mod names in stat selection", ref Settings.displayModName, "Display mod name on top of each stat group.");
 			listing.CheckboxLabeled("Category names in stat selection", ref Settings.displayCatName, "Display category of group of stats.");
+			listing.CheckboxLabeled("Use description for filter too", ref Settings.includeDescrForStatSearch, "Filter stat will include description text.\n\n" +
+				"It will increase probability to find a stat, but it will also increase a number of outputted stats, which don't fit to filter directly.");
 
 			listing.GapLine();
 			listing.Label("Score options");

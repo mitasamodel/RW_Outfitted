@@ -26,7 +26,12 @@ namespace Outfitted
 		public static void Postfix(Dialog_ManageApparelPolicies __instance)
 		{
 			if ( OutfittedMod.Settings.draggableWindow) __instance.draggable = true;
+			if (OutfittedMod.Settings.nonBlockingWindow)
+			{
+				__instance.closeOnClickedOutside = false;
+				__instance.absorbInputAroundWindow = false;
+				__instance.preventCameraMotion = false;
+			}
 		}
 	}
-
 }

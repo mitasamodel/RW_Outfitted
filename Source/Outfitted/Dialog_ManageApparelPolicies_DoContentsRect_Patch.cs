@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using LudeonTK;
 
 namespace Outfitted
 {
@@ -212,6 +213,37 @@ namespace Outfitted
 			return PreferredModIndex.TryGetValue(id, out var idx) ? idx : int.MaxValue;
 		}
 
+		[TweakValue("00_",0, 21)]
+		static int modColor = 15;
+		[TweakValue("00_", 0, 21)]
+		static int catColor = 7;
+		
+		public static readonly string[] selectColor = new string[]
+		{
+			"aqua",
+			"black",
+			"blue",
+			"brown",
+			"cyan",
+			"darkblue",
+			"fuchsia",
+			"green",
+			"grey",
+			"lightblue",
+			"lime",
+			"magenta",
+			"maroon",
+			"navy",
+			"olive",
+			"orange",
+			"purple",
+			"red",
+			"silver",
+			"teal",
+			"white",
+			"yellow"
+		};
+
 		private static void DrawApparelStats(ExtendedOutfit selectedOutfit, Vector2 cur, Rect canvas)
 		{
 			Rect rect1 = new Rect(cur.x, cur.y, canvas.width, 22f);
@@ -238,30 +270,20 @@ namespace Outfitted
 			if (Widgets.ButtonImage(rect3, ResourceBank.Textures.AddButton))
 			{
 				// Filtered list.
-				var raw = selectedOutfit.UnassignedStats
+				var filtered = selectedOutfit.UnassignedStats
 					.Where(i => !i.alwaysHide)
 					.Where(i =>
 						string.IsNullOrEmpty(statFilterBuffer) ||
 						i.label.ContainsIgnoreCase(statFilterBuffer) ||
-						i.description.ContainsIgnoreCase(statFilterBuffer));
-
-				// Create tmp list with applied priorities. They will be calculated here.
-				var projected = raw.Select(i => new
-				{
-					Stat = i,
-					ModId = i.modContentPack?.PackageId ?? "ludeon.rimworld",
-					ModName = i.modContentPack?.Name ?? "Core",
-					ModPri = GetModPriority(i),
-					Cat = i.category,
-					LabelCap = i.LabelCap
-				});
+						i.defName.ContainsIgnoreCase(statFilterBuffer) ||
+						(OutfittedMod.Settings.includeDescrForStatSearch && i.description.ContainsIgnoreCase(statFilterBuffer)));
 
 				// Final list.
-				var ordered = projected
-					.OrderBy(x => x.ModPri)					// Pre-defined order for some mods.
-					.ThenBy(x => x.ModId)                   // All other mods simple alphabetically.
-					.ThenBy(x => x.Cat.displayOrder)        // Then - by category
-					.ThenBy(x => x.Stat.label);             // Finally - by the label
+				var ordered = filtered
+					.OrderBy(x => GetModPriority(x))            // Pre-defined order for some mods.
+					.ThenBy(x => x.modContentPack.PackageId)    // All other mods simple alphabetically.
+					.ThenBy(x => x.category.displayOrder)       // Then - by category
+					.ThenBy(x => x.label);                      // Finally - by the label
 
 				StatCategoryDef category = null;
 				string modId = null;
@@ -272,11 +294,11 @@ namespace Outfitted
 					// Add mod name on top of each group.
 					if (OutfittedMod.Settings.displayModName)
 					{
-						if (modId == null || modId != item.ModId)
+						if (modId == null || modId != item.modContentPack.PackageId)
 						{
-							modId = item.ModId;
-							modName = item.ModName;
-							options.Add(new FloatMenuOption($"<color=orange>{modName}</color>", null));
+							modId = item.modContentPack.PackageId;
+							modName = item.modContentPack.Name;
+							options.Add(new FloatMenuOption($"<color={selectColor[modColor]}>{modName}</color>", null));
 							category = null;    // Reset category, to display it in next mod section.
 						}
 					}
@@ -284,10 +306,10 @@ namespace Outfitted
 					// Add category on top of each group.
 					if (OutfittedMod.Settings.displayCatName)
 					{
-						if (category == null || category != item.Cat)
+						if (category == null || category != item.category)
 						{
-							category = item.Cat;
-							options.Add(new FloatMenuOption($"{category.LabelCap}", null));
+							category = item.category;
+							options.Add(new FloatMenuOption($"<color={selectColor[catColor]}>{category.LabelCap}</color>", null));
 						}
 					}
 
@@ -295,7 +317,7 @@ namespace Outfitted
 						item.LabelCap,
 						() =>
 						{
-							selectedOutfit.AddStatPriority(item.Stat, 0.0f);
+							selectedOutfit.AddStatPriority(item, 0.0f);
 							guiChanged = true;
 						});
 					options.Add(floatMenuOption);
