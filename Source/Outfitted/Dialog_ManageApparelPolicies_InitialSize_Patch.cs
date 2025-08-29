@@ -31,6 +31,7 @@ namespace Outfitted
 				__instance.closeOnClickedOutside = false;
 				__instance.absorbInputAroundWindow = false;
 				__instance.preventCameraMotion = false;
+				__instance.forcePause = false;
 			}
 		}
 	}

@@ -29,7 +29,8 @@ namespace Outfitted
 			listing.CheckboxLabeled("Draggable outfit window", ref Settings.draggableWindow, "Allow to drag the outfit manager window.\n\n" +
 				"When it is not a good option: if you intend to use \"drag\" across selections. Obviously, instead of dragging the setting, the window will be dragged."
 				);
-			listing.CheckboxLabeled("Window does not block iteractions", ref Settings.nonBlockingWindow, "Allow to iteract with objects in background.");
+			listing.CheckboxLabeled("Window does not block iteractions", ref Settings.nonBlockingWindow, "Allow to iteract with objects in background.\n\n"+
+				"Allows: click on objects, move camera, don't force pause.");
 			listing.CheckboxLabeled("Mod names in stat selection", ref Settings.displayModName, "Display mod name on top of each stat group.");
 			listing.CheckboxLabeled("Category names in stat selection", ref Settings.displayCatName, "Display category of group of stats.");
 			listing.CheckboxLabeled("Use description for filter too", ref Settings.includeDescrForStatSearch, "Filter stat will include description text.\n\n" +
