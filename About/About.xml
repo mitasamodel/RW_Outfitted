@@ -31,4 +31,12 @@ Thanks to:
 			<downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
 		</li>
 	</modDependencies>
+	<modDependencies>
+		<li>
+			<packageId>mitasamodel.justutils</packageId>
+			<displayName>JustUtils</displayName>
+			<steamWorkshopUrl></steamWorkshopUrl>
+			<downloadUrl>https://github.com/mitasamodel/RW_JustUtils</downloadUrl>
+		</li>
+	</modDependencies>
 </ModMetaData>

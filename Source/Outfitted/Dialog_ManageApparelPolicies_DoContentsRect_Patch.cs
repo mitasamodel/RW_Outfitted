@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using RimWorld;
-using RW_JustUtils;
-using RW_Utils;
+using Outfitted.RW_JustUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
