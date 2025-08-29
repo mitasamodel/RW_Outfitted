@@ -225,14 +225,19 @@ namespace Outfitted
 					.OrderBy(i => i.category.displayOrder))
 				{
 					StatDef def = statDef;
-					FloatMenuOption floatMenuOption = new FloatMenuOption(def.LabelCap, (Action)(() =>
-					{
-						selectedOutfit.AddStatPriority(def, 0.0f);
-						guiChanged = true;
-					}));
+					FloatMenuOption floatMenuOption = new FloatMenuOption(
+						def.LabelCap, 
+						() =>
+						{
+							selectedOutfit.AddStatPriority(def, 0.0f);
+							guiChanged = true;
+						});
 					options.Add(floatMenuOption);
 				}
-				Find.WindowStack.Add(new FloatMenu(options));
+				if (options.Count > 0)
+					Find.WindowStack.Add(new FloatMenu(options));
+				else
+					Messages.Message((string)"NoStatOptionsToShow".Translate(), MessageTypeDefOf.RejectInput, false);
 			}
 			TooltipHandler.TipRegion(rect3, new TipSignal(ResourceBank.Strings.StatPriorityAdd));
 			GUI.color = Color.grey;
@@ -320,7 +325,7 @@ namespace Outfitted
 			for (var y = cur.y; y < cur.y + 30; y += 5)
 				Widgets.DrawLineVertical(((rect2.xMin + rect2.xMax) / 2f), y, 3f);
 			GUI.color = AssigmentColor(statPriority);
-			double weight = (double)statPriority.Weight;
+			double weight = statPriority.Weight;
 			float num = GUI.HorizontalSlider(rect2, statPriority.Weight, -2.5f, 2.5f);
 			if (Mathf.Abs(num - statPriority.Weight) > 0.0001)
 			{
