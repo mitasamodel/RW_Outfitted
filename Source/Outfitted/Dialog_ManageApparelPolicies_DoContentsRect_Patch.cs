@@ -6,6 +6,7 @@
 
 using HarmonyLib;
 using RimWorld;
+using RW_Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -205,9 +206,9 @@ namespace Outfitted
 			Text.Anchor = TextAnchor.UpperLeft;
 			cur.y += 5f;
 			Rect rect2 = new Rect(cur.x, cur.y, canvas.width - 20f, 24f);
-			if (Dialog_ManageApparelPolicies_DoContentsRect_Patch.statFilterBuffer == null)
-				Dialog_ManageApparelPolicies_DoContentsRect_Patch.statFilterBuffer = "";
-			if (string.IsNullOrEmpty(Dialog_ManageApparelPolicies_DoContentsRect_Patch.statFilterBuffer) && Event.current.type == EventType.Repaint)
+			if (statFilterBuffer == null)
+				statFilterBuffer = "";
+			if (string.IsNullOrEmpty(statFilterBuffer) && Event.current.type == EventType.Repaint)
 			{
 				GUI.color = Color.gray;
 				Text.Anchor = TextAnchor.MiddleLeft;
@@ -215,13 +216,20 @@ namespace Outfitted
 				Text.Anchor = TextAnchor.UpperLeft;
 				GUI.color = Color.white;
 			}
-			Dialog_ManageApparelPolicies_DoContentsRect_Patch.statFilterBuffer = Widgets.TextField(rect2, Dialog_ManageApparelPolicies_DoContentsRect_Patch.statFilterBuffer);
+			statFilterBuffer = Widgets.TextField(rect2, statFilterBuffer);
 			cur.y += 29f;
 			Rect rect3 = new Rect(rect1.xMax - 16f, rect1.yMin + 10f, 16f, 16f);
 			if (Widgets.ButtonImage(rect3, ResourceBank.Textures.AddButton))
 			{
 				List<FloatMenuOption> options = new List<FloatMenuOption>();
-				foreach (StatDef statDef in (IEnumerable<StatDef>)selectedOutfit.UnassignedStats.Where<StatDef>((Func<StatDef, bool>)(i => !i.alwaysHide)).Where<StatDef>((Func<StatDef, bool>)(i => string.IsNullOrEmpty(Dialog_ManageApparelPolicies_DoContentsRect_Patch.statFilterBuffer) || i.label.ToLower().Contains(Dialog_ManageApparelPolicies_DoContentsRect_Patch.statFilterBuffer.ToLower()) || i.description.ToLower().Contains(Dialog_ManageApparelPolicies_DoContentsRect_Patch.statFilterBuffer.ToLower()))).OrderBy<StatDef, string>((Func<StatDef, string>)(i => i.label)).OrderBy<StatDef, int>((Func<StatDef, int>)(i => i.category.displayOrder)))
+				foreach (StatDef statDef in selectedOutfit.UnassignedStats
+					.Where(i => !i.alwaysHide)
+					.Where(i => 
+						string.IsNullOrEmpty(statFilterBuffer) || 
+						i.label.ContainsIgnoreCase(statFilterBuffer) || 
+						i.description.ContainsIgnoreCase(statFilterBuffer))
+					.OrderBy(i => i.label)
+					.OrderBy(i => i.category.displayOrder))
 				{
 					StatDef def = statDef;
 					FloatMenuOption floatMenuOption = new FloatMenuOption((string)def.LabelCap, (Action)(() =>
