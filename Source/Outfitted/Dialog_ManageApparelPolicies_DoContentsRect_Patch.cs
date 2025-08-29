@@ -1,10 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: Outfitted.Dialog_ManageApparelPolicies_DoContentsRect_Patch
-// Assembly: Outfitted, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 7FA0F5BF-790B-428D-866C-5D33983FFC76
-// Assembly location: D:\SteamLibrary\steamapps\workshop\content\294100\3454809174\1.5\Assemblies\Outfitted.dll
-
-using HarmonyLib;
+﻿using HarmonyLib;
 using RimWorld;
 using RW_Utils;
 using System;
@@ -13,7 +7,6 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-#nullable disable
 namespace Outfitted
 {
 	[HarmonyPatch(typeof(Dialog_ManageApparelPolicies), "DoContentsRect")]
@@ -80,7 +73,7 @@ namespace Outfitted
 					if (outfit != selectedOutfit)
 						options.Add(new FloatMenuOption(outfit.label, (Action)(() => selectedOutfit.CopyFrom((ExtendedOutfit)outfit))));
 				}
-				Find.WindowStack.Add((Window)new FloatMenu(options));
+				Find.WindowStack.Add(new FloatMenu(options));
 			}
 		}
 
@@ -94,7 +87,7 @@ namespace Outfitted
 			Widgets.CheckboxLabeled(rect, ResourceBank.Strings.PenaltyWornByCorpse, ref selectedOutfit.PenaltyWornByCorpse);
 			int num2 = selectedOutfit.PenaltyWornByCorpse ? 1 : 0;
 			if (num1 != num2)
-				Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+				guiChanged = true;
 			TooltipHandler.TipRegion(rect, new TipSignal(ResourceBank.Strings.PenaltyWornByCorpseTooltip));
 			cur.y += rect.height;
 		}
@@ -109,7 +102,7 @@ namespace Outfitted
 			Widgets.CheckboxLabeled(rect, ResourceBank.Strings.AutoWorkPriorities, ref outfit.AutoWorkPriorities);
 			int num2 = outfit.AutoWorkPriorities ? 1 : 0;
 			if (num1 != num2)
-				Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+				guiChanged = true;
 			TooltipHandler.TipRegion(rect, new TipSignal(ResourceBank.Strings.AutoWorkPrioritiesTooltip));
 			pos.y += rect.height;
 		}
@@ -122,7 +115,7 @@ namespace Outfitted
 			if (autoTemp != outfit.AutoTemp)
 			{
 				outfit.AutoTemp = autoTemp;
-				Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+				guiChanged = true;
 			}
 			TooltipHandler.TipRegion(rect, new TipSignal(ResourceBank.Strings.AutoTempTooltip));
 			pos.y += rect.height;
@@ -139,7 +132,7 @@ namespace Outfitted
 			Widgets.IntEntry(rect, ref outfit.autoTempOffset, ref editBuffer);
 			int autoTempOffset2 = outfit.autoTempOffset;
 			if (autoTempOffset1 != autoTempOffset2)
-				Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+				guiChanged = true;
 			TooltipHandler.TipRegion(rect, new TipSignal(ResourceBank.Strings.AutoTempOffsetTooltip));
 			pos.y += rect.height;
 		}
@@ -170,28 +163,28 @@ namespace Outfitted
 			}
 			else
 			{
-				range = Dialog_ManageApparelPolicies_DoContentsRect_Patch.MinMaxTemperatureRange;
+				range = MinMaxTemperatureRange;
 				GUI.color = Color.grey;
 			}
-			FloatRange temperatureRange = Dialog_ManageApparelPolicies_DoContentsRect_Patch.MinMaxTemperatureRange;
+			FloatRange temperatureRange = MinMaxTemperatureRange;
 			FloatRange floatRange = range;
 			Widgets_FloatRange.FloatRange(canvas1, 123123123, ref range, temperatureRange, ToStringStyle.Temperature);
 			if ((double)Math.Abs(floatRange.min - range.min) > 0.0001 || (double)Math.Abs(floatRange.max - range.max) > 0.0001)
-				Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+				guiChanged = true;
 			GUI.color = Color.white;
 			if ((double)Math.Abs(range.min - selectedOutfit.targetTemperatures.min) > 0.0001 || (double)Math.Abs(range.max - selectedOutfit.targetTemperatures.max) > 0.0001)
 			{
 				selectedOutfit.targetTemperatures = range;
 				selectedOutfit.targetTemperaturesOverride = true;
-				Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+				guiChanged = true;
 			}
 			if (!selectedOutfit.targetTemperaturesOverride)
 				return;
 			if (Widgets.ButtonImage(rect2, ResourceBank.Textures.ResetButton))
 			{
 				selectedOutfit.targetTemperaturesOverride = false;
-				selectedOutfit.targetTemperatures = Dialog_ManageApparelPolicies_DoContentsRect_Patch.MinMaxTemperatureRange;
-				Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+				selectedOutfit.targetTemperatures = MinMaxTemperatureRange;
+				guiChanged = true;
 			}
 			TooltipHandler.TipRegion(rect2, new TipSignal(ResourceBank.Strings.TemperatureRangeReset));
 		}
@@ -232,34 +225,34 @@ namespace Outfitted
 					.OrderBy(i => i.category.displayOrder))
 				{
 					StatDef def = statDef;
-					FloatMenuOption floatMenuOption = new FloatMenuOption((string)def.LabelCap, (Action)(() =>
+					FloatMenuOption floatMenuOption = new FloatMenuOption(def.LabelCap, (Action)(() =>
 					{
 						selectedOutfit.AddStatPriority(def, 0.0f);
-						Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+						guiChanged = true;
 					}));
 					options.Add(floatMenuOption);
 				}
-				Find.WindowStack.Add((Window)new FloatMenu(options));
+				Find.WindowStack.Add(new FloatMenu(options));
 			}
 			TooltipHandler.TipRegion(rect3, new TipSignal(ResourceBank.Strings.StatPriorityAdd));
 			GUI.color = Color.grey;
 			Widgets.DrawLineHorizontal(cur.x, cur.y, canvas.width);
 			GUI.color = Color.white;
 			cur.y += 10f;
-			List<StatPriority> list = selectedOutfit.StatPriorities.ToList<StatPriority>();
+			List<StatPriority> list = selectedOutfit.StatPriorities.ToList();
 			Rect outRect = new Rect(cur.x, cur.y, canvas.width, canvas.height - cur.y);
 
 			Rect rect4 = new Rect(outRect);
 			rect4.height = 30f * list.Count;
 
-			if ((double)rect4.height > (double)outRect.height)
+			if (rect4.height > outRect.height)
 				rect4.width -= 20f;
-			Widgets.BeginScrollView(outRect, ref Dialog_ManageApparelPolicies_DoContentsRect_Patch.scrollPosition, rect4);
+			Widgets.BeginScrollView(outRect, ref scrollPosition, rect4);
 			GUI.BeginGroup(rect4);
 			cur = Vector2.zero;
 			if (list.Count > 0)
 			{
-				Rect rect5 = new Rect(cur.x + (float)(((double)rect4.width - 24.0) / 2.0), cur.y, (float)(((double)rect4.width - 24.0) / 2.0), 20f);
+				Rect rect5 = new Rect(cur.x + ((rect4.width - 24.0f) / 2.0f), cur.y, ((rect4.width - 24.0f) / 2.0f), 20f);
 				Text.Font = GameFont.Tiny;
 				GUI.color = Color.grey;
 				Text.Anchor = TextAnchor.LowerLeft;
@@ -271,7 +264,7 @@ namespace Outfitted
 				GUI.color = Color.white;
 				cur.y += 15f;
 				foreach (StatPriority statPriority in list)
-					Dialog_ManageApparelPolicies_DoContentsRect_Patch.DrawStatRow(selectedOutfit, statPriority, ref cur, rect4.width);
+					DrawStatRow(selectedOutfit, statPriority, ref cur, rect4.width);
 			}
 			else
 			{
@@ -294,45 +287,45 @@ namespace Outfitted
 		  ref Vector2 cur,
 		  float width)
 		{
-			Rect rect1 = new Rect(cur.x, cur.y, (float)(((double)width - 24.0) / 2.0), 30f);
+			Rect rect1 = new Rect(cur.x, cur.y, ((width - 24f) / 2f), 30f);
 			Rect rect2 = new Rect(rect1.xMax + 4f, cur.y + 5f, rect1.width, 25f);
 			Rect rect3 = new Rect(rect2.xMax + 4f, cur.y + 3f, 16f, 16f);
-			Text.Font = (double)Text.CalcHeight((string)statPriority.Stat.LabelCap, rect1.width) > (double)rect1.height ? GameFont.Tiny : GameFont.Small;
-			GUI.color = Dialog_ManageApparelPolicies_DoContentsRect_Patch.AssigmentColor(statPriority);
+			Text.Font = Text.CalcHeight(statPriority.Stat.LabelCap, rect1.width) > rect1.height ? GameFont.Tiny : GameFont.Small;
+			GUI.color = AssigmentColor(statPriority);
 			Widgets.Label(rect1, statPriority.Stat.LabelCap);
 			Text.Font = GameFont.Small;
 			string text = string.Empty;
 			if (statPriority.IsManual)
 			{
-				text = ResourceBank.Strings.StatPriorityDelete((string)statPriority.Stat.LabelCap);
+				text = ResourceBank.Strings.StatPriorityDelete(statPriority.Stat.LabelCap);
 				if (Widgets.ButtonImage(rect3, ResourceBank.Textures.DeleteButton))
 				{
 					selectedOutfit.RemoveStatPriority(statPriority.Stat);
-					Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+					guiChanged = true;
 				}
 			}
 			else if (statPriority.IsOverride)
 			{
-				text = ResourceBank.Strings.StatPriorityReset((string)statPriority.Stat.LabelCap);
+				text = ResourceBank.Strings.StatPriorityReset(statPriority.Stat.LabelCap);
 				if (Widgets.ButtonImage(rect3, ResourceBank.Textures.ResetButton))
 				{
-					double weight1 = (double)statPriority.Weight;
+					float weight1 = statPriority.Weight;
 					statPriority.Weight = statPriority.Default;
-					double weight2 = (double)statPriority.Weight;
+					float weight2 = statPriority.Weight;
 					if (weight1 != weight2)
-						Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+						guiChanged = true;
 				}
 			}
 			GUI.color = new Color(0.3f, 0.3f, 0.3f);
-			for (int y = (int)cur.y; (double)y < (double)cur.y + 30.0; y += 5)
-				Widgets.DrawLineVertical((float)(((double)rect2.xMin + (double)rect2.xMax) / 2.0), (float)y, 3f);
-			GUI.color = Dialog_ManageApparelPolicies_DoContentsRect_Patch.AssigmentColor(statPriority);
+			for (var y = cur.y; y < cur.y + 30; y += 5)
+				Widgets.DrawLineVertical(((rect2.xMin + rect2.xMax) / 2f), y, 3f);
+			GUI.color = AssigmentColor(statPriority);
 			double weight = (double)statPriority.Weight;
 			float num = GUI.HorizontalSlider(rect2, statPriority.Weight, -2.5f, 2.5f);
-			if ((double)Mathf.Abs(num - statPriority.Weight) > 0.0001)
+			if (Mathf.Abs(num - statPriority.Weight) > 0.0001)
 			{
 				statPriority.Weight = num;
-				Dialog_ManageApparelPolicies_DoContentsRect_Patch.guiChanged = true;
+				guiChanged = true;
 			}
 			GUI.color = Color.white;
 			TooltipHandler.TipRegion(rect1, new TipSignal(statPriority.Stat.LabelCap + "\n\n" + statPriority.Stat.description));
