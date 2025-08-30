@@ -245,7 +245,7 @@ namespace Outfitted
 				if (stat == StatDefOf_CE.CarryBulk)
 					result -= apparel.GetStatValue(StatDefOf_CE.WornBulk);
 				else if (stat == StatDefOf_CE.CarryWeight)
-					result -= apparel.GetStatValue(RimWorld.StatDefOf.Mass);
+					result -= apparel.GetStatValue(StatDefOf_Rimworld.Mass);
 			}
 
 			return result;
