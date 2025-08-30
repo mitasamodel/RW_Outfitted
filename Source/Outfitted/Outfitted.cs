@@ -115,13 +115,13 @@ namespace Outfitted
 		{
 			if (pawn == null || apparel?.def?.apparel == null) return 0f;
 
-			//var skinLayer = ApparelLayerDefOf.OnSkin;
-			//var legs = BodyPartGroupDefOf.Legs;
+			// Exclude this apparel if it is a run to get real score.
+			Apparel exclude = whatIfNotWorn ? apparel : null;
 
 			// Pawn wants pants
 			if (IsDefPants(apparel.def))
 			{
-				if (PawnCareAboutNaked(pawn) && (!PawnWearPants(pawn) || whatIfNotWorn))
+				if (PawnCareAboutNaked(pawn) && !PawnWearPants(pawn, exclude))
 				{
 					return nakedOffset;
 				}
@@ -129,13 +129,16 @@ namespace Outfitted
 			// Pawn wants shirt
 			else if (IsDefShirt(apparel.def))
 			{
-				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && (!PawnWearShirt(pawn) || whatIfNotWorn))
+				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && !PawnWearShirt(pawn, exclude))
 				{
 					return nakedOffset;
 				}
 			}
 
 			return 0f;
+
+			//var skinLayer = ApparelLayerDefOf.OnSkin;
+			//var legs = BodyPartGroupDefOf.Legs;
 		}
 
 		private static bool PawnCareAboutTorso(Pawn pawn)
@@ -154,21 +157,21 @@ namespace Outfitted
 		}
 
 		// Pawn wear shirt or smth, what covers torso.
-		private static bool PawnWearShirt(Pawn pawn)
+		private static bool PawnWearShirt(Pawn pawn, Apparel exclude)
 		{
 			var worn = pawn.apparel?.WornApparel;
 			if (worn == null) return false;
 
-			return worn.Any(ap => IsDefShirt(ap.def));
+			return worn.Any(ap => ap != exclude && IsDefShirt(ap.def));
 		}
 
 		// Pawn wear pants or smth, what covers same area.
-		private static bool PawnWearPants(Pawn pawn)
+		private static bool PawnWearPants(Pawn pawn, Apparel exclude)
 		{
 			var worn = pawn.apparel?.WornApparel;
 			if (worn == null) return false;
 
-			return worn.Any(ap => IsDefPants(ap.def));
+			return worn.Any(ap => ap != exclude && IsDefPants(ap.def));
 		}
 
 		// Can be used as pants?
@@ -313,12 +316,14 @@ namespace Outfitted
 				FloatRange curComfTemp = pawn.ComfortableTemperatureRange();
 
 				// Target temperature.
+				FloatRange targetTemp;
 				if (outfit.AutoTemp)
 				{
 					float seasonalTemp = pawn.Map.mapTemperature.SeasonalTemp;
-					outfit.targetTemperatures = new FloatRange(seasonalTemp - outfit.autoTempOffset, seasonalTemp + outfit.autoTempOffset);
+					targetTemp = new FloatRange(seasonalTemp - outfit.autoTempOffset, seasonalTemp + outfit.autoTempOffset);
 				}
-				FloatRange targetTemp = outfit.targetTemperatures;
+				else
+					targetTemp = outfit.targetTemperatures;
 
 				FloatRange newApparelInsulation = GetInsulationStats(apparel);
 
@@ -336,7 +341,7 @@ namespace Outfitted
 
 				// Check if can be worn together with existed.
 				// Skip if it is check for already worn apparel for whatIfNotWorn.
-				if (!whatIfNotWorn && !pawn.apparel.WornApparel.Contains(apparel))
+				if (!whatIfNotWorn && pawn.apparel != null && !pawn.apparel.WornApparel.Contains(apparel))
 				{
 					foreach (Apparel apWorn in pawn.apparel.WornApparel)
 					{
