@@ -237,9 +237,9 @@ namespace Outfitted
 			// CE
 			if (ModsConfig.IsActive("CETeam.CombatExtended"))
 			{
-				if (stat == CE_CompatDefOf.CarryBulk)
-					result -= apparel.GetStatValue(CE_CompatDefOf.WornBulk);
-				else if (stat == CE_CompatDefOf.CarryWeight)
+				if (stat == StatDefOf_CE.CarryBulk)
+					result -= apparel.GetStatValue(StatDefOf_CE.WornBulk);
+				else if (stat == StatDefOf_CE.CarryWeight)
 					result -= apparel.GetStatValue(RimWorld.StatDefOf.Mass);
 			}
 

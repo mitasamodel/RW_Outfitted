@@ -1,10 +1,5 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: Outfitted.WorkPriorities
-// Assembly: Outfitted, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 7FA0F5BF-790B-428D-866C-5D33983FFC76
-// Assembly location: D:\SteamLibrary\steamapps\workshop\content\294100\3454809174\1.5\Assemblies\Outfitted.dll
-
-using RimWorld.Planet;
+﻿using RimWorld.Planet;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -104,108 +99,108 @@ namespace Outfitted
 			List<StatPriority> list = new List<StatPriority>();
 			if (worktype == WorkTypeDefOf.Art)
 			{
-				list.Add(new StatPriority(StatDefOf.WorkSpeedGlobal, 1f));
-				list.Add(new StatPriority(StatDefOf.GeneralLaborSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.WorkSpeedGlobal, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.GeneralLaborSpeed, 2f));
 			}
 			if (worktype == WorkTypeDefOf.BasicWorker)
 			{
-				list.Add(new StatPriority(StatDefOf.WorkSpeedGlobal, 1f));
-				list.Add(new StatPriority(StatDefOf.GeneralLaborSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.WorkSpeedGlobal, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.GeneralLaborSpeed, 2f));
 			}
 			if (worktype == WorkTypeDefOf.Cleaning)
 			{
-				list.Add(new StatPriority(StatDefOf.MoveSpeed, 2f));
-				list.Add(new StatPriority(StatDefOf.WorkSpeedGlobal, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MoveSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.WorkSpeedGlobal, 1f));
 			}
 			if (worktype == WorkTypeDefOf.Cooking)
 			{
-				list.Add(new StatPriority(StatDefOf.CookSpeed, 2f));
-				list.Add(new StatPriority(StatDefOf.FoodPoisonChance, -2f));
-				list.Add(new StatPriority(StatDefOf.ButcheryFleshSpeed, 1f));
-				list.Add(new StatPriority(StatDefOf.ButcheryFleshEfficiency, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.CookSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.FoodPoisonChance, -2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.ButcheryFleshSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.ButcheryFleshEfficiency, 1f));
 			}
 			if (worktype == WorkTypeDefOf.Construction)
 			{
-				list.Add(new StatPriority(StatDefOf.ConstructionSpeed, 2f));
-				list.Add(new StatPriority(StatDefOf.ConstructSuccessChance, 2f));
-				list.Add(new StatPriority(StatDefOf.FixBrokenDownBuildingSuccessChance, 1f));
-				list.Add(new StatPriority(StatDefOf.SmoothingSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.ConstructionSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.ConstructSuccessChance, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.FixBrokenDownBuildingSuccessChance, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.SmoothingSpeed, 1f));
 			}
 			if (worktype == WorkTypeDefOf.Crafting)
 			{
-				list.Add(new StatPriority(StatDefOf.WorkSpeedGlobal, 2f));
-				list.Add(new StatPriority(StatDefOf.DrugSynthesisSpeed, 1f));
-				list.Add(new StatPriority(StatDefOf.DrugCookingSpeed, 1f));
-				list.Add(new StatPriority(StatDefOf.ButcheryMechanoidSpeed, 1f));
-				list.Add(new StatPriority(StatDefOf.ButcheryMechanoidEfficiency, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.WorkSpeedGlobal, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.DrugSynthesisSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.DrugCookingSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.ButcheryMechanoidSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.ButcheryMechanoidEfficiency, 1f));
 			}
 			if (worktype == WorkTypeDefOf.Doctor)
 			{
-				list.Add(new StatPriority(StatDefOf.MedicalTendSpeed, 1f));
-				list.Add(new StatPriority(StatDefOf.MedicalTendQuality, 2f));
-				list.Add(new StatPriority(StatDefOf.MedicalOperationSpeed, 1f));
-				list.Add(new StatPriority(StatDefOf.MedicalSurgerySuccessChance, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MedicalTendSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MedicalTendQuality, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MedicalOperationSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MedicalSurgerySuccessChance, 2f));
 			}
 			if (worktype == WorkTypeDefOf.Firefighter)
-				list.Add(new StatPriority(StatDefOf.MoveSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MoveSpeed, 2f));
 			if (worktype == WorkTypeDefOf.Growing)
 			{
-				list.Add(new StatPriority(StatDefOf.PlantWorkSpeed, 2f));
-				list.Add(new StatPriority(StatDefOf.PlantHarvestYield, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.PlantWorkSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.PlantHarvestYield, 2f));
 			}
 			if (worktype == WorkTypeDefOf.Handling)
 			{
-				list.Add(new StatPriority(StatDefOf.MoveSpeed, 1f));
-				list.Add(new StatPriority(StatDefOf.TameAnimalChance, 2f));
-				list.Add(new StatPriority(StatDefOf.TrainAnimalChance, 2f));
-				list.Add(new StatPriority(StatDefOf.AnimalGatherSpeed, 1f));
-				list.Add(new StatPriority(StatDefOf.AnimalGatherYield, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MoveSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.TameAnimalChance, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.TrainAnimalChance, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.AnimalGatherSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.AnimalGatherYield, 1f));
 			}
 			if (worktype == WorkTypeDefOf.Hauling)
 			{
-				list.Add(new StatPriority(StatDefOf.CarryingCapacity, 2f));
-				list.Add(new StatPriority(StatDefOf.MoveSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.CarryingCapacity, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MoveSpeed, 2f));
 			}
 			if (worktype == WorkTypeDefOf.Hunting)
 			{
-				list.Add(new StatPriority(StatDefOf.MoveSpeed, 1f));
-				list.Add(new StatPriority(StatDefOf.ShootingAccuracyPawn, 2f));
-				list.Add(new StatPriority(StatDefOf.AimingDelayFactor, 1f));
-				list.Add(new StatPriority(StatDefOf.HuntingStealth, 2f));
-				list.Add(new StatPriority(StatDefOf.AccuracyTouch, 1f));
-				list.Add(new StatPriority(StatDefOf.AccuracyShort, 1f));
-				list.Add(new StatPriority(StatDefOf.AccuracyMedium, 1f));
-				list.Add(new StatPriority(StatDefOf.AccuracyLong, 2f));
-				list.Add(new StatPriority(StatDefOf.RangedWeapon_Cooldown, 1f));
-				list.Add(new StatPriority(StatDefOf.RangedWeapon_DamageMultiplier, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MoveSpeed, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.ShootingAccuracyPawn, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.AimingDelayFactor, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.HuntingStealth, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.AccuracyTouch, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.AccuracyShort, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.AccuracyMedium, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.AccuracyLong, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.RangedWeapon_Cooldown, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.RangedWeapon_DamageMultiplier, 1f));
 			}
 			if (worktype == WorkTypeDefOf.Mining)
 			{
-				list.Add(new StatPriority(StatDefOf.MiningSpeed, 2f));
-				list.Add(new StatPriority(StatDefOf.MiningYield, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MiningSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.MiningYield, 2f));
 			}
 			if (worktype == WorkTypeDefOf.PlantCutting)
 			{
-				list.Add(new StatPriority(StatDefOf.PlantWorkSpeed, 2f));
-				list.Add(new StatPriority(StatDefOf.PlantHarvestYield, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.PlantWorkSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.PlantHarvestYield, 2f));
 			}
 			if (worktype == WorkTypeDefOf.Research)
-				list.Add(new StatPriority(StatDefOf.ResearchSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.ResearchSpeed, 2f));
 			if (worktype == WorkTypeDefOf.Smithing)
 			{
-				list.Add(new StatPriority(StatDefOf.WorkSpeedGlobal, 1f));
-				list.Add(new StatPriority(StatDefOf.GeneralLaborSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.WorkSpeedGlobal, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.GeneralLaborSpeed, 2f));
 			}
 			if (worktype == WorkTypeDefOf.Tailoring)
 			{
-				list.Add(new StatPriority(StatDefOf.WorkSpeedGlobal, 1f));
-				list.Add(new StatPriority(StatDefOf.GeneralLaborSpeed, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.WorkSpeedGlobal, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.GeneralLaborSpeed, 2f));
 			}
 			if (worktype == WorkTypeDefOf.Warden)
 			{
-				list.Add(new StatPriority(StatDefOf.NegotiationAbility, 2f));
-				list.Add(new StatPriority(StatDefOf.TradePriceImprovement, 1f));
-				list.Add(new StatPriority(StatDefOf.SocialImpact, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.NegotiationAbility, 2f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.TradePriceImprovement, 1f));
+				list.Add(new StatPriority(StatDefOf_Rimworld.SocialImpact, 2f));
 			}
 			list.RemoveDuplicates<StatPriority>();
 			return list;

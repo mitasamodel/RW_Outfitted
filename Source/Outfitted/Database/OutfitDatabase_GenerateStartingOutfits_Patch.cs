@@ -15,7 +15,7 @@ namespace Outfitted.Database
 		{
 			try
 			{
-				OutfitDatabase_GenerateStartingOutfits_Patch.GenerateStartingOutfits(__instance);
+				GenerateStartingOutfits(__instance);
 			}
 			catch (Exception ex)
 			{
@@ -28,229 +28,232 @@ namespace Outfitted.Database
 		{
 			if (vanilla)
 			{
-				OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfit(
-					OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Anything", true),
-					new Dictionary<StatDef, float>()
-					{
-						{ global::Outfitted.StatDefOf.MoveSpeed, 1f },
-						{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 2f },
-						{ global::Outfitted.StatDefOf.ArmorRating_Blunt, 1f },
-						{ global::Outfitted.StatDefOf.ArmorRating_Sharp, 1f }
-					});
+				ConfigureOutfit(
+					MakeOutfit(db, "Anything", true),
+					StatDefOfHelper.MakeDict(
+						(StatDefOf_Rimworld.MoveSpeed, 1f),
+						(StatDefOf_Rimworld.WorkSpeedGlobal, 2f),
+						(StatDefOf_Rimworld.ArmorRating_Blunt, 1f),
+						(StatDefOf_Rimworld.ArmorRating_Sharp, 1f)
+					)
+				);
 
-				OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-					OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Worker", true),
-					new Dictionary<StatDef, float>()
-					{
-						{ global::Outfitted.StatDefOf.MoveSpeed, 0.0f },
-						{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f }
-					});
+				ConfigureOutfitWorker(
+					MakeOutfit(db, "Worker", true),
+					StatDefOfHelper.MakeDict(
+						(StatDefOf_Rimworld.MoveSpeed, 0f),
+						(StatDefOf_Rimworld.WorkSpeedGlobal, 1f),
+						(StatDefOf_CE.CarryBulk, 1f),
+						(StatDefOf_CE.CarryWeight, 0.5f)
+					)
+				);
 			}
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Doctor"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.MedicalSurgerySuccessChance, 2f },
-					{ global::Outfitted.StatDefOf.MedicalOperationSpeed, 2f },
-					{ global::Outfitted.StatDefOf.MedicalTendQuality, 2f },
-					{ global::Outfitted.StatDefOf.MedicalTendSpeed, 1f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Doctor"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.MedicalSurgerySuccessChance, 2f),
+					(StatDefOf_Rimworld.MedicalOperationSpeed, 2f),
+					(StatDefOf_Rimworld.MedicalTendQuality, 2f),
+					(StatDefOf_Rimworld.MedicalTendSpeed, 1f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 1f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Warden"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.NegotiationAbility, 2f },
-					{ global::Outfitted.StatDefOf.SocialImpact, 1f },
-					{ global::Outfitted.StatDefOf.TradePriceImprovement, 2f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Warden"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.NegotiationAbility, 2f),
+					(StatDefOf_Rimworld.SocialImpact, 1f),
+					(StatDefOf_Rimworld.TradePriceImprovement, 2f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Handler"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.TrainAnimalChance, 2f },
-					{ global::Outfitted.StatDefOf.TameAnimalChance, 2f },
-					{ global::Outfitted.StatDefOf.ArmorRating_Sharp, 0.0f },
-					{ global::Outfitted.StatDefOf.MeleeDodgeChance, 1f },
-					{ global::Outfitted.StatDefOf.MeleeHitChance, 0.0f },
-					{ global::Outfitted.StatDefOf.MoveSpeed, 0.0f },
-					{ global::Outfitted.StatDefOf.MeleeDPS, 0.0f },
-					{ global::Outfitted.StatDefOf.AccuracyTouch, 0.0f },
-					{ global::Outfitted.StatDefOf.MeleeWeapon_CooldownMultiplier, -2f },
-					{ global::Outfitted.StatDefOf.MeleeWeapon_DamageMultiplier, 0.0f },
-					{ global::Outfitted.StatDefOf.PainShockThreshold, 2f },
-					{ global::Outfitted.StatDefOf.AnimalGatherYield, 2f },
-					{ global::Outfitted.StatDefOf.AnimalGatherSpeed, 2f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Handler"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.TrainAnimalChance, 2f),
+					(StatDefOf_Rimworld.TameAnimalChance, 2f),
+					(StatDefOf_Rimworld.ArmorRating_Sharp, 0f),
+					(StatDefOf_Rimworld.MeleeDodgeChance, 1f),
+					(StatDefOf_Rimworld.MeleeHitChance, 0f),
+					(StatDefOf_Rimworld.MoveSpeed, 0f),
+					(StatDefOf_Rimworld.MeleeDPS, 0f),
+					(StatDefOf_Rimworld.AccuracyTouch, 0f),
+					(StatDefOf_Rimworld.MeleeWeapon_CooldownMultiplier, -2f),
+					(StatDefOf_Rimworld.MeleeWeapon_DamageMultiplier, 0f),
+					(StatDefOf_Rimworld.PainShockThreshold, 2f),
+					(StatDefOf_Rimworld.AnimalGatherYield, 2f),
+					(StatDefOf_Rimworld.AnimalGatherSpeed, 2f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Cook"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.DrugCookingSpeed, 2f },
-					{ global::Outfitted.StatDefOf.ButcheryFleshSpeed, 2f },
-					{ global::Outfitted.StatDefOf.ButcheryFleshEfficiency, 2f },
-					{ global::Outfitted.StatDefOf.CookSpeed, 2f },
-					{ global::Outfitted.StatDefOf.FoodPoisonChance, -2f },
-					{ global::Outfitted.StatDefOf.MoveSpeed, 1f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Cook"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.DrugCookingSpeed, 2f),
+					(StatDefOf_Rimworld.ButcheryFleshSpeed, 2f),
+					(StatDefOf_Rimworld.ButcheryFleshEfficiency, 2f),
+					(StatDefOf_Rimworld.CookSpeed, 2f),
+					(StatDefOf_Rimworld.FoodPoisonChance, -2f),
+					(StatDefOf_Rimworld.MoveSpeed, 1f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 1f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitSoldier(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Hunter"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.ShootingAccuracyPawn, 2f },
-					{ global::Outfitted.StatDefOf.MoveSpeed, 1f },
-					{ global::Outfitted.StatDefOf.AccuracyShort, 1f },
-					{ global::Outfitted.StatDefOf.AccuracyMedium, 1f },
-					{ global::Outfitted.StatDefOf.AccuracyLong, 1f },
-					{ global::Outfitted.StatDefOf.MeleeDPS, 0.0f },
-					{ global::Outfitted.StatDefOf.MeleeHitChance, 0.0f },
-					{ global::Outfitted.StatDefOf.ArmorRating_Blunt, 0.0f },
-					{ global::Outfitted.StatDefOf.ArmorRating_Sharp, 0.0f },
-					{ global::Outfitted.StatDefOf.RangedWeapon_Cooldown, -2f },
-					{ global::Outfitted.StatDefOf.AimingDelayFactor, -2f },
-					{ global::Outfitted.StatDefOf.PainShockThreshold, 2f }
-				});
+			ConfigureOutfitSoldier(
+				MakeOutfit(db, "Hunter"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.ShootingAccuracyPawn, 2f),
+					(StatDefOf_Rimworld.MoveSpeed, 1f),
+					(StatDefOf_Rimworld.AccuracyShort, 1f),
+					(StatDefOf_Rimworld.AccuracyMedium, 1f),
+					(StatDefOf_Rimworld.AccuracyLong, 1f),
+					(StatDefOf_Rimworld.MeleeDPS, 0f),
+					(StatDefOf_Rimworld.MeleeHitChance, 0f),
+					(StatDefOf_Rimworld.ArmorRating_Blunt, 0f),
+					(StatDefOf_Rimworld.ArmorRating_Sharp, 0f),
+					(StatDefOf_Rimworld.RangedWeapon_Cooldown, -2f),
+					(StatDefOf_Rimworld.AimingDelayFactor, -2f),
+					(StatDefOf_Rimworld.PainShockThreshold, 2f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Builder"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.FixBrokenDownBuildingSuccessChance, 2f },
-					{ global::Outfitted.StatDefOf.ConstructionSpeed, 2f },
-					{ global::Outfitted.StatDefOf.ConstructSuccessChance, 2f },
-					{ global::Outfitted.StatDefOf.SmoothingSpeed, 2f },
-					{ global::Outfitted.StatDefOf.MoveSpeed, 0.0f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 0.0f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Builder"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.FixBrokenDownBuildingSuccessChance, 2f),
+					(StatDefOf_Rimworld.ConstructionSpeed, 2f),
+					(StatDefOf_Rimworld.ConstructSuccessChance, 2f),
+					(StatDefOf_Rimworld.SmoothingSpeed, 2f),
+					(StatDefOf_Rimworld.MoveSpeed, 0f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 0f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Grower"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.PlantHarvestYield, 2f },
-					{ global::Outfitted.StatDefOf.PlantWorkSpeed, 2f },
-					{ global::Outfitted.StatDefOf.MoveSpeed, 0.0f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Grower"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.PlantHarvestYield, 2f),
+					(StatDefOf_Rimworld.PlantWorkSpeed, 2f),
+					(StatDefOf_Rimworld.MoveSpeed, 0f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 1f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Miner"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.MiningYield, 2f },
-					{ global::Outfitted.StatDefOf.MiningSpeed, 2f },
-					{ global::Outfitted.StatDefOf.MoveSpeed, 0.0f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Miner"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.MiningYield, 2f),
+					(StatDefOf_Rimworld.MiningSpeed, 2f),
+					(StatDefOf_Rimworld.MoveSpeed, 0f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 1f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Smith"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.GeneralLaborSpeed, 2f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Smith"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.GeneralLaborSpeed, 2f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 1f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Tailor"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.GeneralLaborSpeed, 2f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Tailor"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.GeneralLaborSpeed, 2f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 1f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Artist"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.GeneralLaborSpeed, 2f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Artist"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.GeneralLaborSpeed, 2f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 1f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Crafter"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.GeneralLaborSpeed, 2f },
-					{ global::Outfitted.StatDefOf.ButcheryMechanoidSpeed, 2f },
-					{ global::Outfitted.StatDefOf.ButcheryMechanoidEfficiency, 2f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 2f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Crafter"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.GeneralLaborSpeed, 2f),
+					(StatDefOf_Rimworld.ButcheryMechanoidSpeed, 2f),
+					(StatDefOf_Rimworld.ButcheryMechanoidEfficiency, 2f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 2f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Hauler"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.MoveSpeed, 2f },
-					{ global::Outfitted.StatDefOf.CarryingCapacity, 2f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Hauler"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.MoveSpeed, 2f),
+					(StatDefOf_Rimworld.CarryingCapacity, 2f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Cleaner"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.MoveSpeed, 2f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 2f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Cleaner"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.MoveSpeed, 2f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 2f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitWorker(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Researcher"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.ResearchSpeed, 2f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f }
-				});
+			ConfigureOutfitWorker(
+				MakeOutfit(db, "Researcher"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.ResearchSpeed, 2f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 1f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitSoldier(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Brawler"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.MoveSpeed, 2f },
-					{ global::Outfitted.StatDefOf.AimingDelayFactor, -2f },
-					{ global::Outfitted.StatDefOf.MeleeDPS, 2f },
-					{ global::Outfitted.StatDefOf.MeleeHitChance, 2f },
-					{ global::Outfitted.StatDefOf.MeleeDodgeChance, 2f },
-					{ global::Outfitted.StatDefOf.ArmorRating_Blunt, 0.0f },
-					{ global::Outfitted.StatDefOf.ArmorRating_Sharp, 1f },
-					{ global::Outfitted.StatDefOf.AccuracyTouch, 2f },
-					{ global::Outfitted.StatDefOf.MeleeWeapon_DamageMultiplier, 2f },
-					{ global::Outfitted.StatDefOf.MeleeWeapon_CooldownMultiplier, -2f },
-					{ global::Outfitted.StatDefOf.PainShockThreshold, 2f }
-				});
+			ConfigureOutfitSoldier(
+				MakeOutfit(db, "Brawler"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.MoveSpeed, 2f),
+					(StatDefOf_Rimworld.AimingDelayFactor, -2f),
+					(StatDefOf_Rimworld.MeleeDPS, 2f),
+					(StatDefOf_Rimworld.MeleeHitChance, 2f),
+					(StatDefOf_Rimworld.MeleeDodgeChance, 2f),
+					(StatDefOf_Rimworld.ArmorRating_Blunt, 0f),
+					(StatDefOf_Rimworld.ArmorRating_Sharp, 1f),
+					(StatDefOf_Rimworld.AccuracyTouch, 2f),
+					(StatDefOf_Rimworld.MeleeWeapon_DamageMultiplier, 2f),
+					(StatDefOf_Rimworld.MeleeWeapon_CooldownMultiplier, -2f),
+					(StatDefOf_Rimworld.PainShockThreshold, 2f)
+				)
+			);
 
 			if (!vanilla)
 				return;
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitSoldier(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Soldier"),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.ShootingAccuracyPawn, 2f },
-					{ global::Outfitted.StatDefOf.AccuracyShort, 1f },
-					{ global::Outfitted.StatDefOf.AccuracyMedium, 1f },
-					{ global::Outfitted.StatDefOf.AccuracyLong, 1f },
-					{ global::Outfitted.StatDefOf.MoveSpeed, 1f },
-					{ global::Outfitted.StatDefOf.ArmorRating_Blunt, 0.0f },
-					{ global::Outfitted.StatDefOf.ArmorRating_Sharp, 1f },
-					{ global::Outfitted.StatDefOf.MeleeDodgeChance, 0.0f },
-					{ global::Outfitted.StatDefOf.AimingDelayFactor, -2f },
-					{ global::Outfitted.StatDefOf.RangedWeapon_Cooldown, -2f },
-					{ global::Outfitted.StatDefOf.PainShockThreshold, 2f }
-				});
+			ConfigureOutfitSoldier(
+				MakeOutfit(db, "Soldier"),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.ShootingAccuracyPawn, 2f),
+					(StatDefOf_Rimworld.AccuracyShort, 1f),
+					(StatDefOf_Rimworld.AccuracyMedium, 1f),
+					(StatDefOf_Rimworld.AccuracyLong, 1f),
+					(StatDefOf_Rimworld.MoveSpeed, 1f),
+					(StatDefOf_Rimworld.ArmorRating_Blunt, 0f),
+					(StatDefOf_Rimworld.ArmorRating_Sharp, 1f),
+					(StatDefOf_Rimworld.MeleeDodgeChance, 0f),
+					(StatDefOf_Rimworld.AimingDelayFactor, -2f),
+					(StatDefOf_Rimworld.RangedWeapon_Cooldown, -2f),
+					(StatDefOf_Rimworld.PainShockThreshold, 2f)
+				)
+			);
 
-			OutfitDatabase_GenerateStartingOutfits_Patch.ConfigureOutfitNudist(
-				OutfitDatabase_GenerateStartingOutfits_Patch.MakeOutfit(db, "Nudist", true),
-				new Dictionary<StatDef, float>()
-				{
-					{ global::Outfitted.StatDefOf.MoveSpeed, 1f },
-					{ global::Outfitted.StatDefOf.WorkSpeedGlobal, 2f }
-				});
+			ConfigureOutfitNudist(
+				MakeOutfit(db, "Nudist", true),
+				StatDefOfHelper.MakeDict(
+					(StatDefOf_Rimworld.MoveSpeed, 1f),
+					(StatDefOf_Rimworld.WorkSpeedGlobal, 2f)
+				)
+			);
+
 		}
 
 		private static ExtendedOutfit MakeOutfit(

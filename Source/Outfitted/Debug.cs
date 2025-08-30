@@ -18,14 +18,44 @@ namespace Outfitted
 	{
 		static LogSomeStuff()
 		{
-			//var stats = DefDatabase<StatDef>.AllDefsListForReading;
-			//foreach (var stat in stats)
-			//{
-			//	//if (stat.defaultBaseValue != 0)
-			//	{
-			//		Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Def[{stat.defaultBaseValue}] ");
-			//	}
-			//}
+			var stats = DefDatabase<StatDef>.AllDefsListForReading
+				.GroupBy(stat => stat.modContentPack.PackageId);
+			var list = new List<string>()
+			{
+				"ludeon.rimworld",
+				"ludeon.rimworld.royalty",
+				"ludeon.rimworld.ideology",
+				"ludeon.rimworld.biotech",
+				"ludeon.rimworld.anomaly",
+				"ludeon.rimworld.odyssey",
+				"ceteam.combatextended"
+			};
+
+			Logger.LogNL($"New StatDefs:");
+			foreach (var group in stats)
+			{
+				if (!list.Contains(group.Key))
+				{
+					Logger.LogNL($"// {group.Key}");
+					foreach (var stat in group)
+					{
+						Logger.LogNL($"[MayRequire(\"{group.Key}\")] public static StatDef {stat.defName};");
+					}
+				}
+			}
+
+			//ListAllStats();
+		}
+
+		private static void ListAllStats()
+		{
+			foreach (var stat in DefDatabase<StatDef>.AllDefsListForReading)
+			{
+				//if (stat.defaultBaseValue != 0)
+				{
+					Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Default[{stat.defaultBaseValue}] Mod[{stat.modContentPack.PackageId}] ");
+				}
+			}
 		}
 	}
 
@@ -50,9 +80,14 @@ namespace Outfitted
 
 			if (_apparel == null || _outfit == null || _pawn == null) return;
 
+			//ShowApparelStatScores();
+		}
+
+		private static void ShowApparelStatScores()
+		{
 			if (ModsConfig.IsActive("CETeam.CombatExtended"))
 			{
-				float CE_Bulk = _apparel.GetStatValue(CE_CompatDefOf.Bulk);
+				float CE_Bulk = _apparel.GetStatValue(StatDefOf_CE.Bulk);
 				Logger.LogNL($"Ap[{_apparel.def.defName}] CE_Bulk[{CE_Bulk}] Out[{_outfit.label}] Pawn[{_pawn.Name}]");
 			}
 			else

@@ -24,7 +24,7 @@ namespace Outfitted
 					yield return new CodeInstruction(OpCodes.Ldsfld, fld);      // push neededWarmth
 					yield return new CodeInstruction(OpCodes.Call, add);        // call ApparelScoreExtra
 					yield return new CodeInstruction(OpCodes.Stloc_0, null);    // store result in "num" (overwrite)
-					yield return new CodeInstruction(OpCodes.Ldarg_1, null);    // push ap (was previously on the stack; used by original code)
+					yield return new CodeInstruction(OpCodes.Ldarg_1, null);    // push ap (was previously on the stack; will be used by original code futher)
 				}
 				yield return ins;
 			}
