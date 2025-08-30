@@ -183,15 +183,8 @@ namespace Outfitted
 			{
 				float weight = sp.Weight;
 				float baseValue = Math.Max(Math.Abs(sp.Stat.defaultBaseValue), 0.001f);
-				bool hasEquippedOffset = DefHasEquippedOffset(apparel.def, sp.Stat);
-
 				float raw = ApparelScore(apparel, sp.Stat);
-
-				float delta;
-				if (hasEquippedOffset)
-					delta = raw / baseValue;
-				else
-					delta = (Math.Abs(sp.Stat.defaultBaseValue) < 0.001f) ? raw : (raw - sp.Stat.defaultBaseValue) / baseValue;
+				float delta = (Math.Abs(sp.Stat.defaultBaseValue) < 0.001f) ? raw : (raw - sp.Stat.defaultBaseValue) / baseValue;
 
 				return delta * (float)Math.Pow(weight, 3f);
 			});
@@ -220,17 +213,24 @@ namespace Outfitted
 		public static float ApparelScore(Apparel apparel, StatDef stat, bool basedOnQuality = true)
 		{
 			float result;
-			// Apparel provides gear offset for this stat.
+			// Apparel provides gear offset for the stat.
+			// That means only offset depends on quality/material.
+			// Base value comes from stat default.
 			if (DefHasEquippedOffset(apparel.def, stat))
 			{
 				result = basedOnQuality ? StatWorker.StatOffsetFromGear(apparel, stat) : apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat);
+				result += stat.defaultBaseValue;
 			}
 
 			// Pawn-category stats with no equipped offset (example: CarryBulk with no offset).
+			// Apparel itself doesn't provide any bonus.
+			// Stat is always here "default", but to be safe, take it from apparel, not from stat itself.
 			else if (stat.category == StatCategoryDefOf.BasicsPawn)
 				result = apparel.def.GetStatValueAbstract(stat, null);
 
-			// All other. Example: armor, cold/warm insulation. Depends on gear itsef, not modifying Pawn's stats.
+			// All other.
+			// Stat is not default; it is defined not as gear offset, but as stat itself.
+			// Example: armor, cold/warm insulation. Depends on gear itsef, not modifying Pawn's stats.
 			else
 				result = basedOnQuality ? apparel.GetStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
 
