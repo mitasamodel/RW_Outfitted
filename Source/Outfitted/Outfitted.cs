@@ -72,10 +72,17 @@ namespace Outfitted
 #if DEBUG
 			Logger.Init();
 #endif
-			Outfitted.isSaveStorageSettingsEnabled = ModLister.GetActiveModWithIdentifier("savestoragesettings.kv.rw") != null;
+			isSaveStorageSettingsEnabled = ModLister.GetActiveModWithIdentifier("savestoragesettings.kv.rw") != null;
 			new Harmony("rimworld.outfitted").PatchAll();
 			Log.Message("[Outfitted] loaded");
 		}
+
+		internal static void PruneNullStatPriorities(ExtendedOutfit outfit)
+		{
+			if (outfit?.StatPriorities == null) return;
+			outfit.StatPriorities.RemoveAll(sp => sp == null || sp.Stat == null);
+		}
+
 
 		public static float ApparelScoreExtra(Pawn pawn, Apparel apparel, NeededWarmth neededWarmth)
 		{
@@ -91,15 +98,15 @@ namespace Outfitted
 			// Score offset.
 			num1 += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.def.apparel.scoreOffset;
 
-			num1 += Outfitted.ApparelScoreRawPriorities(apparel, currentApparelPolicy);
+			num1 += ApparelScoreRawPriorities(apparel, currentApparelPolicy);
 
 			if (currentApparelPolicy.AutoWorkPriorities)
-				num1 += Outfitted.ApparelScoreAutoWorkPriorities(pawn, apparel);
+				num1 += ApparelScoreAutoWorkPriorities(pawn, apparel);
 			if (apparel.def.useHitPoints)
-				num1 *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate((float)apparel.HitPoints / (float)apparel.MaxHitPoints);
+				num1 *= HitPointsPercentScoreFactorCurve.Evaluate(apparel.HitPoints / apparel.MaxHitPoints);
 			float num2 = OutfittedMod.Settings.disableScoreOffset ? num1 : num1 + apparel.GetSpecialApparelScoreOffset();
 			if (pawn != null && currentApparelPolicy != null)
-				num2 += Outfitted.ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
+				num2 += ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
 			if (currentApparelPolicy.PenaltyWornByCorpse && apparel.WornByCorpse && ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.DeadMansApparel, true))
 			{
 				num2 -= 0.5f;
@@ -112,9 +119,12 @@ namespace Outfitted
 
 		private static float ApparelScoreRawPriorities(Apparel apparel, ExtendedOutfit outfit)
 		{
-			if (!outfit.StatPriorities.Any<StatPriority>()) return 0f;
+			if (!outfit.StatPriorities.Any()) return 0f;
 
-			return outfit.StatPriorities.Average(sp =>
+			// Check for validity
+			var valid = outfit.StatPriorities.Where(sp => sp != null && sp.Stat != null).ToList();
+
+			return valid.Average(sp =>
 			{
 				float weight = sp.Weight;
 				float baseValue = Math.Max(Math.Abs(sp.Stat.defaultBaseValue), 0.001f);

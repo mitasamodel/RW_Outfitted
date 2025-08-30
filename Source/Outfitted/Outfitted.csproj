@@ -70,6 +70,7 @@
     <Compile Include="Dialog_ManageApparelPolicies_InitialSize_Patch.cs" />
     <Compile Include="Dialog_ManageApparelPolicies_DoContentsRect_Patch.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="OutfittedGameComponent.cs" />
     <Compile Include="OutfittedSettigs.cs" />
     <Compile Include="SettingsWindow.cs" />
     <Compile Include="StatDefOf.cs" />

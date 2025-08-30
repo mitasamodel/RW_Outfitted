@@ -60,9 +60,9 @@ namespace Outfitted
 			}
 		}
 
-		public IEnumerable<StatPriority> StatPriorities
+		public List<StatPriority> StatPriorities
 		{
-			get => (IEnumerable<StatPriority>)this.statPriorities;
+			get => statPriorities;
 		}
 
 		public ExtendedOutfit(int uniqueId, string label)
@@ -107,6 +107,10 @@ namespace Outfitted
 			Scribe_Values.Look(ref AutoWorkPriorities, "AutoWorkPriorities");
 			Scribe_Values.Look(ref _autoTemp, "AutoTemp");
 			Scribe_Values.Look(ref autoTempOffset, "autoTempOffset");
+
+			// Safeguard. Remove all nulls.
+			if (Scribe.mode == LoadSaveMode.PostLoadInit)
+				Outfitted.PruneNullStatPriorities(this);
 		}
 
 		public void CopyFrom(ExtendedOutfit outfit)
