@@ -127,9 +127,9 @@ namespace Outfitted
 				}
 			}
 			// Pawn wants shirt
-			else if (IsDefShirt(apparel.def))
+			else if (CoversTorso(apparel.def))
 			{
-				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && !PawnWearShirt(pawn, exclude))
+				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && !PawnTorsoCovered(pawn, exclude))
 				{
 					return nakedOffset;
 				}
@@ -157,12 +157,12 @@ namespace Outfitted
 		}
 
 		// Pawn wear shirt or smth, what covers torso.
-		private static bool PawnWearShirt(Pawn pawn, Apparel exclude)
+		private static bool PawnTorsoCovered(Pawn pawn, Apparel exclude)
 		{
 			var worn = pawn.apparel?.WornApparel;
 			if (worn == null) return false;
 
-			return worn.Any(ap => ap != exclude && IsDefShirt(ap.def));
+			return worn.Any(ap => ap != exclude && CoversTorso(ap.def));
 		}
 
 		// Pawn wear pants or smth, what covers same area.
@@ -183,13 +183,13 @@ namespace Outfitted
 			return apparel.layers.Contains(ApparelLayerDefOf.OnSkin) && apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Legs);
 		}
 
-		// Can be used as shirt?
-		private static bool IsDefShirt(ThingDef def)
+		// Can be used as shirt (or anything what covers torso)?
+		private static bool CoversTorso(ThingDef def)
 		{
 			var apparel = def?.apparel;
 			if (apparel == null) return false;
 
-			return apparel.layers.Contains(ApparelLayerDefOf.OnSkin) && apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Torso);
+			return apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Torso);
 		}
 
 		// Can be called also for equipped apparel.
@@ -319,8 +319,18 @@ namespace Outfitted
 				FloatRange targetTemp;
 				if (outfit.AutoTemp)
 				{
-					float seasonalTemp = pawn.Map.mapTemperature.SeasonalTemp;
-					targetTemp = new FloatRange(seasonalTemp - outfit.autoTempOffset, seasonalTemp + outfit.autoTempOffset);
+					var map = pawn?.MapHeld ?? pawn?.Map;
+					if (map != null)
+					{
+						float seasonalTemp = pawn.Map.mapTemperature.SeasonalTemp;
+						targetTemp = new FloatRange(seasonalTemp - outfit.autoTempOffset, seasonalTemp + outfit.autoTempOffset);
+					}
+					else
+					{
+						// No map (caravan, world-only context, etc.).
+						// Use the user-set manual range rather than guessing world temps.
+						targetTemp = outfit.targetTemperatures;
+					}
 				}
 				else
 					targetTemp = outfit.targetTemperatures;
