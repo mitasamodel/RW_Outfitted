@@ -109,9 +109,9 @@ namespace Outfitted
 		/// </summary>
 		/// <param name="pawn"></param>
 		/// <param name="apparel"></param>
-		/// <param name="ifNotWorn">Run the scoring like if this apparel will be removed and will be worn again</param>
+		/// <param name="whatIfNotWorn">Run the scoring like if this apparel will be removed and will be worn again</param>
 		/// <returns></returns>
-		internal static float ApparelScorePawnNeedThis(Pawn pawn, Apparel apparel, bool ifNotWorn = false)
+		internal static float ApparelScorePawnNeedThis(Pawn pawn, Apparel apparel, bool whatIfNotWorn = false)
 		{
 			if (pawn == null || apparel?.def?.apparel == null) return 0f;
 
@@ -121,7 +121,7 @@ namespace Outfitted
 			// Pawn wants pants
 			if (IsDefPants(apparel.def))
 			{
-				if (PawnCareAboutNaked(pawn) && (!PawnWearPants(pawn) || ifNotWorn))
+				if (PawnCareAboutNaked(pawn) && (!PawnWearPants(pawn) || whatIfNotWorn))
 				{
 					return nakedOffset;
 				}
@@ -129,7 +129,7 @@ namespace Outfitted
 			// Pawn wants shirt
 			else if (IsDefShirt(apparel.def))
 			{
-				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && (!PawnWearShirt(pawn) || ifNotWorn))
+				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && (!PawnWearShirt(pawn) || whatIfNotWorn))
 				{
 					return nakedOffset;
 				}
