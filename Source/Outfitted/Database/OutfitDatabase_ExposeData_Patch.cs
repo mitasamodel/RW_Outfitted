@@ -12,12 +12,12 @@ namespace Outfitted.Database
 	{
 		private static void Postfix(OutfitDatabase __instance, List<ApparelPolicy> ___outfits)
 		{
-			if (Scribe.mode != LoadSaveMode.LoadingVars || ___outfits.Any<ApparelPolicy>((Predicate<ApparelPolicy>)(i => i is ExtendedOutfit)))
+			if (Scribe.mode != LoadSaveMode.LoadingVars || ___outfits.Any(i => i is ExtendedOutfit))
 				return;
-			foreach (ApparelPolicy outfit in ___outfits.ToList<ApparelPolicy>())
+			foreach (ApparelPolicy outfit in ___outfits.ToList())
 			{
 				___outfits.Remove(outfit);
-				___outfits.Add(OutfitDatabase_ExposeData_Patch.ReplaceKnownVanillaOutfits(outfit));
+				___outfits.Add(ReplaceKnownVanillaOutfits(outfit));
 			}
 			OutfitDatabase_GenerateStartingOutfits_Patch.GenerateStartingOutfits(__instance, false);
 		}
@@ -28,14 +28,14 @@ namespace Outfitted.Database
 			switch (extendedOutfit.label)
 			{
 				case "Worker":
-					extendedOutfit.AddRange((IEnumerable<StatPriority>)new List<StatPriority>()
+					extendedOutfit.AddRange(new List<StatPriority>()
 					{
 						new StatPriority(global::Outfitted.StatDefOf.MoveSpeed, 0.0f),
 						new StatPriority(global::Outfitted.StatDefOf.WorkSpeedGlobal, 1f)
 					});
 					break;
 				case "Soldier":
-					extendedOutfit.AddRange((IEnumerable<StatPriority>)new List<StatPriority>()
+					extendedOutfit.AddRange(new List<StatPriority>()
 					{
 						new StatPriority(global::Outfitted.StatDefOf.ShootingAccuracyPawn, 2f),
 						new StatPriority(global::Outfitted.StatDefOf.AccuracyShort, 1f),
@@ -51,14 +51,14 @@ namespace Outfitted.Database
 					});
 					break;
 				case "Nudist":
-					extendedOutfit.AddRange((IEnumerable<StatPriority>)new List<StatPriority>()
+					extendedOutfit.AddRange(new List<StatPriority>()
 					{
 						new StatPriority(global::Outfitted.StatDefOf.MoveSpeed, 1f),
 						new StatPriority(global::Outfitted.StatDefOf.WorkSpeedGlobal, 2f)
 					});
 					break;
 				default:
-					extendedOutfit.AddRange((IEnumerable<StatPriority>)new List<StatPriority>()
+					extendedOutfit.AddRange(new List<StatPriority>()
 					{
 						new StatPriority(global::Outfitted.StatDefOf.MoveSpeed, 1f),
 						new StatPriority(global::Outfitted.StatDefOf.WorkSpeedGlobal, 2f),
@@ -67,7 +67,7 @@ namespace Outfitted.Database
 					});
 					break;
 			}
-			return (ApparelPolicy)extendedOutfit;
+			return extendedOutfit;
 		}
 	}
 }

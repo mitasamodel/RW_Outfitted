@@ -1,5 +1,4 @@
-﻿using CombatExtended;
-using HarmonyLib;
+﻿using HarmonyLib;
 using RimWorld;
 using System;
 using System.Linq;
@@ -11,61 +10,33 @@ namespace Outfitted
 	[StaticConstructorOnStartup]
 	public static class Outfitted
 	{
+		private const float nakedOffset = 1f;
+
 		internal static bool showApparelScores;
 		internal static bool isSaveStorageSettingsEnabled;
-		private static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve()
-	{
-	  {
-		new CurvePoint(0.0f, 0.0f),
-		true
-	  },
-	  {
-		new CurvePoint(0.2f, 0.2f),
-		true
-	  },
-	  {
-		new CurvePoint(0.22f, 0.6f),
-		true
-	  },
-	  {
-		new CurvePoint(0.5f, 0.6f),
-		true
-	  },
-	  {
-		new CurvePoint(0.52f, 1f),
-		true
-	  }
-	};
-		private static readonly SimpleCurve InsulationTemperatureScoreFactorCurve_Need = new SimpleCurve()
-	{
-	  {
-		new CurvePoint(0.0f, 1f),
-		true
-	  },
-	  {
-		new CurvePoint(30f, 4f),
-		true
-	  }
-	};
-		private static readonly SimpleCurve InsulationFactorCurve = new SimpleCurve()
-	{
-	  {
-		new CurvePoint(-20f, -3f),
-		true
-	  },
-	  {
-		new CurvePoint(-10f, -2f),
-		true
-	  },
-	  {
-		new CurvePoint(10f, 2f),
-		true
-	  },
-	  {
-		new CurvePoint(20f, 3f),
-		true
-	  }
-	};
+		private static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
+		{
+			{ new CurvePoint(0.0f, 0.0f), true },
+			{ new CurvePoint(0.2f, 0.2f), true },
+			{ new CurvePoint(0.22f, 0.6f), true },
+			{ new CurvePoint(0.5f, 0.6f), true },
+			{ new CurvePoint(0.52f, 1f), true }
+		};
+
+		private static readonly SimpleCurve InsulationTemperatureScoreFactorCurve_Need = new SimpleCurve
+		{
+			{ new CurvePoint(0.0f, 1f), true },
+			{ new CurvePoint(30f, 4f), true }
+		};
+
+		private static readonly SimpleCurve InsulationFactorCurve = new SimpleCurve
+		{
+			{ new CurvePoint(-20f, -3f), true },
+			{ new CurvePoint(-10f, -2f), true },
+			{ new CurvePoint(10f, 2f), true },
+			{ new CurvePoint(20f, 3f), true }
+		};
+
 
 		static Outfitted()
 		{
@@ -83,7 +54,6 @@ namespace Outfitted
 			outfit.StatPriorities.RemoveAll(sp => sp == null || sp.Stat == null);
 		}
 
-
 		public static float ApparelScoreExtra(Pawn pawn, Apparel apparel, NeededWarmth neededWarmth)
 		{
 			if (!(pawn.outfits.CurrentApparelPolicy is ExtendedOutfit currentApparelPolicy))
@@ -98,12 +68,19 @@ namespace Outfitted
 			// Score offset.
 			num1 += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.def.apparel.scoreOffset;
 
+			// Score from appaerl itself.
 			num1 += ApparelScoreRawPriorities(apparel, currentApparelPolicy);
+
+			// If Pawn need pants / shirt.
+			num1 += ApparelScorePawnNeedThis(pawn, apparel);
 
 			if (currentApparelPolicy.AutoWorkPriorities)
 				num1 += ApparelScoreAutoWorkPriorities(pawn, apparel);
 			if (apparel.def.useHitPoints)
-				num1 *= HitPointsPercentScoreFactorCurve.Evaluate(apparel.HitPoints / apparel.MaxHitPoints);
+			{
+				float hp = (float)apparel.HitPoints / apparel.MaxHitPoints;
+				num1 *= HitPointsPercentScoreFactorCurve.Evaluate(Mathf.Clamp01(hp));
+			}
 			float num2 = OutfittedMod.Settings.disableScoreOffset ? num1 : num1 + apparel.GetSpecialApparelScoreOffset();
 			if (pawn != null && currentApparelPolicy != null)
 				num2 += ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
@@ -115,6 +92,84 @@ namespace Outfitted
 			}
 			return num2;
 			//return num1;
+		}
+
+		private static float ApparelScorePawnNeedThis(Pawn pawn, Apparel apparel)
+		{
+			if (pawn == null || apparel?.def?.apparel == null) return 0f;
+
+			//var skinLayer = ApparelLayerDefOf.OnSkin;
+			//var legs = BodyPartGroupDefOf.Legs;
+
+			// Pawn wants pants
+			if (IsDefPants(apparel.def))
+			{
+				if (PawnCareAboutNaked(pawn) && !PawnWearPants(pawn))
+				{
+					return nakedOffset;
+				}
+			}
+			// Pawn wants shirt
+			else if (IsDefShirt(apparel.def))
+			{
+				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && !PawnWearShirt(pawn))
+				{
+					return nakedOffset;
+				}
+			}
+
+			return 0f;
+		}
+
+		private static bool PawnCareAboutTorso(Pawn pawn)
+		{
+			if (pawn == null) return false;
+			//if (!ModsConfig.IdeologyActive) return pawn.gender == Gender.Female;
+
+			// For now.
+			// TODO: How to check Thought "naked" for female if Ideology is active and it is acceptable to not wear a shirt.
+			return pawn.gender == Gender.Female;
+		}
+
+		private static bool PawnCareAboutNaked(Pawn pawn)
+		{
+			return ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.Naked, true);
+		}
+
+		// Pawn wear shirt or smth, what covers torso.
+		private static bool PawnWearShirt(Pawn pawn)
+		{
+			var worn = pawn.apparel?.WornApparel;
+			if (worn == null) return false;
+
+			return worn.Any(ap => IsDefShirt(ap.def));
+		}
+
+		// Pawn wear pants or smth, what covers same area.
+		private static bool PawnWearPants(Pawn pawn)
+		{
+			var worn = pawn.apparel?.WornApparel;
+			if (worn == null) return false;
+
+			return worn.Any(ap => IsDefPants(ap.def));
+		}
+
+		// Can be used as pants?
+		private static bool IsDefPants(ThingDef def)
+		{
+			var apparel = def?.apparel;
+			if (apparel == null) return false;
+
+			return apparel.layers.Contains(ApparelLayerDefOf.OnSkin) && apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Legs);
+		}
+
+		// Can be used as shirt?
+		private static bool IsDefShirt(ThingDef def)
+		{
+			var apparel = def?.apparel;
+			if (apparel == null) return false;
+
+			return apparel.layers.Contains(ApparelLayerDefOf.OnSkin) && apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Torso);
 		}
 
 		private static float ApparelScoreRawPriorities(Apparel apparel, ExtendedOutfit outfit)
@@ -207,7 +262,7 @@ namespace Outfitted
 
 		private static float ApparelScoreAutoWorkPriorities(Pawn pawn, Apparel apparel)
 		{
-			return WorkPriorities.WorktypeStatPriorities(pawn).Select<StatPriority, float>((Func<StatPriority, float>)(sp => (apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetStatValue(sp.Stat) - sp.Stat.defaultBaseValue) * sp.Weight)).Sum();
+			return WorkPriorities.WorktypeStatPriorities(pawn).Select<StatPriority, float>(sp => (apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetStatValue(sp.Stat) - sp.Stat.defaultBaseValue) * sp.Weight).Sum();
 		}
 
 		private static float ApparelScoreRawInsulation(
@@ -225,10 +280,10 @@ namespace Outfitted
 				if (outfit.AutoTemp)
 				{
 					float seasonalTemp = pawn.Map.mapTemperature.SeasonalTemp;
-					outfit.targetTemperatures = new FloatRange(seasonalTemp - (float)outfit.autoTempOffset, seasonalTemp + (float)outfit.autoTempOffset);
+					outfit.targetTemperatures = new FloatRange(seasonalTemp - outfit.autoTempOffset, seasonalTemp + outfit.autoTempOffset);
 				}
 				FloatRange targetTemperatures = outfit.targetTemperatures;
-				FloatRange insulationStats1 = Outfitted.GetInsulationStats(apparel);
+				FloatRange insulationStats1 = GetInsulationStats(apparel);
 				floatRange2.min += insulationStats1.min;
 				floatRange2.max += insulationStats1.max;
 				if (num2 == 0)
@@ -237,7 +292,7 @@ namespace Outfitted
 					{
 						if (!ApparelUtility.CanWearTogether(apparel.def, apparel1.def, pawn.RaceProps.body))
 						{
-							FloatRange insulationStats2 = Outfitted.GetInsulationStats(apparel1);
+							FloatRange insulationStats2 = GetInsulationStats(apparel1);
 							floatRange2.min -= insulationStats2.min;
 							floatRange2.max -= insulationStats2.max;
 						}
@@ -245,7 +300,7 @@ namespace Outfitted
 				}
 				FloatRange floatRange3 = new FloatRange(Mathf.Max(floatRange1.min - targetTemperatures.min, 0.0f), Mathf.Max(targetTemperatures.max - floatRange1.max, 0.0f));
 				FloatRange floatRange4 = new FloatRange(Mathf.Max(floatRange2.min - targetTemperatures.min, 0.0f), Mathf.Max(targetTemperatures.max - floatRange2.max, 0.0f));
-				num1 = Outfitted.InsulationFactorCurve.Evaluate(floatRange3.min - floatRange4.min) + Outfitted.InsulationFactorCurve.Evaluate(floatRange3.max - floatRange4.max);
+				num1 = InsulationFactorCurve.Evaluate(floatRange3.min - floatRange4.min) + InsulationFactorCurve.Evaluate(floatRange3.max - floatRange4.max);
 			}
 			else
 			{
@@ -253,11 +308,11 @@ namespace Outfitted
 				{
 					case NeededWarmth.Warm:
 						float statValue1 = apparel.GetStatValue(StatDefOf.Insulation_Heat);
-						num1 = Outfitted.InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue1);
+						num1 = InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue1);
 						break;
 					case NeededWarmth.Cool:
 						float statValue2 = apparel.GetStatValue(StatDefOf.Insulation_Cold);
-						num1 = Outfitted.InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue2);
+						num1 = InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue2);
 						break;
 					default:
 						num1 = 1f;
@@ -278,12 +333,12 @@ namespace Outfitted
 			{
 				if (PawnsFinder.AllMaps_SpawnedPawnsInFaction(Faction.OfPlayer) == null)
 					return;
-				foreach (Pawn pawn in PawnsFinder.AllMaps_SpawnedPawnsInFaction(Faction.OfPlayer).Where<Pawn>((Func<Pawn, bool>)(i => i != null && i.outfits != null && i.outfits.CurrentApparelPolicy != null && i.outfits.CurrentApparelPolicy.id == id)))
+				foreach (Pawn pawn in PawnsFinder.AllMaps_SpawnedPawnsInFaction(Faction.OfPlayer).Where<Pawn>(i => i != null && i.outfits != null && i.outfits.CurrentApparelPolicy != null && i.outfits.CurrentApparelPolicy.id == id))
 					pawn.mindState?.Notify_OutfitChanged();
 			}
 			catch (Exception ex)
 			{
-				Log.Error(string.Format("Outfitted.Notify_OutfitChanged: {0}", (object)ex));
+				Log.Error(string.Format("Outfitted.Notify_OutfitChanged: {0}", ex));
 			}
 		}
 	}
