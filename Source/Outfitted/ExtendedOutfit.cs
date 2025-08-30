@@ -34,13 +34,13 @@ namespace Outfitted
 
 		public bool AutoTemp
 		{
-			get => this._autoTemp;
+			get => _autoTemp;
 			set
 			{
-				this._autoTemp = value;
-				if (!this._autoTemp)
+				_autoTemp = value;
+				if (!_autoTemp)
 					return;
-				this.targetTemperaturesOverride = true;
+				targetTemperaturesOverride = true;
 			}
 		}
 

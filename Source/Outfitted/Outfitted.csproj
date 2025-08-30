@@ -69,6 +69,7 @@
     <Compile Include="Debug.cs" />
     <Compile Include="Dialog_ManageApparelPolicies_InitialSize_Patch.cs" />
     <Compile Include="Dialog_ManageApparelPolicies_DoContentsRect_Patch.cs" />
+    <Compile Include="HarmonyPatches\JobGiver_OptimizeApparel_TryGiveJob_Patch.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="OutfittedGameComponent.cs" />
     <Compile Include="OutfittedSettigs.cs" />
@@ -82,7 +83,7 @@
     <Compile Include="WorkTypeDefOf.cs" />
     <Compile Include="ExtendedOutfit.cs" />
     <Compile Include="Outfitted.cs" />
-    <Compile Include="JobGiver_OptimizeApparel_ApparelScoreRaw_Patch.cs" />
+    <Compile Include="HarmonyPatches\JobGiver_OptimizeApparel_ApparelScoreRaw_Patch.cs" />
     <Compile Include="PlaySettings_DoPlaySettingsGlobalControls_Patch.cs" />
     <Compile Include="Thing_DrawGUIOverlay_Patch.cs" />
     <Compile Include="ResourceBank.cs" />

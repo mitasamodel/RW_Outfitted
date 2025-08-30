@@ -14,7 +14,7 @@ namespace Outfitted
 
 		internal static bool showApparelScores;
 		internal static bool isSaveStorageSettingsEnabled;
-		private static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
+		internal static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
 		{
 			{ new CurvePoint(0.0f, 0.0f), true },
 			{ new CurvePoint(0.2f, 0.2f), true },
@@ -63,38 +63,55 @@ namespace Outfitted
 			}
 
 			// Starting score.
-			float num1 = OutfittedMod.Settings.disableStartScore ? 0f : 0.1f;
+			float num = OutfittedMod.Settings.disableStartScore ? 0f : 0.1f;
 
 			// Score offset.
-			num1 += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.def.apparel.scoreOffset;
+			num += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.def.apparel.scoreOffset;
 
 			// Score from appaerl itself.
-			num1 += ApparelScoreRawPriorities(apparel, currentApparelPolicy);
+			num += ApparelScoreRawPriorities(apparel, currentApparelPolicy);
 
 			// If Pawn need pants / shirt.
-			num1 += ApparelScorePawnNeedThis(pawn, apparel);
+			num += ApparelScorePawnNeedThis(pawn, apparel);
 
 			if (currentApparelPolicy.AutoWorkPriorities)
-				num1 += ApparelScoreAutoWorkPriorities(pawn, apparel);
+				num += ApparelScoreAutoWorkPriorities(pawn, apparel);
+
 			if (apparel.def.useHitPoints)
 			{
 				float hp = (float)apparel.HitPoints / apparel.MaxHitPoints;
-				num1 *= HitPointsPercentScoreFactorCurve.Evaluate(Mathf.Clamp01(hp));
+				num *= HitPointsPercentScoreFactorCurve.Evaluate(Mathf.Clamp01(hp));
 			}
-			float num2 = OutfittedMod.Settings.disableScoreOffset ? num1 : num1 + apparel.GetSpecialApparelScoreOffset();
+
+			num += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.GetSpecialApparelScoreOffset();
+
 			if (pawn != null && currentApparelPolicy != null)
-				num2 += ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
-			if (currentApparelPolicy.PenaltyWornByCorpse && apparel.WornByCorpse && ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.DeadMansApparel, true))
-			{
-				num2 -= 0.5f;
-				if ((double)num2 > 0.0)
-					num2 *= 0.1f;
-			}
-			return num2;
-			//return num1;
+				num += ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
+
+			num = ModifiedWornByCorpse(pawn, apparel, currentApparelPolicy, num);
+			return num;
 		}
 
-		private static float ApparelScorePawnNeedThis(Pawn pawn, Apparel apparel)
+		internal static float ModifiedWornByCorpse(Pawn pawn, Apparel apparel, ExtendedOutfit currentApparelPolicy, float num)
+		{
+			if (currentApparelPolicy.PenaltyWornByCorpse && apparel.WornByCorpse && ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.DeadMansApparel, true))
+			{
+				num -= 0.5f;
+				if (num > 0.0f)
+					num *= 0.1f;
+			}
+
+			return num;
+		}
+
+		/// <summary>
+		/// Return additional score if apparel needed due to nudity 
+		/// </summary>
+		/// <param name="pawn"></param>
+		/// <param name="apparel"></param>
+		/// <param name="ifNotWorn">Run the scoring like if this apparel will be removed and will be worn again</param>
+		/// <returns></returns>
+		internal static float ApparelScorePawnNeedThis(Pawn pawn, Apparel apparel, bool ifNotWorn = false)
 		{
 			if (pawn == null || apparel?.def?.apparel == null) return 0f;
 
@@ -104,7 +121,7 @@ namespace Outfitted
 			// Pawn wants pants
 			if (IsDefPants(apparel.def))
 			{
-				if (PawnCareAboutNaked(pawn) && !PawnWearPants(pawn))
+				if (PawnCareAboutNaked(pawn) && (!PawnWearPants(pawn) || ifNotWorn))
 				{
 					return nakedOffset;
 				}
@@ -112,7 +129,7 @@ namespace Outfitted
 			// Pawn wants shirt
 			else if (IsDefShirt(apparel.def))
 			{
-				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && !PawnWearShirt(pawn))
+				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && (!PawnWearShirt(pawn) || ifNotWorn))
 				{
 					return nakedOffset;
 				}
@@ -172,7 +189,8 @@ namespace Outfitted
 			return apparel.layers.Contains(ApparelLayerDefOf.OnSkin) && apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Torso);
 		}
 
-		private static float ApparelScoreRawPriorities(Apparel apparel, ExtendedOutfit outfit)
+		// Can be called also for equipped apparel.
+		internal static float ApparelScoreRawPriorities(Apparel apparel, ExtendedOutfit outfit)
 		{
 			if (!outfit.StatPriorities.Any()) return 0f;
 
@@ -180,7 +198,7 @@ namespace Outfitted
 			int count = 0;
 			foreach (var sp in outfit.StatPriorities)
 			{
-				if ( sp?.Stat == null ) continue;
+				if (sp?.Stat == null) continue;
 				float weight = sp.Weight;
 				float defaultAbs = Math.Abs(sp.Stat.defaultBaseValue);
 				float baseValue = Math.Max(defaultAbs, 0.001f);
@@ -265,46 +283,74 @@ namespace Outfitted
 			return false;
 		}
 
-		private static float ApparelScoreAutoWorkPriorities(Pawn pawn, Apparel apparel)
+		internal static float ApparelScoreAutoWorkPriorities(Pawn pawn, Apparel apparel)
 		{
-			return WorkPriorities.WorktypeStatPriorities(pawn).Select<StatPriority, float>(sp => (apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetStatValue(sp.Stat) - sp.Stat.defaultBaseValue) * sp.Weight).Sum();
+			return WorkPriorities.WorktypeStatPriorities(pawn)
+				.Select(sp => (apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetStatValue(sp.Stat) - sp.Stat.defaultBaseValue) * sp.Weight).Sum();
 		}
 
-		private static float ApparelScoreRawInsulation(
-		  Pawn pawn,
-		  Apparel apparel,
-		  ExtendedOutfit outfit,
-		  NeededWarmth neededWarmth)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="pawn"></param>
+		/// <param name="apparel"></param>
+		/// <param name="outfit"></param>
+		/// <param name="neededWarmth"></param>
+		/// <param name="whatIfNotWorn">Run the scoring like if this apparel will be removed and will be worn again. Is used to get correct score of apparel.</param>
+		/// <returns></returns>
+		internal static float ApparelScoreRawInsulation(
+			Pawn pawn,
+			Apparel apparel,
+			ExtendedOutfit outfit,
+			NeededWarmth neededWarmth,
+			bool whatIfNotWorn = false
+		)
 		{
 			float num1;
 			if (outfit.targetTemperaturesOverride)
 			{
-				int num2 = pawn.apparel.WornApparel.Contains(apparel) ? 1 : 0;
-				FloatRange floatRange1 = pawn.ComfortableTemperatureRange();
-				FloatRange floatRange2 = floatRange1;
+				// Current comfortable temperature.
+				FloatRange curComfTemp = pawn.ComfortableTemperatureRange();
+
+				// Target temperature.
 				if (outfit.AutoTemp)
 				{
 					float seasonalTemp = pawn.Map.mapTemperature.SeasonalTemp;
 					outfit.targetTemperatures = new FloatRange(seasonalTemp - outfit.autoTempOffset, seasonalTemp + outfit.autoTempOffset);
 				}
-				FloatRange targetTemperatures = outfit.targetTemperatures;
-				FloatRange insulationStats1 = GetInsulationStats(apparel);
-				floatRange2.min += insulationStats1.min;
-				floatRange2.max += insulationStats1.max;
-				if (num2 == 0)
+				FloatRange targetTemp = outfit.targetTemperatures;
+
+				FloatRange newApparelInsulation = GetInsulationStats(apparel);
+
+				// Remove current apparel temps to get the real score of already worn apparel.
+				if (whatIfNotWorn)
 				{
-					foreach (Apparel apparel1 in pawn.apparel.WornApparel)
+					curComfTemp.min -= newApparelInsulation.min;
+					curComfTemp.max -= newApparelInsulation.max;
+				}
+
+				// New apparel insulation.
+				FloatRange newComfTemp = curComfTemp;
+				newComfTemp.min += newApparelInsulation.min;
+				newComfTemp.max += newApparelInsulation.max;
+
+				// Check if can be worn together with existed.
+				// Skip if it is check for already worn apparel for whatIfNotWorn.
+				if (!whatIfNotWorn && !pawn.apparel.WornApparel.Contains(apparel))
+				{
+					foreach (Apparel apWorn in pawn.apparel.WornApparel)
 					{
-						if (!ApparelUtility.CanWearTogether(apparel.def, apparel1.def, pawn.RaceProps.body))
+						if (!ApparelUtility.CanWearTogether(apparel.def, apWorn.def, pawn.RaceProps.body))
 						{
-							FloatRange insulationStats2 = GetInsulationStats(apparel1);
-							floatRange2.min -= insulationStats2.min;
-							floatRange2.max -= insulationStats2.max;
+							// Cannot be worn together: reduce insulation by apparel, which will be removed.
+							FloatRange insulationWorn = GetInsulationStats(apWorn);
+							newComfTemp.min -= insulationWorn.min;
+							newComfTemp.max -= insulationWorn.max;
 						}
 					}
 				}
-				FloatRange floatRange3 = new FloatRange(Mathf.Max(floatRange1.min - targetTemperatures.min, 0.0f), Mathf.Max(targetTemperatures.max - floatRange1.max, 0.0f));
-				FloatRange floatRange4 = new FloatRange(Mathf.Max(floatRange2.min - targetTemperatures.min, 0.0f), Mathf.Max(targetTemperatures.max - floatRange2.max, 0.0f));
+				FloatRange floatRange3 = new FloatRange(Mathf.Max(curComfTemp.min - targetTemp.min, 0.0f), Mathf.Max(targetTemp.max - curComfTemp.max, 0.0f));
+				FloatRange floatRange4 = new FloatRange(Mathf.Max(newComfTemp.min - targetTemp.min, 0.0f), Mathf.Max(targetTemp.max - newComfTemp.max, 0.0f));
 				num1 = InsulationFactorCurve.Evaluate(floatRange3.min - floatRange4.min) + InsulationFactorCurve.Evaluate(floatRange3.max - floatRange4.max);
 			}
 			else

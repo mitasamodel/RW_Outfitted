@@ -10,50 +10,15 @@ namespace Outfitted
 	public static class StatDefOf_CE
 	{
 		// ceteam.combatextended
-		[MayRequire("ceteam.combatextended")] public static StatDef WornBulk;
-		[MayRequire("ceteam.combatextended")] public static StatDef ArmorRating_Electric;
-		[MayRequire("ceteam.combatextended")] public static StatDef ElectricDamageMultiplier;
-		[MayRequire("ceteam.combatextended")] public static StatDef Bulk;
-		[MayRequire("ceteam.combatextended")] public static StatDef AmmoCaliber;
-		[MayRequire("ceteam.combatextended")] public static StatDef LongRange;
-		[MayRequire("ceteam.combatextended")] public static StatDef NightVisionEfficiency;
-		[MayRequire("ceteam.combatextended")] public static StatDef NightVisionEfficiency_Implant;
-		[MayRequire("ceteam.combatextended")] public static StatDef NightVisionEfficiency_Weapon;
-		[MayRequire("ceteam.combatextended")] public static StatDef NightVisionEfficiency_Apparel;
-		[MayRequire("ceteam.combatextended")] public static StatDef AimingAccuracy;
-		[MayRequire("ceteam.combatextended")] public static StatDef ReloadSpeed;
-		[MayRequire("ceteam.combatextended")] public static StatDef Suppressability;
-		[MayRequire("ceteam.combatextended")] public static StatDef AverageSharpArmor;
-		[MayRequire("ceteam.combatextended")] public static StatDef MeleeArmorPenetration;
-		[MayRequire("ceteam.combatextended")] public static StatDef MeleeCritChance;
-		[MayRequire("ceteam.combatextended")] public static StatDef MeleeParryChance;
-		[MayRequire("ceteam.combatextended")] public static StatDef UnarmedDamage;
-		[MayRequire("ceteam.combatextended")] public static StatDef BodyPartSharpArmor;
-		[MayRequire("ceteam.combatextended")] public static StatDef BodyPartBluntArmor;
-		[MayRequire("ceteam.combatextended")] public static StatDef SmokeSensitivity;
-		[MayRequire("ceteam.combatextended")] public static StatDef CarryWeight;
 		[MayRequire("ceteam.combatextended")] public static StatDef CarryBulk;
-		[MayRequire("ceteam.combatextended")] public static StatDef StuffPower_Armor_Electric;
-		[MayRequire("ceteam.combatextended")] public static StatDef MeleeDamage;
-		[MayRequire("ceteam.combatextended")] public static StatDef StuffEffectMultiplierToughness;
-		[MayRequire("ceteam.combatextended")] public static StatDef ToughnessRating;
-		[MayRequire("ceteam.combatextended")] public static StatDef MeleePenetrationFactor;
-		[MayRequire("ceteam.combatextended")] public static StatDef MeleeCounterParryBonus;
-		[MayRequire("ceteam.combatextended")] public static StatDef SightsEfficiency;
-		[MayRequire("ceteam.combatextended")] public static StatDef OneHandedness;
-		[MayRequire("ceteam.combatextended")] public static StatDef UBGLInfo;
-		[MayRequire("ceteam.combatextended")] public static StatDef ShotSpread;
-		[MayRequire("ceteam.combatextended")] public static StatDef SwayFactor;
-		[MayRequire("ceteam.combatextended")] public static StatDef MuzzleFlash;
-		[MayRequire("ceteam.combatextended")] public static StatDef Caliber;
-		[MayRequire("ceteam.combatextended")] public static StatDef BipodStats;
-		[MayRequire("ceteam.combatextended")] public static StatDef TicksBetweenBurstShots;
-		[MayRequire("ceteam.combatextended")] public static StatDef BurstShotCount;
-		[MayRequire("ceteam.combatextended")] public static StatDef Recoil;
-		[MayRequire("ceteam.combatextended")] public static StatDef MagazineCapacity;
-		[MayRequire("ceteam.combatextended")] public static StatDef ReloadTime;
-		[MayRequire("ceteam.combatextended")] public static StatDef ammoConsumedPerShotCount;
-		[MayRequire("ceteam.combatextended")] public static StatDef AmmoGenPerMagOverride;
+		[MayRequire("ceteam.combatextended")] public static StatDef CarryWeight;
+		[MayRequire("ceteam.combatextended")] public static StatDef Bulk;
+		[MayRequire("ceteam.combatextended")] public static StatDef WornBulk;
+
+		static StatDefOf_CE()
+		{
+			DefOfHelper.EnsureInitializedInCtor(typeof(StatDefOf_CE));
+		}
 	}
 
 	/// <summary>
@@ -312,7 +277,14 @@ namespace Outfitted
 		[MayRequire("ludeon.rimworld.odyssey")] public static StatDef FishingSpeed;
 		[MayRequire("ludeon.rimworld.odyssey")] public static StatDef FishingYield;
 		[MayRequire("ludeon.rimworld.odyssey")] public static StatDef PilotingAbility;
+
+		static StatDefOf_Rimworld()
+		{
+			DefOfHelper.EnsureInitializedInCtor(typeof(StatDefOf_Rimworld));
+		}
 	}
+
+	
 
 	/// <summary>
 	/// Add safe to dictionary. Checks for null-references.
