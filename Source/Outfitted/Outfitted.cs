@@ -176,20 +176,25 @@ namespace Outfitted
 		{
 			if (!outfit.StatPriorities.Any()) return 0f;
 
-			// Check for validity
-			var valid = outfit.StatPriorities.Where(sp => sp != null && sp.Stat != null).ToList();
-
-			return valid.Average(sp =>
+			float sum = 0f;
+			int count = 0;
+			foreach (var sp in outfit.StatPriorities)
 			{
+				if ( sp?.Stat == null ) continue;
 				float weight = sp.Weight;
-				float baseValue = Math.Max(Math.Abs(sp.Stat.defaultBaseValue), 0.001f);
+				float defaultAbs = Math.Abs(sp.Stat.defaultBaseValue);
+				float baseValue = Math.Max(defaultAbs, 0.001f);
 				float raw = ApparelScore(apparel, sp.Stat);
-				float delta = (Math.Abs(sp.Stat.defaultBaseValue) < 0.001f) ? raw : (raw - sp.Stat.defaultBaseValue) / baseValue;
+				float delta = (defaultAbs < 0.001f) ? raw : (raw - sp.Stat.defaultBaseValue) / baseValue;
 
-				return delta * (float)Math.Pow(weight, 3f);
-			});
+				sum += delta * weight * weight * weight;
+				count++;
+			}
 
+			// Depending on setting return either sum or average.
+			return OutfittedMod.Settings.sumScoresInsteadOfAverage ? sum : (count == 0 ? 0f : sum / count);
 
+			//// Original
 			//return !outfit.StatPriorities.Any<StatPriority>() ? 0.0f : outfit.StatPriorities.Select(sp => new
 			//{
 			//	weight = sp.Weight,

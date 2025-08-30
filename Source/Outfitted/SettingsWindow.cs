@@ -47,6 +47,15 @@ namespace Outfitted
 				"Some Apparel has constant positive offset.\n\n" +
 				"Example: Apparel_PackJump has +4 constant offset. All shields - too."
 				);
+			listing.CheckboxLabeled("Sum stats scores instead of averaging", ref Settings.sumScoresInsteadOfAverage, 
+				"All previous versions of the mod used an average value of all scores of stats for the selected outfit.\n"+
+				"It is a good approach to hold the total score in some manageble range.\n"+
+				"However, it creates a possibility for better apparel be scored lower than sligltly worse apparel nearby.\n\n"+
+				"Example: as priority stats the \"Move speed\" and \"Armor\" are selected. In stockpile there are 2 apparels options:\n" +
+				"1 - armor#1, which adds only armor. Value = 10\n"+
+				"2 - armor#2, which adds armor (value=10) and move speed (value=+0.4)\n"+
+				"Armor#1 will have a raw score of +10. Armor#2 will have a raw score of (10+0.4)/2 = +5.2. Armor#1 wins.\n\n"+
+				"This option replaces the average calculation by simple sum of all values. Better armor should win.");
 
 			listing.End();
 
