@@ -115,7 +115,7 @@ namespace Outfitted
 		{
 			if (pawn == null || apparel?.def?.apparel == null) return 0f;
 
-			// Exclude this apparel if it is a run to get real score.
+			// Exclude this apparel if it is a run to get real _worn_ score.
 			Apparel exclude = whatIfNotWorn ? apparel : null;
 
 			// Pawn wants pants
@@ -322,7 +322,7 @@ namespace Outfitted
 					var map = pawn?.MapHeld ?? pawn?.Map;
 					if (map != null)
 					{
-						float seasonalTemp = pawn.Map.mapTemperature.SeasonalTemp;
+						float seasonalTemp = map.mapTemperature.SeasonalTemp;
 						targetTemp = new FloatRange(seasonalTemp - outfit.autoTempOffset, seasonalTemp + outfit.autoTempOffset);
 					}
 					else
