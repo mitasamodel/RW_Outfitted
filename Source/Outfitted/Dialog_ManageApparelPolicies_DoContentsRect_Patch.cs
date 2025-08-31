@@ -209,15 +209,18 @@ namespace Outfitted
 		// Get priority.
 		private static int GetModPriority(Def def)
 		{
-			var id = def?.modContentPack?.PackageId ?? "ludeon.rimworld";
-			return PreferredModIndex.TryGetValue(id, out var idx) ? idx : int.MaxValue;
+			var id = def?.modContentPack?.PackageId;
+			if (id != null)
+				return PreferredModIndex.TryGetValue(id, out var idx) ? idx : int.MaxValue;
+			else
+				return int.MaxValue;
 		}
 
-		[TweakValue("00_",0, 21)]
+		[TweakValue("00_", 0, 21)]
 		static int modColor = 15;
 		[TweakValue("00_", 0, 21)]
 		static int catColor = 7;
-		
+
 		public static readonly string[] selectColor = new string[]
 		{
 			"aqua",
@@ -271,6 +274,7 @@ namespace Outfitted
 			{
 				// Filtered list.
 				var filtered = selectedOutfit.UnassignedStats
+					.Where(i => i!= null)
 					.Where(i => !i.alwaysHide)
 					.Where(i =>
 						string.IsNullOrEmpty(statFilterBuffer) ||
@@ -281,10 +285,10 @@ namespace Outfitted
 				// Final list.
 				var ordered = filtered
 					.OrderBy(x => GetModPriority(x))            // Pre-defined order for some mods.
-					.ThenBy(x => x.modContentPack?.PackageId == null ? 1 : 0)		// Push items without modContentPack to the end
-					.ThenBy(x => x.modContentPack?.PackageId ?? string.Empty)		// All other mods simple alphabetically.
-					.ThenBy(x => x.category?.displayOrder ?? int.MaxValue)			// Then - by category
-					.ThenBy(x => x.label ?? x.defName);			// Finally - by the label
+					.ThenBy(x => x.modContentPack?.PackageId == null ? 1 : 0)       // Push items without modContentPack to the end
+					.ThenBy(x => x.modContentPack?.PackageId ?? string.Empty)       // All other mods simple alphabetically.
+					.ThenBy(x => x.category?.displayOrder ?? int.MaxValue)          // Then - by category
+					.ThenBy(x => x.label ?? x.defName);         // Finally - by the label
 
 				StatCategoryDef category = null;
 				string modId = null;
@@ -296,7 +300,12 @@ namespace Outfitted
 					if (OutfittedMod.Settings.displayModName)
 					{
 						var itemModId = item.modContentPack?.PackageId ?? "<UNKNOWN>";
-						var itemModName = item.modContentPack.Name ?? "<UNKNOWN>";
+						var itemModName = item.modContentPack?.Name ?? "<UNKNOWN>";
+#if DEBUG
+						if (itemModId == "<UNKNOWN>")
+							Logger.LogNL($"[DrawApparelStats]: modContentPack is null for item [{item.label ?? item.defName}].");
+
+#endif
 						if (modId == null || modId != itemModId)
 						{
 							modId = itemModId;
