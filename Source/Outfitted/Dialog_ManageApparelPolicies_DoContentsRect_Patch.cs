@@ -281,9 +281,10 @@ namespace Outfitted
 				// Final list.
 				var ordered = filtered
 					.OrderBy(x => GetModPriority(x))            // Pre-defined order for some mods.
-					.ThenBy(x => x.modContentPack.PackageId)    // All other mods simple alphabetically.
-					.ThenBy(x => x.category.displayOrder)       // Then - by category
-					.ThenBy(x => x.label);                      // Finally - by the label
+					.ThenBy(x => x.modContentPack?.PackageId == null ? 1 : 0)		// Push items without modContentPack to the end
+					.ThenBy(x => x.modContentPack?.PackageId ?? string.Empty)		// All other mods simple alphabetically.
+					.ThenBy(x => x.category?.displayOrder ?? int.MaxValue)			// Then - by category
+					.ThenBy(x => x.label ?? x.defName);			// Finally - by the label
 
 				StatCategoryDef category = null;
 				string modId = null;
@@ -294,10 +295,12 @@ namespace Outfitted
 					// Add mod name on top of each group.
 					if (OutfittedMod.Settings.displayModName)
 					{
-						if (modId == null || modId != item.modContentPack.PackageId)
+						var itemModId = item.modContentPack?.PackageId ?? "<UNKNOWN>";
+						var itemModName = item.modContentPack.Name ?? "<UNKNOWN>";
+						if (modId == null || modId != itemModId)
 						{
-							modId = item.modContentPack.PackageId;
-							modName = item.modContentPack.Name;
+							modId = itemModId;
+							modName = itemModName;
 							options.Add(new FloatMenuOption($"<color={selectColor[modColor]}>{modName}</color>", null));
 							category = null;    // Reset category, to display it in next mod section.
 						}
@@ -306,9 +309,10 @@ namespace Outfitted
 					// Add category on top of each group.
 					if (OutfittedMod.Settings.displayCatName)
 					{
-						if (category == null || category != item.category)
+						var itemCat = item.category;
+						if (itemCat != null && (category == null || category != itemCat))
 						{
-							category = item.category;
+							category = itemCat;
 							options.Add(new FloatMenuOption($"<color={selectColor[catColor]}>{category.LabelCap}</color>", null));
 						}
 					}
