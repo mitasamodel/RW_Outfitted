@@ -36,6 +36,7 @@ namespace Outfitted
 		/// </summary>
 
 		// Each thread holds its own dictionary of PawnID -> flag.
+		// Threads are managed automaticelly. To do here: provide a factory for the first time initialization.
 		private static readonly ThreadLocal<Dictionary<int, bool>> WhatIfNotWornByThread
 			= new ThreadLocal<Dictionary<int, bool>>(() => new Dictionary<int, bool>());
 
@@ -44,8 +45,9 @@ namespace Outfitted
 		{
 			if (pawn == null) return false;
 
-			var map = WhatIfNotWornByThread.Value;
-			return map.TryGetValue(pawn.thingIDNumber, out var result) && result;
+			// Value - where ThreadLocal stores our var.
+			var dict = WhatIfNotWornByThread.Value;
+			return dict.TryGetValue(pawn.thingIDNumber, out var result) && result;
 		}
 
 		// Sets or clears the WhatIfNotWorn flag for this pawn on the current thread.
@@ -53,14 +55,14 @@ namespace Outfitted
 		{
 			if (pawn == null) return;
 
-			var map = WhatIfNotWornByThread.Value;
+			var dict = WhatIfNotWornByThread.Value;
 			if (flag)
 			{
-				map[pawn.thingIDNumber] = true;
+				dict[pawn.thingIDNumber] = true;
 			}
 			else
 			{
-				map.Remove(pawn.thingIDNumber);
+				dict.Remove(pawn.thingIDNumber);
 			}
 		}
 		/// <summary>
@@ -72,19 +74,16 @@ namespace Outfitted
 		private sealed class WhatIfNotWornScopeImpl : IDisposable
 		{
 			private readonly Pawn _pawn;
-			private readonly bool _prev;
 
 			public WhatIfNotWornScopeImpl(Pawn pawn)
 			{
 				_pawn = pawn;
-				_prev = GetWhatIfNotWorn(pawn);
 				SetWhatIfNotWorn(pawn, true);
 			}
 
 			public void Dispose()
 			{
-				// Restore previous value (removes entry if it was false).
-				SetWhatIfNotWorn(_pawn, _prev);
+				SetWhatIfNotWorn(_pawn, false);
 			}
 		}
 	}
