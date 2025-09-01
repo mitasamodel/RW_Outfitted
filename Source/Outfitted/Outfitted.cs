@@ -11,8 +11,6 @@ namespace Outfitted
 	[StaticConstructorOnStartup]
 	public static class Outfitted
 	{
-		private const float nakedOffset = 1f;
-
 		internal static bool showApparelScores;
 		internal static bool isSaveStorageSettingsEnabled;
 		internal static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
@@ -70,10 +68,10 @@ namespace Outfitted
 			num += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.def.apparel.scoreOffset;
 
 			// Score from appaerl itself.
-			num += ApparelScoreRawPriorities(apparel, currentApparelPolicy);
+			num += ApparelScorePriorities.RawPriorities(apparel, currentApparelPolicy);
 
 			// If Pawn need pants / shirt.
-			num += ApparelScorePawnNeedThis(pawn, apparel, whatIfNotWorn);
+			num += ApparelScoreNeeds.PawnNeedThis(pawn, apparel, whatIfNotWorn);
 
 			if (currentApparelPolicy.AutoWorkPriorities)
 				num += ApparelScoreAutoWorkPriorities(pawn, apparel);
@@ -89,202 +87,8 @@ namespace Outfitted
 			if (pawn != null && currentApparelPolicy != null)
 				num += ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth, whatIfNotWorn);
 
-			num = ModifiedWornByCorpse(pawn, apparel, currentApparelPolicy, num);
+			num = ApparelScoreNeeds.ModifiedWornByCorpse(pawn, apparel, currentApparelPolicy, num);
 			return num;
-		}
-
-		internal static float ModifiedWornByCorpse(Pawn pawn, Apparel apparel, ExtendedOutfit currentApparelPolicy, float num)
-		{
-			if (currentApparelPolicy.PenaltyWornByCorpse && apparel.WornByCorpse && ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.DeadMansApparel, true))
-			{
-				num -= 0.5f;
-				if (num > 0.0f)
-					num *= 0.1f;
-			}
-
-			return num;
-		}
-
-		/// <summary>
-		/// Return additional score if apparel needed due to nudity 
-		/// </summary>
-		/// <param name="pawn"></param>
-		/// <param name="apparel"></param>
-		/// <param name="whatIfNotWorn">Run the scoring like if this apparel will be removed and will be worn again</param>
-		/// <returns></returns>
-		internal static float ApparelScorePawnNeedThis(Pawn pawn, Apparel apparel, bool whatIfNotWorn = false)
-		{
-			if (pawn == null || apparel?.def?.apparel == null) return 0f;
-
-			// Exclude this apparel if it is a run to get real _worn_ score.
-			Apparel exclude = whatIfNotWorn ? apparel : null;
-
-			// Pawn wants pants
-			if (IsDefPants(apparel.def))
-			{
-				if (PawnCareAboutNaked(pawn) && !PawnWearPants(pawn, exclude))
-				{
-					return nakedOffset;
-				}
-			}
-			// Pawn wants shirt
-			else if (CoversTorso(apparel.def))
-			{
-				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && !PawnTorsoCovered(pawn, exclude))
-				{
-					return nakedOffset;
-				}
-			}
-
-			return 0f;
-
-			//var skinLayer = ApparelLayerDefOf.OnSkin;
-			//var legs = BodyPartGroupDefOf.Legs;
-		}
-
-		private static bool PawnCareAboutTorso(Pawn pawn)
-		{
-			if (pawn == null) return false;
-			//if (!ModsConfig.IdeologyActive) return pawn.gender == Gender.Female;
-
-			// For now.
-			// TODO: How to check Thought "naked" for female if Ideology is active and it is acceptable to not wear a shirt.
-			return pawn.gender == Gender.Female;
-		}
-
-		private static bool PawnCareAboutNaked(Pawn pawn)
-		{
-			return ThoughtUtility.CanGetThought(pawn, ThoughtDefOf.Naked, true);
-		}
-
-		// Pawn wear shirt or smth, what covers torso.
-		private static bool PawnTorsoCovered(Pawn pawn, Apparel exclude)
-		{
-			var worn = pawn.apparel?.WornApparel;
-			if (worn == null) return false;
-
-			return worn.Any(ap => ap != exclude && CoversTorso(ap.def));
-		}
-
-		// Pawn wear pants or smth, what covers same area.
-		private static bool PawnWearPants(Pawn pawn, Apparel exclude)
-		{
-			var worn = pawn.apparel?.WornApparel;
-			if (worn == null) return false;
-
-			return worn.Any(ap => ap != exclude && IsDefPants(ap.def));
-		}
-
-		// Can be used as pants?
-		private static bool IsDefPants(ThingDef def)
-		{
-			var apparel = def?.apparel;
-			if (apparel == null) return false;
-
-			return apparel.layers.Contains(ApparelLayerDefOf.OnSkin) && apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Legs);
-		}
-
-		// Can be used as shirt (or anything what covers torso)?
-		private static bool CoversTorso(ThingDef def)
-		{
-			var apparel = def?.apparel;
-			if (apparel == null) return false;
-
-			return apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Torso);
-		}
-
-		// Can be called also for equipped apparel.
-		internal static float ApparelScoreRawPriorities(Apparel apparel, ExtendedOutfit outfit)
-		{
-			if (!outfit.StatPriorities.Any()) return 0f;
-
-			float sum = 0f;
-			int count = 0;
-			foreach (var sp in outfit.StatPriorities)
-			{
-				if (sp?.Stat == null) continue;
-				float weight = sp.Weight;
-				float defaultAbs = Math.Abs(sp.Stat.defaultBaseValue);
-				float baseValue = Math.Max(defaultAbs, 0.001f);
-				float raw = ApparelScore(apparel, sp.Stat);
-				float delta = (defaultAbs < 0.001f) ? raw : (raw - sp.Stat.defaultBaseValue) / baseValue;
-
-				sum += delta * weight * weight * weight;
-				count++;
-			}
-
-			// Depending on setting return either sum or average.
-			return OutfittedMod.Settings.sumScoresInsteadOfAverage ? sum : (count == 0 ? 0f : sum / count);
-
-			//// Original
-			//return !outfit.StatPriorities.Any<StatPriority>() ? 0.0f : outfit.StatPriorities.Select(sp => new
-			//{
-			//	weight = sp.Weight,
-			//	value = apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetStatValue(sp.Stat),
-			//	def = sp.Stat.defaultBaseValue
-			//})
-			//	.Average(sp => (
-			//		(double)Math.Abs(sp.def) < 0.001 ? sp.value : (sp.value - sp.def) / Math.Abs(sp.def)) * Mathf.Pow(sp.weight, 3f)
-			//	);
-		}
-
-		/// <summary>
-		/// Score based on effect of apparel.
-		/// Example: CE's default CarryBulk is never 0 (it is 20) and "normal" formula will return higher than 20 for all "good" items
-		/// even if this item does not modify CarryBulk (it is checked in StatOffsetFromGear instead).
-		/// </summary>
-		/// <param name="apparel"></param>
-		/// <param name="stat"></param>
-		/// <param name="basedOnQuality"></param>
-		/// <returns></returns>
-		public static float ApparelScore(Apparel apparel, StatDef stat, bool basedOnQuality = true)
-		{
-			float result;
-			// Apparel provides gear offset for the stat.
-			// That means only offset depends on quality/material.
-			// Base value comes from stat default.
-			if (DefHasEquippedOffset(apparel.def, stat))
-			{
-				result = basedOnQuality ? StatWorker.StatOffsetFromGear(apparel, stat) : apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat);
-				result += stat.defaultBaseValue;
-			}
-
-			// Pawn-category stats with no equipped offset (example: CarryBulk with no offset).
-			// Apparel itself doesn't provide any bonus.
-			// Stat is always here "default", but to be safe, take it from apparel, not from stat itself.
-			else if (stat.category == StatCategoryDefOf.BasicsPawn)
-				result = apparel.def.GetStatValueAbstract(stat, null);
-
-			// All other.
-			// Stat is not default; it is defined not as gear offset, but as stat itself.
-			// Example: armor, cold/warm insulation. Depends on gear itsef, not modifying Pawn's stats.
-			else
-				result = basedOnQuality ? apparel.GetStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
-
-			// CE
-			if (ModsConfig.IsActive("CETeam.CombatExtended"))
-			{
-				if (stat == StatDefOf_CE.CarryBulk)
-					result -= apparel.GetStatValue(StatDefOf_CE.WornBulk);
-				else if (stat == StatDefOf_CE.CarryWeight)
-					result -= apparel.GetStatValue(StatDefOf_Rimworld.Mass);
-			}
-
-			return result;
-		}
-
-		// Check if ThingDef has stat modifier applied when equipped.
-		private static bool DefHasEquippedOffset(ThingDef def, StatDef stat)
-		{
-			var list = def.equippedStatOffsets;
-			if (list != null)
-			{
-				foreach (var statApparel in list)
-				{
-					if (statApparel.stat == stat && Math.Abs(statApparel.value) > float.Epsilon) return true;
-				}
-			}
-			return false;
 		}
 
 		internal static float ApparelScoreAutoWorkPriorities(Pawn pawn, Apparel apparel)

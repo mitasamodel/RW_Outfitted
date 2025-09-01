@@ -187,12 +187,12 @@ namespace Outfitted
 			Logger.Log($"Base[{num:F2}] ");
 
 			// Priority stats.
-			float prio = Outfitted.ApparelScoreRawPriorities(ap, policy);
+			float prio = ApparelScorePriorities.RawPriorities(ap, policy);
 			Logger.Log($"Prio[{prio:F2}] ");
 			num += prio;
 
 			// Pawn need this.
-			float need = Outfitted.ApparelScorePawnNeedThis(pawn, ap, whatIfNotWorn);
+			float need = ApparelScoreNeeds.PawnNeedThis(pawn, ap, whatIfNotWorn);
 			Logger.Log($"Need[{need:F2}] ");
 			num += need;
 
@@ -223,7 +223,7 @@ namespace Outfitted
 			Logger.Log($"Ins[{insulation:F2}] ");
 
 			// Corpse.
-			num = Outfitted.ModifiedWornByCorpse(pawn, ap, policy, num);
+			num = ApparelScoreNeeds.ModifiedWornByCorpse(pawn, ap, policy, num);
 			Logger.Log($"Final[{num:F2}] ");
 
 
@@ -259,7 +259,7 @@ namespace Outfitted
 					$"SumQ[{baseStatQ + wearStat}] " +
 					$"Sum_Q[{baseStat + wearStatQ}] "
 				);
-				Logger.LogNL($"\tScore: {Outfitted.ApparelScore(_apparel, stat.Stat)}");
+				Logger.LogNL($"\tScore: {ApparelScorePriorities.ApparelScore(_apparel, stat.Stat)}");
 			}
 		}
 	}

@@ -66,6 +66,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApparelScoreNeeds.cs" />
+    <Compile Include="ApparelScorePriorities.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="HarmonyPatches\Dialog_ManageApparelPolicies_Patches.cs" />
     <Compile Include="Dialog_ManageApparelPolicies_DoContentsRect_Patch.cs" />
