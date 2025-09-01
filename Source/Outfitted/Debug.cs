@@ -89,6 +89,7 @@ namespace Outfitted
 		private static Apparel _apparel;
 		private static ExtendedOutfit _outfit;
 		private static Pawn _pawn;
+		private static List<float> _wornScore = new List<float>();
 
 		public static void ClickedOn(ISelectable selectable)
 		{
@@ -97,6 +98,8 @@ namespace Outfitted
 				_pawn = pawn;
 				if (pawn.outfits.CurrentApparelPolicy is ExtendedOutfit outfit)
 					_outfit = outfit;
+
+				Outfitted.BuildWornScore(pawn, pawn.apparel?.WornApparel, _wornScore);
 
 				ShowScoreWornApparel(pawn);
 			}
@@ -116,28 +119,18 @@ namespace Outfitted
 			if (pawn?.outfits?.CurrentApparelPolicy is ExtendedOutfit outfit)
 			{
 				Logger.LogNL($"Apparel score:");
-				// Worn apparel.
 				List<Apparel> wornApparel = pawn.apparel?.WornApparel;
 				if (wornApparel == null || wornApparel.Count == 0) return;
 
 				string test = _apparel?.def?.defName ?? "CE_Apparel_Backpack";
 				ShowScoreWornApp(pawn, wornApparel);
-
-				//Logger.LogNL($"Remove {test}");
-				//if (wornApparel.Any(ap => ap.def.defName == test))
-				//{
-				//	Apparel testApp = wornApparel.FirstOrDefault(ap => ap.def.defName == test);
-				//	wornApparel.RemoveAll(ap => ap.def.defName == test);
-				//	ShowScoreWornApp(pawn, wornApparel);
-				//	var score = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, testApp);
-				//	Logger.LogNL($"Def[{testApp.def.defName}] Score[{score}]. Add back");
-				//	wornApparel.Add(testApp);
-				//}
 			}
 		}
 
 		private static void ShowScoreWornApp(Pawn pawn, List<Apparel> wornApparel)
 		{
+			List<float> gameScore = new List<float>();
+			Outfitted.BuildWornScore(pawn, wornApparel, gameScore);
 			ExtendedOutfit policy = pawn.outfits.CurrentApparelPolicy as ExtendedOutfit;
 			Map map = pawn.MapHeld ?? pawn.Map;
 			var seasonTemp = map.mapTemperature.SeasonalTemp;
@@ -145,7 +138,7 @@ namespace Outfitted
 			Logger.LogNL($"SeasonalTemp [{seasonTemp}] Offset [{tempOffset}] Final [{seasonTemp + tempOffset}]");
 			foreach (var ap in wornApparel)
 			{
-				ShowScoreApp(ap, pawn, policy);
+				//ShowScoreApp(ap, pawn, policy);
 				ShowScoreApp(ap, pawn, policy, whatIfNotWorn: true);
 			}
 			Logger.LogNL($"\tMin[{pawn.ComfortableTemperatureRange().min}] Max[{pawn.ComfortableTemperatureRange().max}]");
@@ -156,7 +149,7 @@ namespace Outfitted
 			float temp = 0f;
 			if (map == null) return 0f;
 			var conditions = map.GameConditionManager.ActiveConditions;
-			if ( conditions  == null ) return 0f;
+			if (conditions == null) return 0f;
 			foreach (var condition in conditions)
 			{
 				temp += condition.TemperatureOffset();
@@ -174,8 +167,18 @@ namespace Outfitted
 				Logger.Log($"\tDefNormScore[{ap.def?.defName}] ");
 			else
 				Logger.Log($"\tDefIfNotWorn[{ap.def?.defName}] ");
-			float totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
+
+			float totalRaw = 0f;
+			if (whatIfNotWorn)
+			{
+				using (PawnContext.WhatIfNotWornScope(pawn))
+					totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
+			}
+			else totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
 			Logger.Log($"RWScore[{totalRaw:F2}] ");
+
+			if (!whatIfNotWorn)
+				Logger.Log($"RWGain[{JobGiver_OptimizeApparel.ApparelScoreGain(pawn, ap, _wornScore):F2}] ");
 
 			float num = 0f;
 
