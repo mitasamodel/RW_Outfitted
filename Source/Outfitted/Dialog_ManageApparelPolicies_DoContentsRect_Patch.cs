@@ -291,8 +291,8 @@ namespace Outfitted
 					.ThenBy(x => x.label ?? x.defName);         // Finally - by the label
 
 				StatCategoryDef category = null;
-				string modId = null;
-				string modName = null;
+				string displayedModId = null;
+				string displayedModName = null;
 				List<FloatMenuOption> options = new List<FloatMenuOption>();
 				foreach (var item in ordered)
 				{
@@ -306,12 +306,12 @@ namespace Outfitted
 							Logger.LogNL($"[DrawApparelStats]: modContentPack is null for item [{item.label ?? item.defName}].");
 
 #endif
-						if (modId == null || modId != itemModId)
+						if (displayedModId == null || displayedModId != itemModId)
 						{
-							modId = itemModId;
-							modName = itemModName;
-							options.Add(new FloatMenuOption($"<color={selectColor[modColor]}>{modName}</color>", null));
-							category = null;    // Reset category, to display it in next mod section.
+							displayedModId = itemModId;
+							displayedModName = itemModName;
+							options.Add(new FloatMenuOption($"<color={selectColor[modColor]}>{displayedModName}</color>", null));
+							category = null;    // Reset category to display it in the next mod section.
 						}
 					}
 

@@ -5,6 +5,9 @@ using Verse;
 
 namespace Outfitted
 {
+	/// <summary>
+	/// Set outfit policy windows size: increase the size.
+	/// </summary>
 	[HarmonyPatch(typeof(Dialog_ManageApparelPolicies), nameof(Dialog_ManageApparelPolicies.InitialSize), MethodType.Getter)]
 	public static class Window_InitialSize_Patch
 	{
@@ -20,12 +23,16 @@ namespace Outfitted
 		}
 	}
 
+	/// <summary>
+	/// Allow to move window and to interact with backgrounds.
+	/// </summary>
 	[HarmonyPatch(typeof(Dialog_ManageApparelPolicies), MethodType.Constructor, argumentTypes: new[] { typeof(ApparelPolicy) })]
 	public static class Dialog_ManageApparelPolicies_Ctor_Patch
 	{
 		public static void Postfix(Dialog_ManageApparelPolicies __instance)
 		{
-			if ( OutfittedMod.Settings.draggableWindow) __instance.draggable = true;
+			if (OutfittedMod.Settings.draggableWindow) __instance.draggable = true;
+
 			if (OutfittedMod.Settings.nonBlockingWindow)
 			{
 				__instance.closeOnClickedOutside = false;

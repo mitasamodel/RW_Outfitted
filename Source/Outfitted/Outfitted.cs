@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using RimWorld;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -54,7 +55,7 @@ namespace Outfitted
 			outfit.StatPriorities.RemoveAll(sp => sp == null || sp.Stat == null);
 		}
 
-		public static float ApparelScoreExtra(Pawn pawn, Apparel apparel, NeededWarmth neededWarmth)
+		public static float ApparelScoreExtra(Pawn pawn, Apparel apparel, NeededWarmth neededWarmth, bool whatIfNotWorn = false)
 		{
 			if (!(pawn.outfits.CurrentApparelPolicy is ExtendedOutfit currentApparelPolicy))
 			{
@@ -72,7 +73,7 @@ namespace Outfitted
 			num += ApparelScoreRawPriorities(apparel, currentApparelPolicy);
 
 			// If Pawn need pants / shirt.
-			num += ApparelScorePawnNeedThis(pawn, apparel);
+			num += ApparelScorePawnNeedThis(pawn, apparel, whatIfNotWorn);
 
 			if (currentApparelPolicy.AutoWorkPriorities)
 				num += ApparelScoreAutoWorkPriorities(pawn, apparel);
@@ -86,7 +87,7 @@ namespace Outfitted
 			num += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.GetSpecialApparelScoreOffset();
 
 			if (pawn != null && currentApparelPolicy != null)
-				num += ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth);
+				num += ApparelScoreRawInsulation(pawn, apparel, currentApparelPolicy, neededWarmth, whatIfNotWorn);
 
 			num = ModifiedWornByCorpse(pawn, apparel, currentApparelPolicy, num);
 			return num;
@@ -405,6 +406,17 @@ namespace Outfitted
 			catch (Exception ex)
 			{
 				Log.Error(string.Format("Outfitted.Notify_OutfitChanged: {0}", ex));
+			}
+		}
+
+		public static void BuildWornScore(Pawn pawn, List<Apparel> wornApparel, List<float> wornScores)
+		{
+			using (PawnContext.WhatIfNotWornScope(pawn))
+			{
+				foreach (var ap in wornApparel)
+				{
+					wornScores.Add(JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap));
+				}
 			}
 		}
 	}

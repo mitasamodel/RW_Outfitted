@@ -175,7 +175,7 @@ namespace Outfitted
 			else
 				Logger.Log($"\tDefIfNotWorn[{ap.def?.defName}] ");
 			float totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
-			Logger.Log($"Score[{totalRaw:F2}] ");
+			Logger.Log($"RWScore[{totalRaw:F2}] ");
 
 			float num = 0f;
 
