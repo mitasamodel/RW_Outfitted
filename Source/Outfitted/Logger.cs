@@ -18,8 +18,24 @@ namespace Outfitted
 			if (!_init)
 			{
 				_init = true;
-				File.WriteAllText(logFile, "[LLPatch] Debug start\n");    //force in debug
+				File.WriteAllText(logFile, "[Outfitted] Debug start\n");    //force in debug
 			}
+#endif
+		}
+
+		public static void Log_Warning(string str)
+		{
+			Verse.Log.Warning($"[Outfitted] " + str);
+#if DEBUG
+			LogNL(str);
+#endif
+		}
+
+		public static void Log_Error(string str)
+		{
+			Verse.Log.Error($"[Outfitted] " + str);
+#if DEBUG
+			LogNL(str);
 #endif
 		}
 

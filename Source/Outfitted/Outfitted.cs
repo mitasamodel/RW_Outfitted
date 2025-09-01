@@ -213,12 +213,21 @@ namespace Outfitted
 			}
 		}
 
-		public static void BuildWornScore(Pawn pawn, List<Apparel> wornApparel, List<float> wornScores)
+		public static void BuildWornScore(Pawn pawn, List<float> wornScores)
 		{
+			if (pawn == null || pawn.apparel == null || pawn.apparel.WornApparel == null) return;
+			if (wornScores is null) throw new ArgumentNullException(nameof(wornScores));
+			var worn = pawn.apparel.WornApparel;
+			wornScores.Capacity = wornScores.Count + worn.Count;
 			using (PawnContext.WhatIfNotWornScope(pawn))
 			{
-				foreach (var ap in wornApparel)
+				foreach (var ap in worn)
 				{
+					if (ap == null)
+					{
+						Logger.Log_Warning("BuildWornScore: Unexpected Apparel-null in worn list.");
+						continue;
+					}
 					wornScores.Add(JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap));
 				}
 			}

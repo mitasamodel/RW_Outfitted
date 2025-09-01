@@ -32,7 +32,7 @@ namespace Outfitted
 		{
 			if (cachedId != pawn.thingIDNumber || cachedTick < GenTicks.TicksGame)
 			{
-				Outfitted.BuildWornScore(pawn, pawn.apparel.WornApparel, cachedScores);
+				Outfitted.BuildWornScore(pawn, cachedScores);
 				//cachedScores = ScoresForPawn(pawn);
 				cachedId = pawn.thingIDNumber;
 				cachedTick = GenTicks.TicksGame;

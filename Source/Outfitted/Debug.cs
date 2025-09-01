@@ -99,7 +99,7 @@ namespace Outfitted
 				if (pawn.outfits.CurrentApparelPolicy is ExtendedOutfit outfit)
 					_outfit = outfit;
 
-				Outfitted.BuildWornScore(pawn, pawn.apparel?.WornApparel, _wornScore);
+				Outfitted.BuildWornScore(pawn, _wornScore);
 
 				ShowScoreWornApparel(pawn);
 			}
@@ -130,7 +130,7 @@ namespace Outfitted
 		private static void ShowScoreWornApp(Pawn pawn, List<Apparel> wornApparel)
 		{
 			List<float> gameScore = new List<float>();
-			Outfitted.BuildWornScore(pawn, wornApparel, gameScore);
+			Outfitted.BuildWornScore(pawn, gameScore);
 			ExtendedOutfit policy = pawn.outfits.CurrentApparelPolicy as ExtendedOutfit;
 			Map map = pawn.MapHeld ?? pawn.Map;
 			var seasonTemp = map.mapTemperature.SeasonalTemp;

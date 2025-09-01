@@ -83,7 +83,6 @@ namespace Outfitted
 			// Insert our method BuildWornScoreWithFlag(pawn, wornApparel, wornScores)
 			matcher.InsertAfterAndAdvance(
 				new CodeInstruction(OpCodes.Ldarg_1),       // pawn
-				new CodeInstruction(OpCodes.Ldloc_2),       // wornApparel
 				new CodeInstruction(OpCodes.Ldsfld, WornScoresField), // wornApparelScores (private static)
 				new CodeInstruction(OpCodes.Call, BuildWithFlag)  // call helper
 			);
