@@ -25,20 +25,19 @@ namespace Outfitted
 
 			List<float> wornScoresCache = CachedScoresForPawn(singleSelectedThing);
 			float beauty = JobGiver_OptimizeApparel.ApparelScoreGain(singleSelectedThing, apparel, wornScoresCache);
-			//if ((double)Math.Abs(beauty) <= 0.0099999997764825821)
-			//	return;
 			GenMapUI.DrawThingLabel(GenMapUI.LabelDrawPosFor(apparel, 0.0f), beauty.ToString("F1"), BeautyDrawer.BeautyColor(beauty, 3f));
 		}
 
 		private static List<float> CachedScoresForPawn(Pawn pawn)
 		{
-			if (Thing_DrawGUIOverlay_Patch.cachedId != pawn.thingIDNumber || Thing_DrawGUIOverlay_Patch.cachedTick < GenTicks.TicksGame)
+			if (cachedId != pawn.thingIDNumber || cachedTick < GenTicks.TicksGame)
 			{
-				Thing_DrawGUIOverlay_Patch.cachedScores = Thing_DrawGUIOverlay_Patch.ScoresForPawn(pawn);
-				Thing_DrawGUIOverlay_Patch.cachedId = pawn.thingIDNumber;
-				Thing_DrawGUIOverlay_Patch.cachedTick = GenTicks.TicksGame;
+				Outfitted.BuildWornScore(pawn, pawn.apparel.WornApparel, cachedScores);
+				//cachedScores = ScoresForPawn(pawn);
+				cachedId = pawn.thingIDNumber;
+				cachedTick = GenTicks.TicksGame;
 			}
-			return Thing_DrawGUIOverlay_Patch.cachedScores;
+			return cachedScores;
 		}
 
 		private static List<float> ScoresForPawn(Pawn pawn)
