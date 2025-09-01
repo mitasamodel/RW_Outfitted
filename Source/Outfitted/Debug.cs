@@ -33,7 +33,7 @@ namespace Outfitted
 			//	{
 			//		var st = def.GetStatValueDef(stat.stat);
 			//		Logger.LogNL($"\tStat[{stat.stat.defName}] Cat[{stat.stat.category}] Default[{stat.stat.defaultBaseValue}] This[{st}] Equipped[{stat.value}]");
-					
+
 			//	}
 			//	Logger.LogNL("");
 			//}
@@ -139,77 +139,41 @@ namespace Outfitted
 		private static void ShowScoreWornApp(Pawn pawn, List<Apparel> wornApparel)
 		{
 			ExtendedOutfit policy = pawn.outfits.CurrentApparelPolicy as ExtendedOutfit;
+			Map map = pawn.MapHeld ?? pawn.Map;
+			var seasonTemp = map.mapTemperature.SeasonalTemp;
+			var tempOffset = GetTempOffset(map);
+			Logger.LogNL($"SeasonalTemp [{seasonTemp}] Offset [{tempOffset}] Final [{seasonTemp + tempOffset}]");
 			foreach (var ap in wornApparel)
 			{
 				ShowScoreApp(ap, pawn, policy);
-				ShowScoreAppRemoval(ap, pawn, policy);
+				ShowScoreApp(ap, pawn, policy, whatIfNotWorn: true);
 			}
 			Logger.LogNL($"\tMin[{pawn.ComfortableTemperatureRange().min}] Max[{pawn.ComfortableTemperatureRange().max}]");
 		}
 
-		private static void ShowScoreAppRemoval(Apparel ap, Pawn pawn, ExtendedOutfit policy)
+		private static float GetTempOffset(Map map)
 		{
-			if (ap == null || pawn == null || policy == null) return;
-
-			Logger.Log($"\tRem[{ap.def?.defName}] ");
-			float totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
-			Logger.Log($"Score[{totalRaw:F2}] ");
-
-			float num = 0f;
-
-			num += OutfittedMod.Settings.disableStartScore ? 0f : 0.1f;
-			num += OutfittedMod.Settings.disableScoreOffset ? 0f : ap.def.apparel.scoreOffset;
-			Logger.Log($"Base[{num:F2}] ");
-
-			// Priority stats.
-			float prio = Outfitted.ApparelScoreRawPriorities(ap, policy);
-			Logger.Log($"Prio[{prio:F2}] ");
-			num += prio;
-
-			// Pawn need this.
-			float need = Outfitted.ApparelScorePawnNeedThis(pawn, ap, true);
-			Logger.Log($"Need[{need:F2}] ");
-			num += need;
-
-			// Auto work.
-			float autoWork = 0f;
-			if (policy.AutoWorkPriorities)
-				autoWork += Outfitted.ApparelScoreAutoWorkPriorities(pawn, ap);
-			Logger.Log($"Work[{autoWork:F2}] ");
-			num += autoWork;
-
-			// HP.
-			float hp = 1f;
-			if (ap.def.useHitPoints)
+			float temp = 0f;
+			if (map == null) return 0f;
+			var conditions = map.GameConditionManager.ActiveConditions;
+			if ( conditions  == null ) return 0f;
+			foreach (var condition in conditions)
 			{
-				hp = (float)ap.HitPoints / ap.MaxHitPoints;
-				num *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate(Mathf.Clamp01(hp));
+				temp += condition.TemperatureOffset();
+				Logger.LogNL($"[{condition.def.defName}] [{condition.TemperatureOffset()}] [{condition.def.temperatureOffset}]");
 			}
-			Logger.Log($"HP_Mult[{hp:F2}] Num[{num:F2}] ");
-
-			// Special score offset.
-			float offset = OutfittedMod.Settings.disableScoreOffset ? 0 : ap.GetSpecialApparelScoreOffset();
-			num += offset;
-			Logger.Log($"Offset[{offset:F2}] ");
-
-			// Insulation.
-			float insulation = Outfitted.ApparelScoreRawInsulation(pawn, ap, policy, NeededWarmth.Any, true);
-			num += insulation;
-			Logger.Log($"Ins[{insulation:F2}] ");
-
-			// Corpse.
-			num = Outfitted.ModifiedWornByCorpse(pawn, ap, policy, num);
-			Logger.Log($"Final[{num:F2}] ");
-
-
-			Logger.LogNL("");
+			//GameConditionDefOf
+			return temp;
 		}
 
-		private static void ShowScoreApp(Apparel ap, Pawn pawn, ExtendedOutfit policy)
+		private static void ShowScoreApp(Apparel ap, Pawn pawn, ExtendedOutfit policy, bool whatIfNotWorn = false)
 		{
 			if (ap == null || pawn == null || policy == null) return;
 
-			Logger.Log($"\tDef[{ap.def?.defName}] ");
+			if (!whatIfNotWorn)
+				Logger.Log($"\tDefNormScore[{ap.def?.defName}] ");
+			else
+				Logger.Log($"\tDefIfNotWorn[{ap.def?.defName}] ");
 			float totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
 			Logger.Log($"Score[{totalRaw:F2}] ");
 
@@ -225,7 +189,7 @@ namespace Outfitted
 			num += prio;
 
 			// Pawn need this.
-			float need = Outfitted.ApparelScorePawnNeedThis(pawn, ap);
+			float need = Outfitted.ApparelScorePawnNeedThis(pawn, ap, whatIfNotWorn);
 			Logger.Log($"Need[{need:F2}] ");
 			num += need;
 
@@ -251,7 +215,7 @@ namespace Outfitted
 			Logger.Log($"Offset[{offset:F2}] ");
 
 			// Insulation.
-			float insulation = Outfitted.ApparelScoreRawInsulation(pawn, ap, policy, NeededWarmth.Any);
+			float insulation = Outfitted.ApparelScoreRawInsulation(pawn, ap, policy, NeededWarmth.Any, whatIfNotWorn);
 			num += insulation;
 			Logger.Log($"Ins[{insulation:F2}] ");
 
