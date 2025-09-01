@@ -107,11 +107,17 @@ namespace Outfitted
 			{
 				_apparel = apparel;
 				ShowScoreApp(_apparel, _pawn, _outfit);
+				ShowIfWorn(_apparel, _pawn, _outfit);
 			}
 
 			if (_apparel == null || _outfit == null || _pawn == null) return;
 
 			//ShowApparelStatScores();
+		}
+
+		private static void ShowIfWorn(Apparel ap, Pawn pawn, ExtendedOutfit outfit)
+		{
+
 		}
 
 		private static void ShowScoreWornApparel(Pawn pawn)
@@ -218,7 +224,7 @@ namespace Outfitted
 			Logger.Log($"Offset[{offset:F2}] ");
 
 			// Insulation.
-			float insulation = Outfitted.ApparelScoreRawInsulation(pawn, ap, policy, NeededWarmth.Any, whatIfNotWorn);
+			float insulation = ApparelScoreInsulation.RawInsulation(pawn, ap, policy, NeededWarmth.Any);
 			num += insulation;
 			Logger.Log($"Ins[{insulation:F2}] ");
 
