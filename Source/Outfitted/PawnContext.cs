@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Verse;
 
@@ -33,23 +34,38 @@ namespace Outfitted
 		/// 
 		/// Key is pawn.thingIDNumber.
 		/// </summary>
-		private static readonly Dictionary<int,bool> _whatIfNotWorn_JobGiver_OptimizeApparel = new Dictionary<int,bool>();
+
+		// Each thread holds its own dictionary of PawnID -> flag.
+		private static readonly ThreadLocal<Dictionary<int, bool>> WhatIfNotWornByThread
+			= new ThreadLocal<Dictionary<int, bool>>(() => new Dictionary<int, bool>());
+
+		// Returns true if the current thread has the WhatIfNotWorn flag set for this pawn.
 		public static bool GetWhatIfNotWorn(Pawn pawn)
 		{
 			if (pawn == null) return false;
-			return _whatIfNotWorn_JobGiver_OptimizeApparel.TryGetValue(pawn.thingIDNumber, out bool result) && result;
+
+			var map = WhatIfNotWornByThread.Value;
+			return map.TryGetValue(pawn.thingIDNumber, out var result) && result;
 		}
+
+		// Sets or clears the WhatIfNotWorn flag for this pawn on the current thread.
 		public static void SetWhatIfNotWorn(Pawn pawn, bool flag)
 		{
 			if (pawn == null) return;
+
+			var map = WhatIfNotWornByThread.Value;
 			if (flag)
-				_whatIfNotWorn_JobGiver_OptimizeApparel[pawn.thingIDNumber] = true;
+			{
+				map[pawn.thingIDNumber] = true;
+			}
 			else
-				_whatIfNotWorn_JobGiver_OptimizeApparel.Remove(pawn.thingIDNumber);
+			{
+				map.Remove(pawn.thingIDNumber);
+			}
 		}
 		/// <summary>
-		/// Convenience scope that sets the flag to true for the duration of the scope
-		/// and restores the previous state on dispose.
+		/// Scope helper: sets the flag to true for the duration of the scope,
+		/// then restores the previous value (on the same thread).
 		/// Usage: using (PawnContext.WhatIfNotWornScope(pawn)) { /* internal logic */ }
 		/// </summary>
 		public static IDisposable WhatIfNotWornScope(Pawn pawn) => new WhatIfNotWornScopeImpl(pawn);
