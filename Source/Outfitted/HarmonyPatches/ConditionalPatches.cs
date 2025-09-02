@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using LudeonTK;
 
 namespace Outfitted
 {
@@ -31,10 +32,19 @@ namespace Outfitted
 
 		internal static void GearDisplayScore(Rect rowRect, Thing thing, bool CE = false)
 		{
+			float smallGap = 6f;
 			Rect freeSpaceRect = rowRect;
 
 			freeSpaceRect.width -= (24f + 24f + 24f + 60f);
 			Utils_GUI.DrawBox(freeSpaceRect, Color.grey);
+
+			string sampleText = "-123.5";
+			Rect scoreRect = freeSpaceRect.ToTheRight(Text.CalcSize(sampleText).x);
+			scoreRect.x -= smallGap;
+			Utils_GUI.DrawBox(scoreRect, Color.white);
+
+			Utils_GUI.LabelRight(scoreRect, "-123.4");
+			Log.Message("Size: " + Text.CalcSize(sampleText).x);
 		}
 	}
 

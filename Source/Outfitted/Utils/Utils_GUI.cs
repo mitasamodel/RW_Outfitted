@@ -129,5 +129,12 @@ namespace Outfitted.RW_JustUtils
 			Widgets.Label(inRect, label);
 			Text.Anchor = oldAnchor;
 		}
+		public static void LabelRight(Rect inRect, string label)
+		{
+			var oldAnchor = Text.Anchor;
+			Text.Anchor = TextAnchor.MiddleRight;
+			Widgets.Label(inRect, label);
+			Text.Anchor = oldAnchor;
+		}
 	}
 }

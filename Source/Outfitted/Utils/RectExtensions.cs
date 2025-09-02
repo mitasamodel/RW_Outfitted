@@ -25,5 +25,10 @@ namespace Outfitted.RW_JustUtils
 			var y = rect.y + (rect.height - height) / 2f;
 			return new Rect(rect.x, y, rect.width, height);
 		}
+		public static Rect ToTheRight(this Rect rect, float width)
+		{
+			var x = rect.xMax - width;
+			return new Rect(x, rect.y, width, rect.height);
+		}
 	}
 }
