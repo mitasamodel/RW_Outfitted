@@ -167,7 +167,7 @@ namespace Outfitted
 			if (!whatIfNotWorn)
 				Logger.Log($"\tDefNormScore[{ap.def?.defName}] ");
 			else
-				Logger.Log($"\tDefIfNotWorn[{ap.def?.defName}] ");
+				Logger.Log($"\tDef[{ap.def?.defName}] ");
 
 			float totalRaw = 0f;
 			if (whatIfNotWorn)

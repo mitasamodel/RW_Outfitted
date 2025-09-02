@@ -29,7 +29,10 @@ namespace Outfitted
 			Logger.Init();
 #endif
 			isSaveStorageSettingsEnabled = ModLister.GetActiveModWithIdentifier("savestoragesettings.kv.rw") != null;
-			new Harmony("rimworld.outfitted").PatchAll();
+			var harmony = new Harmony("rimworld.outfitted");
+			//Harmony.DEBUG = true;
+			harmony.PatchAll();
+			ConditionalPatches.PatchAll(harmony);
 			Log.Message("[Outfitted] loaded");
 		}
 
@@ -110,7 +113,8 @@ namespace Outfitted
 		/// <exception cref="ArgumentNullException"></exception>
 		public static List<float> BuildWornScore(Pawn pawn)
 		{
-			var worn = (pawn?.apparel?.WornApparel) ?? throw new ArgumentNullException(nameof(pawn));
+			var worn = pawn?.apparel?.WornApparel;
+			worn ??= new List<Apparel>();
 
 			var wornScores = new List<float>(worn.Count);
 			foreach (var ap in worn)
