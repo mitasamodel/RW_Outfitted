@@ -75,9 +75,9 @@
     <Compile Include="HarmonyPatches\JobGiver_OptimizeApparel_TryGiveJob_Patch.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="OutfittedGameComponent.cs" />
-    <Compile Include="OutfittedSettigs.cs" />
+    <Compile Include="Settings\OutfittedSettigs.cs" />
     <Compile Include="PawnContext.cs" />
-    <Compile Include="SettingsWindow.cs" />
+    <Compile Include="Settings\SettingsWindow.cs" />
     <Compile Include="StatDefOf.cs" />
     <Compile Include="Utils\FloatMenuPreserveOrder.cs" />
     <Compile Include="Utils\Listing_StandardExtensions.cs" />

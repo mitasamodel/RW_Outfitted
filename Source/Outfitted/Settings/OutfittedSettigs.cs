@@ -26,10 +26,12 @@ namespace Outfitted
 		public const bool disableStartScore_default = false;
 		public const bool disableScoreOffset_default = false;
 		public const bool sumScoresInsteadOfAverage_default = true;
+		public const bool insScoreBasedOnConditions_default = true;
 
 		public bool disableStartScore = disableStartScore_default;
 		public bool disableScoreOffset = disableScoreOffset_default;
 		public bool sumScoresInsteadOfAverage = sumScoresInsteadOfAverage_default;
+		public bool insScoreBasedOnConditions = insScoreBasedOnConditions_default;
 
 		public override void ExposeData()
 		{
@@ -42,6 +44,7 @@ namespace Outfitted
 			Scribe_Values.Look(ref disableStartScore, "disableStartScore", disableStartScore_default);
 			Scribe_Values.Look(ref disableScoreOffset, "disableScoreOffset", disableScoreOffset_default);
 			Scribe_Values.Look(ref sumScoresInsteadOfAverage, "sumScoresInsteadOfAverage", sumScoresInsteadOfAverage_default);
+			Scribe_Values.Look(ref insScoreBasedOnConditions, "insScoreBasedOnConditions", insScoreBasedOnConditions_default);
 		}
 
 		public void ResetDefault()
@@ -55,6 +58,7 @@ namespace Outfitted
 			disableStartScore = disableStartScore_default;
 			disableScoreOffset = disableScoreOffset_default;
 			sumScoresInsteadOfAverage = sumScoresInsteadOfAverage_default;
+			insScoreBasedOnConditions = insScoreBasedOnConditions_default;
 		}
 	}
 }

@@ -3,6 +3,7 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
 
@@ -38,7 +39,7 @@ namespace Outfitted
 			outfit.StatPriorities.RemoveAll(sp => sp == null || sp.Stat == null);
 		}
 
-		public static float ApparelScoreExtra(Pawn pawn, Apparel apparel, NeededWarmth neededWarmth, bool whatIfNotWorn = false)
+		public static float ApparelScoreExtra(Pawn pawn, Apparel apparel, NeededWarmth neededWarmth)
 		{
 			if (!(pawn.outfits.CurrentApparelPolicy is ExtendedOutfit currentApparelPolicy))
 			{
@@ -56,7 +57,10 @@ namespace Outfitted
 			num += ApparelScorePriorities.RawPriorities(apparel, currentApparelPolicy);
 
 			// If Pawn need pants / shirt.
-			num += ApparelScoreNeeds.PawnNeedThis(pawn, apparel, whatIfNotWorn);
+			num += ApparelScoreNeeds.PawnNeedThis(pawn, apparel);
+
+			// Ideology
+			num += ApparelScoreNeeds.PawnNeedIdeology(pawn, apparel);
 
 			if (currentApparelPolicy.AutoWorkPriorities)
 				num += ApparelScoreAutoWorkPriorities(pawn, apparel);
@@ -97,10 +101,14 @@ namespace Outfitted
 			}
 		}
 
-		public static void BuildWornScore(Pawn pawn, List<float> wornScores)
+		public static void ReBuildWornScore(Pawn pawn, List<float> wornScores)
 		{
-			if (pawn == null || pawn.apparel == null || pawn.apparel.WornApparel == null) return;
-			if (wornScores is null) throw new ArgumentNullException(nameof(wornScores));
+			if (pawn == null || pawn.apparel == null || pawn.apparel.WornApparel == null) 
+				throw new ArgumentNullException(nameof(pawn)); ;
+			if (wornScores is null) 
+				throw new ArgumentNullException(nameof(wornScores));
+
+			wornScores.Clear();
 			var worn = pawn.apparel.WornApparel;
 			wornScores.Capacity = wornScores.Count + worn.Count;
 			using (PawnContext.WhatIfNotWornScope(pawn))
@@ -110,9 +118,10 @@ namespace Outfitted
 					if (ap == null)
 					{
 						Logger.Log_Warning("BuildWornScore: Unexpected Apparel-null in worn list.");
-						continue;
+						wornScores.Add(0f);
 					}
-					wornScores.Add(JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap));
+					else
+						wornScores.Add(JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap));
 				}
 			}
 		}

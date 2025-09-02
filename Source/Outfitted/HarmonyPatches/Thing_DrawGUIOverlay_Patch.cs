@@ -1,7 +1,9 @@
 ﻿using HarmonyLib;
+using Outfitted.RW_JustUtils;
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Verse;
 
 namespace Outfitted
@@ -32,8 +34,7 @@ namespace Outfitted
 		{
 			if (cachedId != pawn.thingIDNumber || cachedTick < GenTicks.TicksGame)
 			{
-				Outfitted.BuildWornScore(pawn, cachedScores);
-				//cachedScores = ScoresForPawn(pawn);
+				Outfitted.ReBuildWornScore(pawn, cachedScores);
 				cachedId = pawn.thingIDNumber;
 				cachedTick = GenTicks.TicksGame;
 			}

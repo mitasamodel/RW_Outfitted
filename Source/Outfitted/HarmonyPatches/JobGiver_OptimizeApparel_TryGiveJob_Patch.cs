@@ -22,7 +22,7 @@ namespace Outfitted
 			AccessTools.Method(typeof(JobGiver_OptimizeApparel), nameof(JobGiver_OptimizeApparel.ApparelScoreRaw));
 
 		private static readonly MethodInfo BuildWithFlag =
-			AccessTools.Method(typeof(Outfitted), nameof(Outfitted.BuildWornScore));
+			AccessTools.Method(typeof(Outfitted), nameof(Outfitted.ReBuildWornScore));
 
 		private static readonly FieldInfo WornScoresField =
 		   AccessTools.Field(typeof(JobGiver_OptimizeApparel), "wornApparelScores");

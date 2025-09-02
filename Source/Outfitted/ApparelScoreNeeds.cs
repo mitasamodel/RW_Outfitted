@@ -5,45 +5,55 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 
 namespace Outfitted
 {
 	internal static class ApparelScoreNeeds
 	{
-		private const float nakedOffset = 1f;
+		private const float nakedOffset = 2f;
+		private const float ideologyOffset = 2f;
 
-		/// <summary>
-		/// Return additional score if apparel needed due to nudity 
-		/// </summary>
-		/// <param name="pawn"></param>
-		/// <param name="apparel"></param>
-		/// <param name="whatIfNotWorn">Run the scoring like if this apparel will be removed and will be worn again</param>
-		/// <returns></returns>
-		internal static float PawnNeedThis(Pawn pawn, Apparel apparel, bool whatIfNotWorn = false)
+		// Return additional score if apparel needed due to nudity 
+		internal static float PawnNeedThis(Pawn pawn, Apparel apparel)
 		{
 			if (pawn == null || apparel?.def?.apparel == null) return 0f;
+			float result = 0f;
 
-			// Exclude this apparel if it is a run to get real _worn_ score.
-			Apparel exclude = whatIfNotWorn ? apparel : null;
-
-			// Pawn wants pants
-			if (IsDefPants(apparel.def))
+			List<ThingDef> conflicts = new List<ThingDef>();
+			foreach(var ap in pawn.apparel.WornApparel)
 			{
-				if (PawnCareAboutNaked(pawn) && !PawnWearPants(pawn, exclude))
+				if ( !ApparelUtility.CanWearTogether(ap.def, apparel.def, pawn.RaceProps.body))
 				{
-					return nakedOffset;
+					conflicts.Add(ap.def);
 				}
 			}
+
+			// Pants.
+			if (CoversLegSkin(apparel.def))
+			{
+				// TODO: need to exclude other items, which this item will force to not wear.
+				// VAE_Apparel_MilitaryUniform covers both - legs and torso.
+
+
+				if (PawnCareAboutNaked(pawn) && !PawnLegsCovered(pawn, conflicts))
+				{
+					result += nakedOffset;
+				}
+			}
+
 			// Pawn wants shirt
-			else if (CoversTorso(apparel.def))
+			if (CoversTorso(apparel.def))
 			{
-				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && !PawnTorsoCovered(pawn, exclude))
+				// TODO: the same
+
+				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && !PawnTorsoCovered(pawn, conflicts))
 				{
-					return nakedOffset;
+					result += nakedOffset;
 				}
 			}
 
-			return 0f;
+			return result;
 
 			//var skinLayer = ApparelLayerDefOf.OnSkin;
 			//var legs = BodyPartGroupDefOf.Legs;
@@ -65,25 +75,25 @@ namespace Outfitted
 		}
 
 		// Pawn wear shirt or smth, what covers torso.
-		private static bool PawnTorsoCovered(Pawn pawn, Apparel exclude)
+		private static bool PawnTorsoCovered(Pawn pawn, List<ThingDef> exclude)
 		{
 			var worn = pawn.apparel?.WornApparel;
 			if (worn == null) return false;
 
-			return worn.Any(ap => ap != exclude && CoversTorso(ap.def));
+			return worn.Any(ap => !exclude.Contains(ap.def) && CoversTorso(ap.def));
 		}
 
-		// Pawn wear pants or smth, what covers same area.
-		private static bool PawnWearPants(Pawn pawn, Apparel exclude)
+		// Pawn wear other item, which covers same area.
+		private static bool PawnLegsCovered(Pawn pawn, List<ThingDef> exclude)
 		{
 			var worn = pawn.apparel?.WornApparel;
 			if (worn == null) return false;
 
-			return worn.Any(ap => ap != exclude && IsDefPants(ap.def));
+			return worn.Any(ap => !exclude.Contains(ap.def) && CoversLegSkin(ap.def));
 		}
 
 		// Can be used as pants?
-		private static bool IsDefPants(ThingDef def)
+		private static bool CoversLegSkin(ThingDef def)
 		{
 			var apparel = def?.apparel;
 			if (apparel == null) return false;
@@ -110,6 +120,20 @@ namespace Outfitted
 			}
 
 			return num;
+		}
+
+		internal static float PawnNeedIdeology(Pawn pawn, Apparel ap)
+		{
+			if (pawn?.apparel?.AllRequirements == null || ap == null) return 0f;
+
+			foreach (ApparelRequirementWithSource req in pawn.apparel.AllRequirements)
+			{
+				if (req.requirement.RequiredForPawn(pawn, ap.def))
+				{
+					return ideologyOffset;
+				}
+			}
+			return 0f;
 		}
 	}
 }

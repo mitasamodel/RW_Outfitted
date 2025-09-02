@@ -54,7 +54,9 @@ namespace Outfitted
 					if (map != null)
 					{
 						float seasonalTemp = map.mapTemperature.SeasonalTemp;
-						targetTemp = new FloatRange(seasonalTemp - outfit.autoTempOffset, seasonalTemp + outfit.autoTempOffset);
+						float conTempOffset = OutfittedMod.Settings.insScoreBasedOnConditions ? GetTempOffset(map) : 0f;
+						float mapTemp = seasonalTemp + conTempOffset;
+						targetTemp = new FloatRange(mapTemp - outfit.autoTempOffset, mapTemp + outfit.autoTempOffset);
 					}
 					else
 					{
@@ -78,24 +80,13 @@ namespace Outfitted
 							FloatRange insulationWorn = GetInsulationStats(apWorn);
 							conflictsIns.min += insulationWorn.min;
 							conflictsIns.max += insulationWorn.max;
-
-							//// Cannot be worn together: reduce insulation by apparel, which will be removed.
-							//FloatRange insulationWorn = GetInsulationStats(apWorn);
-							//newComfTemp.min -= insulationWorn.min;
-							//newComfTemp.max -= insulationWorn.max;
-							//if (deepLogger) Logger.LogNL($"Replace newComfTemp min[{newComfTemp.min}] max[{newComfTemp.max}]");
-
-							//// Set current comfortable temperature to what it will be without worn apparel.
-							//curComfTemp.min -= insulationWorn.min;
-							//curComfTemp.max -= insulationWorn.max;
-							//if (deepLogger) Logger.LogNL($"Remove curComfTemp min[{curComfTemp.min}] max[{curComfTemp.max}]");
 						}
 					}
 				}
 				if (deepLogger) Logger.LogNL($"conflictsIns min[{conflictsIns.min}] max[{conflictsIns.max}]");
 
 				// Remove stats from conflicting insulation.
-				// The same is done for already worn apparel to get their proper score.
+				// The same is done for already worn apparel too to get its proper score.
 				curComfTemp.min -= conflictsIns.min;
 				curComfTemp.max -= conflictsIns.max;
 				if (deepLogger) Logger.LogNL($"Adjust curComfTemp min[{curComfTemp.min}] max[{curComfTemp.max}]");
@@ -142,7 +133,7 @@ namespace Outfitted
 		}
 
 		/// <summary>
-		/// Offset by any external conditions (heat weave, cold snap, etc.).
+		/// Offset by any external conditions (heat wave, cold snap, etc.).
 		/// </summary>
 		/// <param name="map"></param>
 		/// <returns></returns>
@@ -155,9 +146,7 @@ namespace Outfitted
 			foreach (var condition in conditions)
 			{
 				offset += condition.TemperatureOffset();
-				Logger.LogNL($"[{condition.def.defName}] [{condition.TemperatureOffset()}] [{condition.def.temperatureOffset}]");
 			}
-			//GameConditionDefOf
 			return offset;
 		}
 

@@ -33,8 +33,7 @@ namespace Outfitted
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static float ApparelScoreExtra(Apparel ap, Pawn pawn, NeededWarmth neededWarmth)
 		{
-			bool whatIfNotWorn = PawnContext.GetWhatIfNotWorn(pawn);
-			return Outfitted.ApparelScoreExtra(pawn, ap, neededWarmth, whatIfNotWorn);
+			return Outfitted.ApparelScoreExtra(pawn, ap, neededWarmth);
 		}
 	}
 }
