@@ -34,19 +34,11 @@ namespace Outfitted
 		{
 			if (cachedId != pawn.thingIDNumber || cachedTick < GenTicks.TicksGame)
 			{
-				Outfitted.ReBuildWornScore(pawn, cachedScores);
+				cachedScores = Outfitted.BuildWornScore(pawn);
 				cachedId = pawn.thingIDNumber;
 				cachedTick = GenTicks.TicksGame;
 			}
 			return cachedScores;
-		}
-
-		private static List<float> ScoresForPawn(Pawn pawn)
-		{
-			List<float> floatList = new List<float>();
-			for (int index = 0; index < pawn.apparel.WornApparel.Count; ++index)
-				floatList.Add(JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, pawn.apparel.WornApparel[index]));
-			return floatList;
 		}
 	}
 }

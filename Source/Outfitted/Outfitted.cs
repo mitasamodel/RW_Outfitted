@@ -101,29 +101,29 @@ namespace Outfitted
 			}
 		}
 
-		public static void ReBuildWornScore(Pawn pawn, List<float> wornScores)
+		/// <summary>
+		/// Build a score list of currently worn apparel.
+		/// Used in JobGiver_OptimizeApparel.TryGiveJob via Harmony patch.
+		/// </summary>
+		/// <param name="pawn"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentNullException"></exception>
+		public static List<float> BuildWornScore(Pawn pawn)
 		{
-			if (pawn == null || pawn.apparel == null || pawn.apparel.WornApparel == null) 
-				throw new ArgumentNullException(nameof(pawn)); ;
-			if (wornScores is null) 
-				throw new ArgumentNullException(nameof(wornScores));
+			var worn = (pawn?.apparel?.WornApparel) ?? throw new ArgumentNullException(nameof(pawn));
 
-			wornScores.Clear();
-			var worn = pawn.apparel.WornApparel;
-			wornScores.Capacity = wornScores.Count + worn.Count;
-			using (PawnContext.WhatIfNotWornScope(pawn))
+			var wornScores = new List<float>(worn.Count);
+			foreach (var ap in worn)
 			{
-				foreach (var ap in worn)
+				if (ap == null)
 				{
-					if (ap == null)
-					{
-						Logger.Log_Warning("BuildWornScore: Unexpected Apparel-null in worn list.");
-						wornScores.Add(0f);
-					}
-					else
-						wornScores.Add(JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap));
+					Logger.Log_Warning("BuildWornScore: Unexpected Apparel-null in worn list.");
+					wornScores.Add(0f);
 				}
+				else
+					wornScores.Add(JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap));
 			}
+			return wornScores;
 		}
 	}
 }

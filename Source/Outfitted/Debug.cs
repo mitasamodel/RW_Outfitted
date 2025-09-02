@@ -99,7 +99,7 @@ namespace Outfitted
 				if (pawn.outfits.CurrentApparelPolicy is ExtendedOutfit outfit)
 					_outfit = outfit;
 
-				Outfitted.ReBuildWornScore(pawn, _wornScore);
+				_wornScore = Outfitted.BuildWornScore(pawn);
 
 				ShowScoreWornApparel(pawn);
 			}
@@ -122,21 +122,16 @@ namespace Outfitted
 
 		private static void ShowScoreWornApparel(Pawn pawn)
 		{
-			if (pawn?.outfits?.CurrentApparelPolicy is ExtendedOutfit outfit)
+			Logger.LogNL($"[{pawn.Name}] Apparel score:");
+			List<Apparel> wornApparel = pawn?.apparel?.WornApparel;
+			if (wornApparel == null || wornApparel.Count == 0)
 			{
-				Logger.LogNL($"Apparel score:");
-				List<Apparel> wornApparel = pawn.apparel?.WornApparel;
-				if (wornApparel == null || wornApparel.Count == 0) return;
-
-				string test = _apparel?.def?.defName ?? "CE_Apparel_Backpack";
-				ShowScoreWornApp(pawn, wornApparel);
+				Logger.LogNL($"No apparel");
+				return;
 			}
-		}
 
-		private static void ShowScoreWornApp(Pawn pawn, List<Apparel> wornApparel)
-		{
 			List<float> gameScore = new List<float>();
-			Outfitted.ReBuildWornScore(pawn, gameScore);
+			gameScore = Outfitted.BuildWornScore(pawn);
 			ExtendedOutfit policy = pawn.outfits.CurrentApparelPolicy as ExtendedOutfit;
 			Map map = pawn.MapHeld ?? pawn.Map;
 			var seasonTemp = map.mapTemperature.SeasonalTemp;
@@ -190,7 +185,7 @@ namespace Outfitted
 
 			num += OutfittedMod.Settings.disableStartScore ? 0f : 0.1f;
 			num += OutfittedMod.Settings.disableScoreOffset ? 0f : ap.def.apparel.scoreOffset;
-			Logger.Log($"Base[{num:F2}] ");
+			if (num != 0) Logger.Log($"Base[{num:F2}] ");
 
 			// Priority stats.
 			float prio = ApparelScorePriorities.RawPriorities(ap, policy);
@@ -204,14 +199,14 @@ namespace Outfitted
 
 			// Ideology
 			float ideo = ApparelScoreNeeds.PawnNeedIdeology(pawn, ap);
-			Logger.Log($"Ideo[{ideo:F2}] ");
+			if (ideo != 0) Logger.Log($"Ideo[{ideo:F2}] ");
 			num += ideo;
 
 			// Auto work.
 			float autoWork = 0f;
 			if (policy.AutoWorkPriorities)
 				autoWork += Outfitted.ApparelScoreAutoWorkPriorities(pawn, ap);
-			Logger.Log($"Work[{autoWork:F2}] ");
+			if (autoWork != 0) Logger.Log($"Work[{autoWork:F2}] ");
 			num += autoWork;
 
 			// HP.
@@ -221,12 +216,12 @@ namespace Outfitted
 				hp = (float)ap.HitPoints / ap.MaxHitPoints;
 				num *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate(Mathf.Clamp01(hp));
 			}
-			Logger.Log($"HP_Mult[{hp:F2}] Num[{num:F2}] ");
+			if (hp != 1) Logger.Log($"HP[{hp:F2}] Num[{num:F2}] ");
 
 			// Special score offset.
 			float offset = OutfittedMod.Settings.disableScoreOffset ? 0 : ap.GetSpecialApparelScoreOffset();
 			num += offset;
-			Logger.Log($"Offset[{offset:F2}] ");
+			if (offset != 0) Logger.Log($"Offset[{offset:F2}] ");
 
 			// Insulation.
 			float insulation = ApparelScoreInsulation.RawInsulation(pawn, ap, policy, NeededWarmth.Any);

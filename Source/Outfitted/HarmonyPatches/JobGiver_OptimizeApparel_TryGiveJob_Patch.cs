@@ -21,8 +21,8 @@ namespace Outfitted
 		private static readonly MethodInfo ApparelScoreRaw =
 			AccessTools.Method(typeof(JobGiver_OptimizeApparel), nameof(JobGiver_OptimizeApparel.ApparelScoreRaw));
 
-		private static readonly MethodInfo BuildWithFlag =
-			AccessTools.Method(typeof(Outfitted), nameof(Outfitted.ReBuildWornScore));
+		private static readonly MethodInfo BuildWornScore =
+			AccessTools.Method(typeof(Outfitted), nameof(Outfitted.BuildWornScore));
 
 		private static readonly FieldInfo WornScoresField =
 		   AccessTools.Field(typeof(JobGiver_OptimizeApparel), "wornApparelScores");
@@ -44,22 +44,20 @@ namespace Outfitted
 			var matcher = new CodeMatcher(instructions, generator);
 
 			// Find wornApparelScores.Clear()
-			matcher.MatchEndForward(
+			matcher.MatchStartForward(
 				new CodeMatch(OpCodes.Ldsfld, WornScoresField),     // JobGiver_OptimizeApparel.wornApparelScores
 				new CodeMatch(OpCodes.Callvirt, List_Clear))   // List<float>.Clear()
 				.ThrowIfInvalid("Can not find wornApparelScores.Clear()");
-			int posClear = matcher.Pos;
 
-			//// Find the loop: wornApparelScores.Add(ApparelScoreRaw(pawn, wornApparel[i]))
-			//matcher.MatchStartForward(
-			//	new CodeMatch(OpCodes.Ldsfld, WornScoresField),     // wornApparelScores
-			//	new CodeMatch(OpCodes.Ldarg_1),                     // pawn
-			//	new CodeMatch(ci => ci.opcode == OpCodes.Ldloc_2 || ci.opcode == OpCodes.Ldloc_S), // wornApparel local
-			//	new CodeMatch(ci => ci.opcode == OpCodes.Ldloc || ci.opcode == OpCodes.Ldloc_S),    // i
-			//	new CodeMatch(OpCodes.Callvirt, List_GetItem),   // wornApparel[i]
-			//	new CodeMatch(OpCodes.Call, ApparelScoreRaw),   // ApparelScoreRaw(pawn, item)
-			//	new CodeMatch(OpCodes.Callvirt, List_AddSingle))        // wornApparelScores.Add(score)
-			//	.ThrowIfInvalid("Could not find worn loop");
+			// Remove both instructions.
+			matcher.RemoveInstructions(2);
+
+			// Insert out method: BuildWornScore
+			matcher.Insert(
+				new CodeInstruction(OpCodes.Ldarg_1),					// pawn
+				new CodeInstruction(OpCodes.Call, BuildWornScore),		// call helper
+				new CodeInstruction(OpCodes.Stsfld, WornScoresField)	// wornApparelScores (private static)
+			);
 
 			// Find loop initialization: int i = 0
 			matcher.MatchStartForward(
@@ -77,25 +75,26 @@ namespace Outfitted
 			// Remove the whole loop
 			matcher.RemoveInstructionsInRange(loopStart, loopEnd);
 
-			// Go back to wornApparelScores.Clear()
-			matcher.Start().Advance(posClear);
-
-			// Insert our method BuildWornScoreWithFlag(pawn, wornApparel, wornScores)
-			matcher.InsertAfterAndAdvance(
-				new CodeInstruction(OpCodes.Ldarg_1),       // pawn
-				new CodeInstruction(OpCodes.Ldsfld, WornScoresField), // wornApparelScores (private static)
-				new CodeInstruction(OpCodes.Call, BuildWithFlag)  // call helper
-			);
-
 			return matcher.InstructionEnumeration();
 
 			//if (matcher.IsValid)
 			//{
 			//	Log.Message($"[MyMod] Found instruction at index {matcher.Pos}: {matcher.Instruction}");
 			//}
+
+			//// Find the loop: wornApparelScores.Add(ApparelScoreRaw(pawn, wornApparel[i]))
+			//matcher.MatchStartForward(
+			//	new CodeMatch(OpCodes.Ldsfld, WornScoresField),     // wornApparelScores
+			//	new CodeMatch(OpCodes.Ldarg_1),                     // pawn
+			//	new CodeMatch(ci => ci.opcode == OpCodes.Ldloc_2 || ci.opcode == OpCodes.Ldloc_S), // wornApparel local
+			//	new CodeMatch(ci => ci.opcode == OpCodes.Ldloc || ci.opcode == OpCodes.Ldloc_S),    // i
+			//	new CodeMatch(OpCodes.Callvirt, List_GetItem),   // wornApparel[i]
+			//	new CodeMatch(OpCodes.Call, ApparelScoreRaw),   // ApparelScoreRaw(pawn, item)
+			//	new CodeMatch(OpCodes.Callvirt, List_AddSingle))        // wornApparelScores.Add(score)
+			//	.ThrowIfInvalid("Could not find worn loop");
 		}
 
-		
+
 
 		public static void Postfix(JobGiver_OptimizeApparel __instance, Pawn pawn, ref Job __result)
 		{
