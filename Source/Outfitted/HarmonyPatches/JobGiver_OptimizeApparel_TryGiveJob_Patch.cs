@@ -54,9 +54,9 @@ namespace Outfitted
 
 			// Insert out method: BuildWornScore
 			matcher.Insert(
-				new CodeInstruction(OpCodes.Ldarg_1),					// pawn
-				new CodeInstruction(OpCodes.Call, BuildWornScore),		// call helper
-				new CodeInstruction(OpCodes.Stsfld, WornScoresField)	// wornApparelScores (private static)
+				new CodeInstruction(OpCodes.Ldarg_1),                   // pawn
+				new CodeInstruction(OpCodes.Call, BuildWornScore),      // call helper
+				new CodeInstruction(OpCodes.Stsfld, WornScoresField)    // wornApparelScores (private static)
 			);
 
 			// Find loop initialization: int i = 0
@@ -98,15 +98,57 @@ namespace Outfitted
 
 		public static void Postfix(JobGiver_OptimizeApparel __instance, Pawn pawn, ref Job __result)
 		{
-			ApparelPolicy currentApparelPolicy = pawn.outfits.CurrentApparelPolicy;
-			List<Apparel> wornApparel = pawn.apparel.WornApparel;
-			bool inVacuum = PawnIsInVacuum(pawn);
+			// Vanilla has assigned a job already.
+			if (__result != null) return;
 
+			// Mirror vanilla simple checks.
+			if (pawn?.outfits == null ||
+				pawn.Faction != Faction.OfPlayer ||
+				(pawn.IsMutant && pawn.mutant.Def.disableApparel) ||
+				pawn.IsQuestLodger()) return;
 
+			// Worn apparel.
+			List<Apparel> worn = pawn?.apparel?.WornApparel;
+			if (worn == null || worn.Count == 0) return;
 
-			//Job job2 = JobMaker.MakeJob(JobDefOf.RemoveApparel, apparel);
-			//job2.haulDroppedApparel = true;
-			//return job2;
+			// Outfitted policy.
+			if (!(pawn.outfits.CurrentApparelPolicy is ExtendedOutfit currentPolicy)) return;
+
+			// Candidate to be removed.
+			Apparel candidate = null;
+			float massCandidate = float.MinValue;
+
+			foreach (var ap in worn)
+			{
+				// Respect policy & vanilla constraints for auto-dropping.
+				// These handled by vanilla.
+				if (!currentPolicy.filter.Allows(ap)) continue;
+				if (!pawn.outfits.forcedHandler.AllowedToAutomaticallyDrop(ap)) continue;
+				if (pawn.apparel.IsLocked(ap)) continue;
+
+				// If in vacuum, skip anything providing vacuum protection.
+				if (PawnIsInVacuum(pawn) && ProtectsFromVacuum(ap)) continue;
+
+				// Check worn scores. All positive stay.
+				float score = CacheWornApparel.GetScore(pawn, ap);
+				if (score > 0f) continue;
+
+				// Select the heaviest.
+				float mass = ap.GetStatValue(StatDefOf_Rimworld.Mass, true);
+				if ( mass > massCandidate )
+				{
+					massCandidate = mass;
+					candidate = ap;
+				}
+			}
+
+			// Issue a Job.
+			if ( candidate != null )
+			{
+				Job job = JobMaker.MakeJob(JobDefOf.RemoveApparel, candidate);
+				job.haulDroppedApparel = true;
+				__result = job;
+			}
 		}
 
 		private static bool PawnIsInVacuum(Pawn pawn)
@@ -114,7 +156,7 @@ namespace Outfitted
 			return pawn.MapHeld.Biome.inVacuum && pawn.Position.GetVacuum(pawn.MapHeld) >= 0.5f;
 		}
 
-		private static bool ApparelForVacuum(Apparel apparel)
+		private static bool ProtectsFromVacuum(Apparel apparel)
 		{
 			if (StatDefOf_Rimworld.VacuumResistance == null) return false;
 			return apparel.GetStatValue(StatDefOf_Rimworld.VacuumResistance, applyPostProcess: true, 60) > 0f;
