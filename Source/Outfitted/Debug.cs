@@ -89,17 +89,18 @@ namespace Outfitted
 		private static Apparel _apparel;
 		private static ExtendedOutfit _outfit;
 		private static Pawn _pawn;
-		private static List<float> _wornScore = new List<float>();
 
 		public static void ClickedOn(ISelectable selectable)
 		{
 			if (selectable is Pawn pawn)
 			{
+				// Only humanlike. Avoid animals.
+				if (!(pawn.RaceProps?.Humanlike == true))
+					return;
+
 				_pawn = pawn;
 				if (pawn.outfits.CurrentApparelPolicy is ExtendedOutfit outfit)
 					_outfit = outfit;
-
-				_wornScore = Outfitted.BuildWornScore(pawn);
 
 				ShowScoreWornApparel(pawn);
 			}
@@ -178,8 +179,9 @@ namespace Outfitted
 			else totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
 			Logger.Log($"RWScore[{totalRaw:F2}] ");
 
+			var wornScore = CacheWornApparel.GetScoreList(pawn);
 			if (!whatIfNotWorn)
-				Logger.Log($"RWGain[{JobGiver_OptimizeApparel.ApparelScoreGain(pawn, ap, _wornScore):F2}] ");
+				Logger.Log($"RWGain[{JobGiver_OptimizeApparel.ApparelScoreGain(pawn, ap, wornScore):F2}] ");
 
 			float num = 0f;
 

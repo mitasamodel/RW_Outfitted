@@ -129,5 +129,23 @@ namespace Outfitted
 			}
 			return wornScores;
 		}
+		public static Dictionary<int, float> BuildWornScoreToDict(Pawn pawn)
+		{
+			var worn = pawn?.apparel?.WornApparel;
+			worn ??= new List<Apparel>();
+			Dictionary<int, float> scoresDict = new Dictionary<int, float>(worn.Count);
+
+			foreach (var ap in worn)
+			{
+				if (ap == null)
+				{
+					Logger.Log_Warning("BuildWornScoreToDict: Unexpected Apparel-null in worn list.");
+					continue;
+				}
+
+				scoresDict[ap.thingIDNumber] = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
+			}
+			return scoresDict;
+		}
 	}
 }

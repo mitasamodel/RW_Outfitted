@@ -22,7 +22,7 @@ namespace Outfitted
 				|| !currentApparelPolicy.filter.Allows(apparel))
 				return;
 
-			List<float> wornScoresCache = CacheWornApparel.GetScore(singleSelectedThing);
+			List<float> wornScoresCache = CacheWornApparel.GetScoreList(singleSelectedThing);
 			float beauty = JobGiver_OptimizeApparel.ApparelScoreGain(singleSelectedThing, apparel, wornScoresCache);
 			GenMapUI.DrawThingLabel(GenMapUI.LabelDrawPosFor(apparel, 0.0f), beauty.ToString("F1"), BeautyDrawer.BeautyColor(beauty, 3f));
 		}

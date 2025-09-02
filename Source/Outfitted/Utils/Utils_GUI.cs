@@ -129,12 +129,22 @@ namespace Outfitted.RW_JustUtils
 			Widgets.Label(inRect, label);
 			Text.Anchor = oldAnchor;
 		}
-		public static void LabelRight(Rect inRect, string label)
+		public static void LabelMiddleRight(Rect inRect, string label, Color textColor, GameFont font = GameFont.Small)
 		{
-			var oldAnchor = Text.Anchor;
+			var prevColor = GUI.color;
+			var prevFont = Text.Font;
+			var prevAnchor = Text.Anchor;
+			GUI.color = textColor;
+			Text.Font = font;
 			Text.Anchor = TextAnchor.MiddleRight;
 			Widgets.Label(inRect, label);
-			Text.Anchor = oldAnchor;
+			Text.Anchor = prevAnchor;
+			Text.Font = prevFont;
+			GUI.color = prevColor;
+		}
+		public static void LabelMiddleRight(Rect inRect, string label)
+		{
+			LabelMiddleRight(inRect, label, Color.white);
 		}
 	}
 }
