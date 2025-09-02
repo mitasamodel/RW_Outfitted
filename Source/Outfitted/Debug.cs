@@ -15,17 +15,6 @@ using System.Diagnostics.Eventing.Reader;
 namespace Outfitted
 {
 	[StaticConstructorOnStartup]
-	static class WorkTypeDefOriginDump
-	{
-		static WorkTypeDefOriginDump()
-		{
-			var names = DefDatabase<WorkTypeDef>.AllDefsListForReading
-				.Select(d => $"{d.defName}  <-  {d.modContentPack?.Name} ({d.modContentPack?.PackageId})");
-			Log.Message("[Outfitted] WorkTypeDefs loaded at startup:\n" + string.Join("\n", names));
-		}
-	}
-
-	[StaticConstructorOnStartup]
 	public static class LogSomeStuff
 	{
 		static LogSomeStuff()

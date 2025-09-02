@@ -16,7 +16,7 @@ namespace Outfitted
 		  : base(world)
 		{
 			_instance = this;
-			Log.Message("WorldComponent created!");
+			Log.Message("[Outfitted] WorldComponent created!");
 		}
 
 		public static List<StatPriority> WorktypeStatPriorities(Pawn pawn)
@@ -81,7 +81,23 @@ namespace Outfitted
 		public override void ExposeData()
 		{
 			base.ExposeData();
-			Scribe_Collections.Look(ref _worktypePriorities, "worktypePriorities", LookMode.Deep);
+			if (Scribe.mode == LoadSaveMode.Saving)
+			{
+				/// Achtung campatability.
+				// Achtung creates Rescuing worktype at World.FinalizeInit (late).
+				// It leads to a situation when during the savegame's load the reference cannot be resolved.
+				// Workaround: don't save this worktype.
+				var listToSave = _worktypePriorities?
+					.Where(wtp => 
+						wtp?.worktype != null &&
+						!string.Equals(wtp.worktype.defName, "Rescuing", StringComparison.OrdinalIgnoreCase)
+					)
+					.ToList() ?? new List<WorktypePriorities>();
+
+				Scribe_Collections.Look(ref listToSave, "worktypePriorities", LookMode.Deep);
+			}
+			else
+				Scribe_Collections.Look(ref _worktypePriorities, "worktypePriorities", LookMode.Deep);
 		}
 
 		public override void FinalizeInit(bool fromLoad)
@@ -91,7 +107,9 @@ namespace Outfitted
 				return;
 			_worktypePriorities = new List<WorktypePriorities>();
 			foreach (WorkTypeDef worktype in DefDatabase<WorkTypeDef>.AllDefsListForReading)
+			{
 				_worktypePriorities.Add(new WorktypePriorities(worktype, DefaultPriorities(worktype)));
+			}
 		}
 
 		private static List<StatPriority> DefaultPriorities(WorkTypeDef worktype)
