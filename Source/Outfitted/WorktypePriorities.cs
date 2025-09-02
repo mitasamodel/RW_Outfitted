@@ -1,13 +1,6 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: Outfitted.WorktypePriorities
-// Assembly: Outfitted, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: 7FA0F5BF-790B-428D-866C-5D33983FFC76
-// Assembly location: D:\SteamLibrary\steamapps\workshop\content\294100\3454809174\1.5\Assemblies\Outfitted.dll
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Verse;
 
-#nullable disable
 namespace Outfitted
 {
 	public class WorktypePriorities : IExposable
@@ -27,8 +20,8 @@ namespace Outfitted
 
 		public void ExposeData()
 		{
-			Scribe_Defs.Look<WorkTypeDef>(ref this.worktype, "worktype");
-			Scribe_Collections.Look<StatPriority>(ref this.priorities, "statPriorities", LookMode.Deep);
+			Scribe_Defs.Look(ref worktype, "worktype");
+			Scribe_Collections.Look(ref priorities, "statPriorities", LookMode.Deep);
 		}
 	}
 }
