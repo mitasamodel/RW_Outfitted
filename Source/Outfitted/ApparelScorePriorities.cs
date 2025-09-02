@@ -55,7 +55,7 @@ namespace Outfitted
 		/// <param name="basedOnQuality"></param>
 		/// <returns></returns>
 		public static float ApparelScore(Apparel apparel, StatDef stat, bool basedOnQuality = true)
-		{
+		{	
 			float result;
 			// Apparel provides gear offset for the stat.
 			// That means only offset depends on quality/material.
@@ -78,7 +78,7 @@ namespace Outfitted
 			else
 				result = basedOnQuality ? apparel.GetStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
 
-			// CE
+			// CE: CarryBulk -> WornBulk; CarryWeight -> Mass
 			if (ModsConfig.IsActive("CETeam.CombatExtended"))
 			{
 				if (stat == StatDefOf_CE.CarryBulk)
