@@ -17,6 +17,15 @@ namespace Outfitted
 	//[HarmonyPatch(typeof(ITab_Inventory), "DrawThingRowCE")]
 	internal static class ConditionalPatches
 	{
+		// cache the private property getter and a fast delegate
+		internal static readonly MethodInfo SelPawnForGearGetter =
+			AccessTools.PropertyGetter(typeof(ITab_Pawn_Gear), "SelPawnForGear");
+
+		// The same as Pawn pawn = (Pawn)SelPawnForGearGetter.Invoke(__instance, null);
+		// But faster (cached reflection).
+		internal static readonly Func<ITab_Pawn_Gear, Pawn> GetSelPawnForGear =
+			AccessTools.MethodDelegate<Func<ITab_Pawn_Gear, Pawn>>(SelPawnForGearGetter);
+
 		internal static void PatchAll(Harmony harmony)
 		{
 			MethodInfo original = AccessTools.TypeByName("CombatExtended.ITab_Inventory")?.GetMethod("DrawThingRowCE");
@@ -27,7 +36,7 @@ namespace Outfitted
 		public static void ITab_InventoryDrawThingRowCEPostfix(ITab_Pawn_Gear __instance, ref float y, float width, Thing thing, bool showDropButtonIfPrisoner)
 		{
 			float rowHeight = 28f;
-			//GearDisplayScore(__instance, new Rect(0, y - rowHeight, width, rowHeight), thing, CE: true);
+			GearDisplayScore(GetSelPawnForGear(__instance), new Rect(0, y - rowHeight, width, rowHeight), thing, CE: true);
 		}
 
 		internal static void GearDisplayScore(Pawn pawn, Rect rowRect, Thing thing, bool CE = false)
@@ -40,26 +49,24 @@ namespace Outfitted
 				return;
 
 			List<Apparel> wornAp = pawn.apparel?.WornApparel;
-			if (wornAp == null || wornAp.Count == 0)
-				return;
+			if (wornAp == null || wornAp.Count == 0) return;
 			if (!wornAp.Any(wa => wa == apparel)) return;
-
 
 			float smallGap = 6f;
 			float scoreWidth = 45f;
 
-
-
 			Rect freeSpaceRect = rowRect;
-
-			freeSpaceRect.width -= (24f + 24f + 24f + 60f);
-			Utils_GUI.DrawBox(freeSpaceRect, Color.grey);
+			if (CE)
+				freeSpaceRect.width -= (24f + 24f + 60f);
+			else
+				freeSpaceRect.width -= (24f + 24f + 24f + 60f);
+			//Utils_GUI.DrawBox(freeSpaceRect, Color.grey);
 
 			Rect scoreRect = freeSpaceRect.ToTheRight(scoreWidth);
 			scoreRect.x -= smallGap;
-			Utils_GUI.DrawBox(scoreRect, Color.white);
+			//Utils_GUI.DrawBox(scoreRect, Color.white);
 
-			float score = CacheWornApparel.GetScore(pawn,apparel);
+			float score = CacheWornApparel.GetScore(pawn, apparel);
 			Utils_GUI.LabelMiddleRight(scoreRect, $"{score:F1}", BeautyDrawer.BeautyColor(score, 3f), GameFont.Tiny);
 		}
 	}
@@ -68,15 +75,6 @@ namespace Outfitted
 	[HarmonyPatch(typeof(ITab_Pawn_Gear), "DrawThingRow")]
 	public static class ITab_Pawn_Gear_DrawThingRow_Patch
 	{
-		// cache the private property getter and a fast delegate
-		private static readonly MethodInfo SelPawnForGearGetter =
-			AccessTools.PropertyGetter(typeof(ITab_Pawn_Gear), "SelPawnForGear");
-
-		// The same as Pawn pawn = (Pawn)SelPawnForGearGetter.Invoke(__instance, null);
-		// But faster (cached reflection).
-		private static readonly Func<ITab_Pawn_Gear, Pawn> GetSelPawnForGear =
-			AccessTools.MethodDelegate<Func<ITab_Pawn_Gear, Pawn>>(SelPawnForGearGetter);
-
 		public static void Postfix(
 			ITab_Pawn_Gear __instance,
 			ref float y,
@@ -86,7 +84,7 @@ namespace Outfitted
 		)
 		{
 			float rowHeight = 28f;
-			ConditionalPatches.GearDisplayScore(GetSelPawnForGear(__instance), new Rect(0, y - rowHeight, width, rowHeight), thing);
+			ConditionalPatches.GearDisplayScore(ConditionalPatches.GetSelPawnForGear(__instance), new Rect(0, y - rowHeight, width, rowHeight), thing);
 		}
 	}
 
