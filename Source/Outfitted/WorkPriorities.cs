@@ -15,8 +15,8 @@ namespace Outfitted
 		public WorkPriorities(World world)
 		  : base(world)
 		{
-			WorkPriorities._instance = this;
-			Log.Message("WorldComponent created!");
+			_instance = this;
+			Log.Message("[Outfitted] WorldComponent created!");
 		}
 
 		public static List<StatPriority> WorktypeStatPriorities(Pawn pawn)
@@ -31,7 +31,7 @@ namespace Outfitted
 				.Select(x => new WorktypePriorityWeights(
 					x.priority,
 					x.worktype,
-					WorkPriorities.WorktypeStatPriorities(x.worktype)
+					WorktypeStatPriorities(x.worktype)
 					));
 
 			if (!source.Any())
@@ -41,11 +41,11 @@ namespace Outfitted
 			float num1 = 0.0f;
 			foreach (var data in source)
 			{
-				float num2 = intRange.min == intRange.max ? 1f : (float)(1.0 - (double)(data.Priority - intRange.min) / (double)(intRange.max - intRange.min));
+				float num2 = intRange.min == intRange.max ? 1f : (float)(1.0 - (float)(data.Priority - intRange.min) / (intRange.max - intRange.min));
 				foreach (StatPriority weight in data.Weights)
 				{
 					StatPriority statWeight = weight;
-					StatPriority statPriority1 = list.FirstOrDefault<StatPriority>((Predicate<StatPriority>)(sp => sp.Stat == statWeight.Stat));
+					StatPriority statPriority1 = list.FirstOrDefault(sp => sp.Stat == statWeight.Stat);
 					if (statPriority1 != null)
 					{
 						statPriority1.Weight += num2 * statWeight.Weight;
@@ -58,7 +58,7 @@ namespace Outfitted
 					num1 += statWeight.Weight * num2;
 				}
 			}
-			if (list.Any<StatPriority>() && (double)num1 != 0.0)
+			if (list.Any() && (double)num1 != 0.0)
 			{
 				foreach (StatPriority statPriority in list)
 					statPriority.Weight *= 10f / num1;
@@ -68,12 +68,12 @@ namespace Outfitted
 
 		public static List<StatPriority> WorktypeStatPriorities(WorkTypeDef worktype)
 		{
-			WorktypePriorities worktypePriorities = WorkPriorities._worktypePriorities.Find((Predicate<WorktypePriorities>)(wp => wp.worktype == worktype));
+			WorktypePriorities worktypePriorities = _worktypePriorities.Find(wp => wp.worktype == worktype);
 			if (worktypePriorities == null)
 			{
-				Log.Warning("Outfitted :: Created worktype stat priorities for '" + worktype.defName + "' after initial init. This should never happen!");
-				worktypePriorities = new WorktypePriorities(worktype, WorkPriorities.DefaultPriorities(worktype));
-				WorkPriorities._worktypePriorities.Add(worktypePriorities);
+				Log.Warning($"Outfitted :: Created worktype stat priorities for '{worktype.defName}' after initial init. This should never happen!");
+				worktypePriorities = new WorktypePriorities(worktype, DefaultPriorities(worktype));
+				_worktypePriorities.Add(worktypePriorities);
 			}
 			return worktypePriorities.priorities;
 		}
@@ -81,17 +81,35 @@ namespace Outfitted
 		public override void ExposeData()
 		{
 			base.ExposeData();
-			Scribe_Collections.Look<WorktypePriorities>(ref WorkPriorities._worktypePriorities, "worktypePriorities", LookMode.Deep);
+			if (Scribe.mode == LoadSaveMode.Saving)
+			{
+				/// Achtung campatability.
+				// Achtung creates Rescuing worktype at World.FinalizeInit (late).
+				// It leads to a situation when during the savegame's load the reference cannot be resolved.
+				// Workaround: don't save this worktype.
+				var listToSave = _worktypePriorities?
+					.Where(wtp => 
+						wtp?.worktype != null &&
+						!string.Equals(wtp.worktype.defName, "Rescuing", StringComparison.OrdinalIgnoreCase)
+					)
+					.ToList() ?? new List<WorktypePriorities>();
+
+				Scribe_Collections.Look(ref listToSave, "worktypePriorities", LookMode.Deep);
+			}
+			else
+				Scribe_Collections.Look(ref _worktypePriorities, "worktypePriorities", LookMode.Deep);
 		}
 
 		public override void FinalizeInit(bool fromLoad)
 		{
 			base.FinalizeInit(fromLoad);
-			if (WorkPriorities._worktypePriorities != null && WorkPriorities._worktypePriorities.Count > 0)
+			if (_worktypePriorities != null && _worktypePriorities.Count > 0)
 				return;
-			WorkPriorities._worktypePriorities = new List<WorktypePriorities>();
+			_worktypePriorities = new List<WorktypePriorities>();
 			foreach (WorkTypeDef worktype in DefDatabase<WorkTypeDef>.AllDefsListForReading)
-				WorkPriorities._worktypePriorities.Add(new WorktypePriorities(worktype, WorkPriorities.DefaultPriorities(worktype)));
+			{
+				_worktypePriorities.Add(new WorktypePriorities(worktype, DefaultPriorities(worktype)));
+			}
 		}
 
 		private static List<StatPriority> DefaultPriorities(WorkTypeDef worktype)
@@ -202,7 +220,7 @@ namespace Outfitted
 				list.Add(new StatPriority(StatDefOf_Rimworld.TradePriceImprovement, 1f));
 				list.Add(new StatPriority(StatDefOf_Rimworld.SocialImpact, 2f));
 			}
-			list.RemoveDuplicates<StatPriority>();
+			list.RemoveDuplicates();
 			return list;
 		}
 	}
