@@ -5,12 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
+using LudeonTK;
 
 namespace Outfitted
 {
 	[HarmonyPatch(typeof(Thing), nameof(Thing.DrawGUIOverlay))]
 	internal static class Thing_DrawGUIOverlay_Patch
 	{
+		[TweakValue("Outfitted",0,60)]
+		static int _skipTicksOverlay = 6;
 		private static int cachedId = -1;
 		private static int cachedTick = -1;
 		private static List<float> cachedScores = new List<float>();
@@ -36,7 +39,7 @@ namespace Outfitted
 			{
 				cachedScores = Outfitted.BuildWornScore(pawn);
 				cachedId = pawn.thingIDNumber;
-				cachedTick = GenTicks.TicksGame;
+				cachedTick = GenTicks.TicksGame + _skipTicksOverlay;
 			}
 			return cachedScores;
 		}
