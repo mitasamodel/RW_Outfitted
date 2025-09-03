@@ -72,8 +72,8 @@ namespace Outfitted
 		[MayRequire("ludeon.rimworld")] public static StatDef MeditationFocusStrength;
 		[MayRequire("ludeon.rimworld")] public static StatDef PsychicSensitivityOffset;
 		[MayRequire("ludeon.rimworld")] public static StatDef PsychicSensitivityFactor;
-		[MayRequire("ludeon.rimworld")] public static StatDef PsychicEntropyMaxOffset;
-		[MayRequire("ludeon.rimworld")] public static StatDef PsychicEntropyRecoveryRateOffset;
+		[MayRequireAnyOf("Ludeon.RimWorld.Royalty,Ludeon.RimWorld.Biotech")] public static StatDef PsychicEntropyMaxOffset;
+		[MayRequireAnyOf("Ludeon.RimWorld.Royalty,Ludeon.RimWorld.Biotech")] public static StatDef PsychicEntropyRecoveryRateOffset;
 		[MayRequire("ludeon.rimworld")] public static StatDef FilthMultiplier;
 		[MayRequire("ludeon.rimworld")] public static StatDef CleaningTimeFactor;
 		[MayRequire("ludeon.rimworld")] public static StatDef WorkToBuild;
@@ -131,12 +131,12 @@ namespace Outfitted
 		[MayRequire("ludeon.rimworld")] public static StatDef CaravanRidingSpeedFactor;
 		[MayRequire("ludeon.rimworld")] public static StatDef MaxNutrition;
 		[MayRequire("ludeon.rimworld")] public static StatDef LifespanFactor;
-		[MayRequire("ludeon.rimworld")] public static StatDef MeditationFocusGain;
-		[MayRequire("ludeon.rimworld")] public static StatDef PsychicEntropyMax;
-		[MayRequire("ludeon.rimworld")] public static StatDef PsychicEntropyRecoveryRate;
+		[MayRequireAnyOf("Ludeon.RimWorld.Royalty,Ludeon.RimWorld.Biotech")] public static StatDef MeditationFocusGain;
+		[MayRequireAnyOf("Ludeon.RimWorld.Royalty,Ludeon.RimWorld.Biotech")] public static StatDef PsychicEntropyMax;
+		[MayRequireAnyOf("Ludeon.RimWorld.Royalty,Ludeon.RimWorld.Biotech")] public static StatDef PsychicEntropyRecoveryRate;
 		[MayRequire("ludeon.rimworld")] public static StatDef ToxicEnvironmentResistance;
 		[MayRequire("ludeon.rimworld")] public static StatDef RestFallRateFactor;
-		[MayRequire("ludeon.rimworld")] public static StatDef EMPResistance;
+		[MayRequireAnyOf("Ludeon.RimWorld.Biotech,Ludeon.RimWorld.Anomaly")] public static StatDef EMPResistance;
 		[MayRequire("ludeon.rimworld")] public static StatDef JoyFallRateFactor;
 		[MayRequire("ludeon.rimworld")] public static StatDef MaxFlightTime;
 		[MayRequire("ludeon.rimworld")] public static StatDef FlightCooldown;
