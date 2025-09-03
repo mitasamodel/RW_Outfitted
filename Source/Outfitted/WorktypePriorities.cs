@@ -7,6 +7,7 @@ namespace Outfitted
 	{
 		public List<StatPriority> priorities = new List<StatPriority>();
 		public WorkTypeDef worktype;
+		internal string workTypeDefName;
 
 		public WorktypePriorities()
 		{
@@ -20,8 +21,11 @@ namespace Outfitted
 
 		public void ExposeData()
 		{
-			Scribe_Defs.Look(ref worktype, "worktype");
+			// Save/load the defName as a string.
+			workTypeDefName = worktype?.defName;
+			Scribe_Values.Look(ref workTypeDefName, "worktype");
 			Scribe_Collections.Look(ref priorities, "statPriorities", LookMode.Deep);
+			priorities ??= new List<StatPriority>();
 		}
 	}
 }

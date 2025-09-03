@@ -81,31 +81,49 @@ namespace Outfitted
 		public override void ExposeData()
 		{
 			base.ExposeData();
-			if (Scribe.mode == LoadSaveMode.Saving)
-			{
-				/// Achtung campatability.
-				// Achtung creates Rescuing worktype at World.FinalizeInit (late).
-				// It leads to a situation when during the savegame's load the reference cannot be resolved.
-				// Workaround: don't save this worktype.
-				var listToSave = _worktypePriorities?
-					.Where(wtp => 
-						wtp?.worktype != null &&
-						!string.Equals(wtp.worktype.defName, "Rescuing", StringComparison.OrdinalIgnoreCase)
-					)
-					.ToList() ?? new List<WorktypePriorities>();
-
-				Scribe_Collections.Look(ref listToSave, "worktypePriorities", LookMode.Deep);
-			}
-			else
-				Scribe_Collections.Look(ref _worktypePriorities, "worktypePriorities", LookMode.Deep);
+			Scribe_Collections.Look(ref _worktypePriorities, "worktypePriorities", LookMode.Deep);
 		}
 
 		public override void FinalizeInit(bool fromLoad)
 		{
 			base.FinalizeInit(fromLoad);
-			if (_worktypePriorities != null && _worktypePriorities.Count > 0)
+
+			_worktypePriorities ??= new List<WorktypePriorities>();
+
+			if (_worktypePriorities.Count > 0)
+			{
+				foreach (var wtp in _worktypePriorities)
+				{
+					if ( wtp == null )
+					{
+						Logger.Log_Error($"[WorkPriorities: FinalizeInit] Unexpected null list element.");
+						Verse.Log.Warning($"Please report it to the mod author.");
+						continue;
+					}
+					if ( wtp.worktype == null )
+					{
+						if ( string.IsNullOrEmpty(wtp.workTypeDefName))
+						{
+							Logger.Log_Error($"[WorkPriorities: FinalizeInit] Null or empty input string.");
+							Verse.Log.Warning($"Please report it to the mod author.");
+							continue;
+						}
+						wtp.worktype = DefDatabase<WorkTypeDef>.GetNamedSilentFail(wtp.workTypeDefName);
+#if DEBUG
+						if (wtp.worktype == null)
+							Logger.LogNL($"[WorkPriorities: FinalizeInit] Cannot resolve [{wtp.workTypeDefName}]");
+#endif
+						wtp.workTypeDefName = null;
+					}
+				}
+
+				int removed = _worktypePriorities.RemoveAll(wtp => wtp?.worktype == null);
+#if DEBUG
+				Logger.LogNL($"[WorkPriorities: FinalizeInit] Removed {removed} items from the list.");
+#endif
 				return;
-			_worktypePriorities = new List<WorktypePriorities>();
+			}
+
 			foreach (WorkTypeDef worktype in DefDatabase<WorkTypeDef>.AllDefsListForReading)
 			{
 				_worktypePriorities.Add(new WorktypePriorities(worktype, DefaultPriorities(worktype)));
