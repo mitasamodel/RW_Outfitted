@@ -90,24 +90,27 @@ namespace Outfitted
 
 			_worktypePriorities ??= new List<WorktypePriorities>();
 
+			// Resolve defs after game loaded.
 			if (_worktypePriorities.Count > 0)
 			{
 				foreach (var wtp in _worktypePriorities)
 				{
-					if ( wtp == null )
+					if (wtp == null)
 					{
 						Logger.Log_Error($"[WorkPriorities: FinalizeInit] Unexpected null list element.");
 						Verse.Log.Warning($"Please report it to the mod author.");
 						continue;
 					}
-					if ( wtp.worktype == null )
+					if (wtp.worktype == null)
 					{
-						if ( string.IsNullOrEmpty(wtp.workTypeDefName))
+						// 'worktype' is stored as worktype.defName (workTypeDefName) in save file (string).
+						if (string.IsNullOrEmpty(wtp.workTypeDefName))
 						{
 							Logger.Log_Error($"[WorkPriorities: FinalizeInit] Null or empty input string.");
 							Verse.Log.Warning($"Please report it to the mod author.");
 							continue;
 						}
+						// Resolve.
 						wtp.worktype = DefDatabase<WorkTypeDef>.GetNamedSilentFail(wtp.workTypeDefName);
 #if DEBUG
 						if (wtp.worktype == null)
@@ -117,6 +120,7 @@ namespace Outfitted
 					}
 				}
 
+				// Remove unresolved.
 				int removed = _worktypePriorities.RemoveAll(wtp => wtp?.worktype == null);
 #if DEBUG
 				Logger.LogNL($"[WorkPriorities: FinalizeInit] Removed {removed} items from the list.");
@@ -124,6 +128,7 @@ namespace Outfitted
 				return;
 			}
 
+			// New game.
 			foreach (WorkTypeDef worktype in DefDatabase<WorkTypeDef>.AllDefsListForReading)
 			{
 				_worktypePriorities.Add(new WorktypePriorities(worktype, DefaultPriorities(worktype)));
