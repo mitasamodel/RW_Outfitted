@@ -20,10 +20,12 @@ namespace Outfitted
 
 		private static readonly SimpleCurve InsulationFactorCurve = new SimpleCurve
 		{
-			{ new CurvePoint(-20f, -3f), true },
+			//{ new CurvePoint(-20f, -3f), true },
+			{ new CurvePoint(-60f, -9.5f), true },
 			{ new CurvePoint(-10f, -2f), true },
 			{ new CurvePoint(10f, 2f), true },
-			{ new CurvePoint(20f, 3f), true }
+			//{ new CurvePoint(20f, 3f), true }
+			{ new CurvePoint(60f, 9.5f), true }
 		};
 
 		internal static float RawInsulation(
