@@ -15,6 +15,15 @@ namespace Outfitted
 		private static int _skipTicks = 12;
 		private static readonly Dictionary<int, CacheWornApparelEntry> _cachedScores = new Dictionary<int, CacheWornApparelEntry>();
 
+		/// <summary>
+		/// Return the score of specific apparel worn by pawn.
+		/// Recalculate the cache if apparel not found or if 200ms passed.
+		/// Cache is stored per Pawn (id) per Apparel (id).
+		/// </summary>
+		/// <param name="pawn"></param>
+		/// <param name="ap"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentNullException"></exception>
 		public static float GetScore(Pawn pawn, Apparel ap)
 		{
 			if (pawn == null) throw new ArgumentNullException(nameof(pawn));
@@ -38,6 +47,13 @@ namespace Outfitted
 			return entry.CachedScores.TryGetValue(apId, out var score) ? score : 0.1f;
 		}
 
+		/// <summary>
+		/// Legacy method. Return the list of score for worn apparels.
+		/// Caller must ensure that the worn list is up-to-date.
+		/// </summary>
+		/// <param name="pawn"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentNullException"></exception>
 		public static List<float> GetScoreList(Pawn pawn)
 		{
 			if (pawn == null) throw new ArgumentNullException(nameof(pawn));
@@ -48,6 +64,7 @@ namespace Outfitted
 			return listScores;
 		}
 	}
+
 	internal sealed class CacheWornApparelEntry
 	{
 		internal int CachedTick { get; set; } = -1;
