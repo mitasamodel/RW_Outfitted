@@ -8,11 +8,11 @@ namespace Outfitted
 {
 	public class ExtendedOutfit : ApparelPolicy, IExposable
 	{
-		public bool targetTemperaturesOverride;
+		public bool targetTemperaturesOverride = true;
 		public FloatRange targetTemperatures = new FloatRange(-100f, 100f);
 		public bool PenaltyWornByCorpse = true;
 		public bool AutoWorkPriorities;
-		private bool _autoTemp;
+		private bool _autoTemp = true;
 		public int autoTempOffset = 20;
 		private static IEnumerable<StatCategoryDef> blacklistedCategories = (IEnumerable<StatCategoryDef>)new List<StatCategoryDef>()
 		{
@@ -113,19 +113,23 @@ namespace Outfitted
 				Outfitted.PruneNullStatPriorities(this);
 		}
 
-		public void CopyFrom(ExtendedOutfit outfit)
+		//public void CopyFrom(ExtendedOutfit outfit)
+		public override void CopyFrom(Policy policy)
 		{
-			filter.CopyAllowancesFrom(outfit.filter);
-			targetTemperaturesOverride = outfit.targetTemperaturesOverride;
-			targetTemperatures = outfit.targetTemperatures;
-			PenaltyWornByCorpse = outfit.PenaltyWornByCorpse;
-			statPriorities.Clear();
-			foreach (StatPriority statPriority in outfit.statPriorities)
-				statPriorities.Add(new StatPriority(statPriority.Stat, statPriority.Weight));
-			//statPriorities.Add(new StatPriority(statPriority.Stat, statPriority.Weight, statPriority.Default));
-			AutoWorkPriorities = outfit.AutoWorkPriorities;
-			_autoTemp = outfit._autoTemp;
-			autoTempOffset = outfit.autoTempOffset;
+			base.CopyFrom(policy);
+			//filter.CopyAllowancesFrom(outfit.filter);
+			if (policy is ExtendedOutfit outfit)
+			{
+				targetTemperaturesOverride = outfit.targetTemperaturesOverride;
+				targetTemperatures = outfit.targetTemperatures;
+				PenaltyWornByCorpse = outfit.PenaltyWornByCorpse;
+				statPriorities.Clear();
+				foreach (StatPriority statPriority in outfit.statPriorities)
+					statPriorities.Add(new StatPriority(statPriority.Stat, statPriority.Weight));
+				AutoWorkPriorities = outfit.AutoWorkPriorities;
+				_autoTemp = outfit._autoTemp;
+				autoTempOffset = outfit.autoTempOffset;
+			}
 		}
 	}
 }

@@ -123,7 +123,8 @@ namespace Outfitted
 				// Remove unresolved.
 				int removed = _worktypePriorities.RemoveAll(wtp => wtp?.worktype == null);
 #if DEBUG
-				Logger.LogNL($"[WorkPriorities: FinalizeInit] Removed {removed} items from the list.");
+				if (removed > 0)
+					Logger.LogNL($"[WorkPriorities: FinalizeInit] Removed {removed} items from the list.");
 #endif
 				return;
 			}
