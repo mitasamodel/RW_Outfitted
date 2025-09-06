@@ -41,7 +41,7 @@ namespace Outfitted.Database
 		private static ApparelPolicy Helper(int id, string label)
 		{
 			ExtendedOutfit outfit = new ExtendedOutfit(id, label);
-			Helpers.AddBasicsStats(outfit);
+			Helpers.AddBasicStats(outfit);
 
 			return outfit;
 		}
