@@ -11,9 +11,6 @@ namespace Outfitted
 {
 	internal static class ApparelScoreNeeds
 	{
-		private const float nakedOffset = 2f;
-		private const float ideologyOffset = 2f;
-
 		// Return additional score if apparel needed due to nudity 
 		internal static float PawnNeedThis(Pawn pawn, Apparel apparel)
 		{
@@ -21,9 +18,9 @@ namespace Outfitted
 			float result = 0f;
 
 			List<ThingDef> conflicts = new List<ThingDef>();
-			foreach(var ap in pawn.apparel.WornApparel)
+			foreach (var ap in pawn.apparel.WornApparel)
 			{
-				if ( !ApparelUtility.CanWearTogether(ap.def, apparel.def, pawn.RaceProps.body))
+				if (!ApparelUtility.CanWearTogether(ap.def, apparel.def, pawn.RaceProps.body))
 				{
 					conflicts.Add(ap.def);
 				}
@@ -38,7 +35,7 @@ namespace Outfitted
 
 				if (PawnCareAboutNaked(pawn) && !PawnLegsCovered(pawn, conflicts))
 				{
-					result += nakedOffset;
+					result += OutfittedMod.Settings.nakedOffset;
 				}
 			}
 
@@ -49,7 +46,7 @@ namespace Outfitted
 
 				if (PawnCareAboutNaked(pawn) && PawnCareAboutTorso(pawn) && !PawnTorsoCovered(pawn, conflicts))
 				{
-					result += nakedOffset;
+					result += OutfittedMod.Settings.nakedOffset;
 				}
 			}
 
@@ -130,7 +127,7 @@ namespace Outfitted
 			{
 				if (req.requirement.RequiredForPawn(pawn, ap.def))
 				{
-					return ideologyOffset;
+					return OutfittedMod.Settings.ideologyOffset;
 				}
 			}
 			return 0f;

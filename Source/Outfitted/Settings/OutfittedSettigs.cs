@@ -9,6 +9,7 @@ namespace Outfitted
 {
 	public class OutfittedSettigs : ModSettings
 	{
+		/// General.
 		// UI options.
 		public const bool draggableWindow_default = true;
 		public const bool nonBlockingWindow_default = true;
@@ -23,8 +24,8 @@ namespace Outfitted
 		public bool includeDescrForStatSearch = includeDescrForStatSearch_default;
 
 		// Score options.
-		public const bool disableStartScore_default = false;
-		public const bool disableScoreOffset_default = false;
+		public const bool disableStartScore_default = true;
+		public const bool disableScoreOffset_default = true;
 		public const bool sumScoresInsteadOfAverage_default = true;
 		public const bool insScoreBasedOnConditions_default = true;
 
@@ -32,6 +33,26 @@ namespace Outfitted
 		public bool disableScoreOffset = disableScoreOffset_default;
 		public bool sumScoresInsteadOfAverage = sumScoresInsteadOfAverage_default;
 		public bool insScoreBasedOnConditions = insScoreBasedOnConditions_default;
+
+		/// Tune values.
+		// Offsets.
+		public const float nakedOffset_default = 2f;
+		public const float ideologyOffset_default = 2f;
+
+		public float nakedOffset = nakedOffset_default;
+		public float ideologyOffset = nakedOffset_default;
+
+		// CE.
+		public const float CECurryBulk_default = 1f;
+		public const float CECarryWeight_default = 1f;
+
+		public float CECurryBulk = CECurryBulk_default;
+		public float CECarryWeight = CECarryWeight_default;
+
+		// Vanilla.
+		public const float mass_default = -0.5f;
+
+		public float mass = mass_default;
 
 		public override void ExposeData()
 		{
@@ -45,9 +66,17 @@ namespace Outfitted
 			Scribe_Values.Look(ref disableScoreOffset, "disableScoreOffset", disableScoreOffset_default);
 			Scribe_Values.Look(ref sumScoresInsteadOfAverage, "sumScoresInsteadOfAverage", sumScoresInsteadOfAverage_default);
 			Scribe_Values.Look(ref insScoreBasedOnConditions, "insScoreBasedOnConditions", insScoreBasedOnConditions_default);
+
+			Scribe_Values.Look(ref nakedOffset, "nakedOffset", nakedOffset_default);
+			Scribe_Values.Look(ref ideologyOffset, "ideologyOffset", nakedOffset_default);
+
+			Scribe_Values.Look(ref CECurryBulk, "CECurryBulk", CECurryBulk_default);
+			Scribe_Values.Look(ref CECarryWeight, "CECarryWeight", CECarryWeight_default);
+
+			Scribe_Values.Look(ref mass, "mass", mass_default);
 		}
 
-		public void ResetDefault()
+		public void ResetGeneralDefault()
 		{
 			draggableWindow = draggableWindow_default;
 			nonBlockingWindow = nonBlockingWindow_default;
@@ -59,6 +88,17 @@ namespace Outfitted
 			disableScoreOffset = disableScoreOffset_default;
 			sumScoresInsteadOfAverage = sumScoresInsteadOfAverage_default;
 			insScoreBasedOnConditions = insScoreBasedOnConditions_default;
+		}
+
+		public void ResetTuneDefault()
+		{
+			nakedOffset = nakedOffset_default;
+			ideologyOffset = nakedOffset_default;
+
+			CECurryBulk = CECurryBulk_default;
+			CECarryWeight = CECarryWeight_default;
+
+			mass = mass_default;
 		}
 	}
 }

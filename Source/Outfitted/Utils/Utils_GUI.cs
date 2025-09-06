@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using Verse.Noise;
 using Verse.Sound;
 
 namespace Outfitted.RW_JustUtils
@@ -50,7 +51,7 @@ namespace Outfitted.RW_JustUtils
 			return Widgets.ButtonText(new Rect(inRect.x, inRect.yMax - buttonHeigt, inRect.width, buttonHeigt), label);
 		}
 
-		public static string LabeledTextField(Listing_Standard listing, string label, string value, float labelWidth = 120f, float gap = 6f)
+		public static string LabelTextField(Listing_Standard listing, string label, string value, float labelWidth = 120f, float gap = 6f)
 		{
 			Rect row = listing.GetRect(22f);
 
@@ -59,6 +60,46 @@ namespace Outfitted.RW_JustUtils
 
 			Widgets.Label(labelRect, label);
 			return Widgets.TextField(fieldRect, value ?? "");
+		}
+
+		/// <summary>
+		/// Label + text field + slider
+		/// </summary>
+		/// <param name="listing"></param>
+		/// <param name="label"></param>
+		/// <param name="value"></param>
+		/// <param name="labelWidth"></param>
+		/// <param name="fieldWidth"></param>
+		/// <param name="gap"></param>
+		/// <returns></returns>
+		public static float LabelTextFieldSlider(
+			this Listing_Standard listing,
+			string label,
+			float value,
+			float min,
+			float max,
+			string tooltip = null,
+			float labelWidth = 120f,
+			float fieldWidth = 50f,
+			float gap = 6f)
+		{
+			Rect row = listing.GetRect(22f);
+
+			float currWidth = 0f;
+			Rect labelRect = new Rect(row.x + currWidth, row.y, labelWidth, row.height);
+			currWidth += labelRect.width;
+			Rect fieldRect = new Rect(row.x + currWidth, row.y, fieldWidth, row.height);
+			currWidth += fieldRect.width + gap;
+			Rect sliderRect = new Rect(row.x + currWidth, row.y, row.width - currWidth, row.height);
+
+			Widgets.Label(labelRect, label);
+			value = float.Parse(Widgets.TextField(fieldRect, value.ToString("F1") ?? ""));
+			value = Widgets.HorizontalSlider(sliderRect, value, min, max, true);
+
+			if (tooltip != null)
+				TooltipHandler.TipRegion(row, tooltip);
+
+			return value;
 		}
 
 		public static bool SetWrap(bool set)

@@ -12,6 +12,7 @@ namespace Outfitted
 	[StaticConstructorOnStartup]
 	public static class Outfitted
 	{
+		internal const string modName = "Outfitted";
 		internal static bool showApparelScores;
 		internal static bool isSaveStorageSettingsEnabled;
 		internal static readonly SimpleCurve HitPointsPercentScoreFactorCurve = new SimpleCurve
