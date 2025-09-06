@@ -42,9 +42,7 @@ namespace Outfitted.Database
 					MakeOutfit(db, "Worker", true),
 					StatDefOfHelper.MakeDict(
 						(StatDefOf_Rimworld.MoveSpeed, 0f),
-						(StatDefOf_Rimworld.WorkSpeedGlobal, 1f),
-						(StatDefOf_CE.CarryBulk, 1f),
-						(StatDefOf_CE.CarryWeight, 0.5f)
+						(StatDefOf_Rimworld.WorkSpeedGlobal, 1f)
 					)
 				);
 			}
