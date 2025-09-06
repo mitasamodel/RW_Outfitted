@@ -18,7 +18,7 @@ namespace Outfitted
 		/// <summary>
 		/// Return the score of specific apparel worn by pawn.
 		/// Recalculate the cache if apparel not found or if 200ms passed.
-		/// Cache is stored per Pawn (id) per Apparel (id).
+		/// Score is stored per Pawn (id) per Apparel (id).
 		/// </summary>
 		/// <param name="pawn"></param>
 		/// <param name="ap"></param>
@@ -49,7 +49,7 @@ namespace Outfitted
 
 		/// <summary>
 		/// Legacy method. Return the list of score for worn apparels.
-		/// Caller must ensure that the worn list is up-to-date.
+		/// Caller must ensure that the corresponding worn list is up-to-date.
 		/// </summary>
 		/// <param name="pawn"></param>
 		/// <returns></returns>

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using Verse;
 
 namespace Outfitted.Database
 {
@@ -12,22 +13,20 @@ namespace Outfitted.Database
 	{
 		private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			ConstructorInfo oldConstructor = AccessTools.Constructor(typeof(ApparelPolicy), new Type[2]
-			{
-				typeof (int),
-				typeof (string)
-			}, false);
-			ConstructorInfo newConstructor = AccessTools.Constructor(typeof(ExtendedOutfit), new Type[2]
-			{
-				typeof (int),
-				typeof (string)
-			}, false);
-			foreach (CodeInstruction instruction in instructions)
-			{
-				if (instruction.opcode == OpCodes.Newobj && oldConstructor.Equals(instruction.operand))
-					instruction.operand = newConstructor;
-				yield return instruction;
-			}
+			var ctorApparel = AccessTools.Constructor(typeof(ApparelPolicy), new[] { typeof(int), typeof(string) });
+			var ctorExtended = AccessTools.Constructor(typeof(ExtendedOutfit), new[] { typeof(int), typeof(string) });
+
+			var matcher = new CodeMatcher(instructions);
+
+			// Find ctor.
+			matcher.MatchStartForward(
+				new CodeMatch(OpCodes.Newobj, ctorApparel))
+				.ThrowIfInvalid("Can not find ctor for ApparelPolicy");
+
+			// Replace operand.
+			matcher.SetOperandAndAdvance(ctorExtended);
+
+			return matcher.InstructionEnumeration();
 		}
 	}
 }
