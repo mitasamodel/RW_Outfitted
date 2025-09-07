@@ -71,7 +71,8 @@
     <Compile Include="ApparelScorePriorities.cs" />
     <Compile Include="CacheWornApparel.cs" />
     <Compile Include="Database\Helpers.cs" />
-    <Compile Include="Debug.cs" />
+    <Compile Include="Debug\Debug.cs" />
+    <Compile Include="Debug\DebugDeepScorePriorities.cs" />
     <Compile Include="HarmonyPatches\Dialog_ManageApparelPolicies_Patches.cs" />
     <Compile Include="Dialog_ManageApparelPolicies_DoContentsRect_Patch.cs" />
     <Compile Include="HarmonyPatches\ConditionalPatches.cs" />

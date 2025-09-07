@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using Verse;
 
 namespace Outfitted
@@ -13,7 +14,17 @@ namespace Outfitted
 		// Can be called also for equipped apparel.
 		internal static float RawPriorities(Apparel apparel, ExtendedOutfit outfit)
 		{
-			if (!outfit.StatPriorities.Any()) return 0f;
+#if DEBUG
+			DebugDeepScorePriorities.Start(apparel.def.defName);
+#endif
+
+			if (!outfit.StatPriorities.Any())
+			{
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog("\tNo StatPriorities.\n");
+#endif
+				return 0f;
+			}
 
 			float sum = 0f;
 			int count = 0;
@@ -21,13 +32,22 @@ namespace Outfitted
 			{
 				if (sp?.Stat == null) continue;
 				float weight = sp.Weight;
-				float defaultAbs = Math.Abs(sp.Stat.defaultBaseValue);
-				float baseValue = Math.Max(defaultAbs, 0.001f);
+				float defBase = Math.Max(sp.Stat.defaultBaseValue, sp.Stat.minValue);
+				float evalDefBase = sp.Stat.postProcessCurve?.Evaluate(defBase) ?? defBase;
+				float defAbs = Math.Abs(evalDefBase);
+				float baseValue = Math.Max(defAbs, 0.001f);
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog($"\t[{apparel.def.defName}] [{sp.Stat.defName}] " +
+					$"Wei[{weight:F1}] defBase[{defBase:F1}] Eval[{evalDefBase:F1}] base[{baseValue:F1}]\n");
+#endif
 				float raw = ApparelScore(apparel, sp.Stat);
-				float delta = (defaultAbs < 0.001f) ? raw : (raw - sp.Stat.defaultBaseValue) / baseValue;
-
-				sum += delta * weight * weight * weight;
+				float delta = (evalDefBase < 0.001f) ? raw : (raw - evalDefBase) / baseValue;
+				float score = delta * weight * weight * weight;
+				sum += score;
 				count++;
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog($"Delta[{delta:F2}] Score[{score:F2}] Sum[{sum:F2}] Count [{count}]\n");
+#endif
 			}
 
 			// Depending on setting return either sum or average.
@@ -55,7 +75,16 @@ namespace Outfitted
 		/// <param name="basedOnQuality"></param>
 		/// <returns></returns>
 		public static float ApparelScore(Apparel apparel, StatDef stat, bool basedOnQuality = true)
-		{	
+		{
+#if DEBUG
+			DebugDeepScorePriorities.AddToLog($"\t\tBase[{stat.defaultBaseValue:F1}] " +
+				$"Min[{stat.minValue:F1}] " +
+				$"NoStuff[{apparel.def.GetStatValueAbstract(stat, null):F1}] " +
+				$"Norm[{apparel.def.GetStatValueAbstract(stat, apparel.Stuff):F1}] " +
+				$"Q[{apparel.GetStatValue(stat):F1}] " +
+				$"Eq[{apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat):F1}] " +
+				$"EqQ[{StatWorker.StatOffsetFromGear(apparel, stat):F1}]\n");
+#endif
 			float result;
 			// Apparel provides gear offset for the stat.
 			// That means only offset depends on quality/material.
@@ -64,19 +93,32 @@ namespace Outfitted
 			{
 				result = basedOnQuality ? StatWorker.StatOffsetFromGear(apparel, stat) : apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat);
 				result += stat.defaultBaseValue;
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog($"\t\tEquipped[{result:F2}] ");
+#endif
 			}
 
 			// Pawn-category stats with no equipped offset (example: CarryBulk with no offset).
 			// Apparel itself doesn't provide any bonus.
 			// Stat is always here "default", but to be safe, take it from apparel, not from stat itself.
 			else if (stat.category == StatCategoryDefOf.BasicsPawn)
+			{
 				result = apparel.def.GetStatValueAbstract(stat, null);
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog($"\t\tPawn-category[{result:F2}] ");
+#endif
+			}
 
 			// All other.
 			// Stat is not default; it is defined not as gear offset, but as stat itself.
 			// Example: armor, cold/warm insulation. Depends on gear itsef, not modifying Pawn's stats.
 			else
+			{
 				result = basedOnQuality ? apparel.GetStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog($"\t\tNormal[{result:F2}] ");
+#endif
+			}
 
 			// CE: CarryBulk -> WornBulk; CarryWeight -> Mass
 			if (ModsConfig.IsActive("CETeam.CombatExtended"))
@@ -85,6 +127,9 @@ namespace Outfitted
 					result -= apparel.GetStatValue(StatDefOf_CE.WornBulk);
 				else if (stat == StatDefOf_CE.CarryWeight)
 					result -= apparel.GetStatValue(StatDefOf_Rimworld.Mass);
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog($"CE_Adjusted[{result:F2}] ");
+#endif
 			}
 
 			return result;

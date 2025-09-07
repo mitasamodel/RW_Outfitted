@@ -44,7 +44,7 @@ namespace Outfitted
 				entry.CachedScores = Outfitted.BuildWornScoreToDict(pawn);
 			}
 
-			return entry.CachedScores.TryGetValue(apId, out var score) ? score : 0.1f;
+			return entry.CachedScores.TryGetValue(apId, out var score) ? score : 0f;
 		}
 
 		/// <summary>

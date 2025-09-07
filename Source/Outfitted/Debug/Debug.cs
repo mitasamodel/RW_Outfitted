@@ -14,81 +14,13 @@ using System.Diagnostics.Eventing.Reader;
 #if DEBUG
 namespace Outfitted
 {
-	[StaticConstructorOnStartup]
-	public static class LogSomeStuff
-	{
-		static LogSomeStuff()
-		{
-			LogStatDefs();
-
-			//var defs = DefDatabase<ThingDef>.AllDefsListForReading
-			//	.Where(def => def.equippedStatOffsets != null && def.equippedStatOffsets.Count > 0);
-
-			//Logger.LogNL("Defs with equipped offset");
-			//Dictionary<string, int> qty = new Dictionary<string, int>();
-			//foreach (var def in defs)
-			//{
-			//	Logger.LogNL($"Def[{def.defName}]");
-			//	foreach (var stat in def.equippedStatOffsets)
-			//	{
-			//		var st = def.GetStatValueDef(stat.stat);
-			//		Logger.LogNL($"\tStat[{stat.stat.defName}] Cat[{stat.stat.category}] Default[{stat.stat.defaultBaseValue}] This[{st}] Equipped[{stat.value}]");
-
-			//	}
-			//	Logger.LogNL("");
-			//}
-
-
-
-		}
-
-
-		private static void LogStatDefs()
-		{
-			var stats = DefDatabase<StatDef>.AllDefsListForReading
-							.GroupBy(stat => stat.modContentPack.PackageId);
-			var list = new List<string>()
-			{
-				"ludeon.rimworld",
-				"ludeon.rimworld.royalty",
-				"ludeon.rimworld.ideology",
-				"ludeon.rimworld.biotech",
-				"ludeon.rimworld.anomaly",
-				"ludeon.rimworld.odyssey",
-				"ceteam.combatextended"
-			};
-
-			Logger.LogNL($"New StatDefs:");
-			foreach (var group in stats)
-			{
-				if (!list.Contains(group.Key))
-				{
-					Logger.LogNL($"// {group.Key}");
-					foreach (var stat in group)
-					{
-						Logger.LogNL($"[MayRequire(\"{group.Key}\")] public static StatDef {stat.defName};");
-					}
-				}
-			}
-		}
-
-		private static void ListAllStats()
-		{
-			foreach (var stat in DefDatabase<StatDef>.AllDefsListForReading)
-			{
-				//if (stat.defaultBaseValue != 0)
-				{
-					Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Default[{stat.defaultBaseValue}] Mod[{stat.modContentPack.PackageId}] ");
-				}
-			}
-		}
-	}
-
 	public static class ScoreDebug
 	{
-		private static Apparel _apparel;
+		internal static bool DeepScorePriorities { get; } = true;
+
+		internal static Apparel SelectedApparel { get; set; }
 		private static ExtendedOutfit _outfit;
-		private static Pawn _pawn;
+		private static Pawn _selectedPawn;
 
 		public static void ClickedOn(ISelectable selectable)
 		{
@@ -98,27 +30,25 @@ namespace Outfitted
 				if (!(pawn.RaceProps?.Humanlike == true))
 					return;
 
-				_pawn = pawn;
+				_selectedPawn = pawn;
 				if (pawn.outfits.CurrentApparelPolicy is ExtendedOutfit outfit)
 					_outfit = outfit;
 
+				DebugDeepScorePriorities.Clear();
 				ShowScoreWornApparel(pawn);
+				DebugDeepScorePriorities.ShowLog();
 			}
 			else if (selectable is Apparel apparel)
 			{
-				_apparel = apparel;
-				ShowScoreApp(_apparel, _pawn, _outfit);
-				ShowIfWorn(_apparel, _pawn, _outfit);
+				SelectedApparel = apparel;
+				DebugDeepScorePriorities.Clear();
+				ShowScoreApp(SelectedApparel, _selectedPawn, _outfit);
+				DebugDeepScorePriorities.ShowLog();
 			}
 
-			if (_apparel == null || _outfit == null || _pawn == null) return;
+			if (SelectedApparel == null || _outfit == null || _selectedPawn == null) return;
 
 			//ShowApparelStatScores();
-		}
-
-		private static void ShowIfWorn(Apparel ap, Pawn pawn, ExtendedOutfit outfit)
-		{
-
 		}
 
 		private static void ShowScoreWornApparel(Pawn pawn)
@@ -140,10 +70,9 @@ namespace Outfitted
 			Logger.LogNL($"SeasonalTemp [{seasonTemp}] Offset [{tempOffset}] Final [{seasonTemp + tempOffset}]");
 			foreach (var ap in wornApparel)
 			{
-				//ShowScoreApp(ap, pawn, policy);
 				ShowScoreApp(ap, pawn, policy, whatIfNotWorn: true);
 			}
-			Logger.LogNL($"\tMin[{pawn.ComfortableTemperatureRange().min}] Max[{pawn.ComfortableTemperatureRange().max}]");
+			Logger.LogNL($"\tComfort: Min[{pawn.ComfortableTemperatureRange().min}] Max[{pawn.ComfortableTemperatureRange().max}]");
 		}
 
 		private static float GetTempOffset(Map map)
@@ -166,7 +95,7 @@ namespace Outfitted
 			if (ap == null || pawn == null || policy == null) return;
 
 			if (!whatIfNotWorn)
-				Logger.Log($"\tDefNormScore[{ap.def?.defName}] ");
+				Logger.Log($"\tDef[{ap.def?.defName}] ");
 			else
 				Logger.Log($"\tDef[{ap.def?.defName}] ");
 
@@ -238,23 +167,23 @@ namespace Outfitted
 			Logger.LogNL("");
 		}
 
-		private static void ShowApparelStatScores()
+		private static void ShowApparelStatScores(Apparel ap)
 		{
 			if (ModsConfig.IsActive("CETeam.CombatExtended"))
 			{
-				float CE_Bulk = _apparel.GetStatValue(StatDefOf_CE.Bulk);
-				float CE_WornBulk = _apparel.GetStatValue(StatDefOf_CE.WornBulk);
-				Logger.LogNL($"Ap[{_apparel.def.defName}] CE_Bulk[{CE_Bulk}] Worn[{CE_WornBulk}] Out[{_outfit.label}] Pawn[{_pawn.Name}]");
+				float CE_Bulk = ap.GetStatValue(StatDefOf_CE.Bulk);
+				float CE_WornBulk = ap.GetStatValue(StatDefOf_CE.WornBulk);
+				Logger.LogNL($"Ap[{ap.def.defName}] CE_Bulk[{CE_Bulk}] Worn[{CE_WornBulk}] Out[{_outfit.label}] Pawn[{_selectedPawn.Name}]");
 			}
 			else
-				Logger.LogNL($"Ap[{_apparel.def.defName}] Out[{_outfit.label}] Pawn[{_pawn.Name}]");
+				Logger.LogNL($"Ap[{ap.def.defName}] Out[{_outfit.label}] Pawn[{_selectedPawn.Name}]");
 
 			foreach (var stat in _outfit.StatPriorities)
 			{
-				var baseStatQ = _apparel.GetStatValue(stat.Stat);
-				var baseStat = _apparel.def.GetStatValueAbstract(stat.Stat, null);
-				var wearStat = _apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat.Stat);
-				float wearStatQ = StatWorker.StatOffsetFromGear(_apparel, stat.Stat);
+				var baseStatQ = ap.GetStatValue(stat.Stat);
+				var baseStat = ap.def.GetStatValueAbstract(stat.Stat, null);
+				var wearStat = ap.def.equippedStatOffsets.GetStatOffsetFromList(stat.Stat);
+				float wearStatQ = StatWorker.StatOffsetFromGear(ap, stat.Stat);
 
 
 				Logger.LogNL($"\t-{stat.Stat.defName} " +
@@ -267,7 +196,7 @@ namespace Outfitted
 					$"SumQ[{baseStatQ + wearStat}] " +
 					$"Sum_Q[{baseStat + wearStatQ}] "
 				);
-				Logger.LogNL($"\tScore: {ApparelScorePriorities.ApparelScore(_apparel, stat.Stat)}");
+				Logger.LogNL($"\tScore: {ApparelScorePriorities.ApparelScore(ap, stat.Stat)}");
 			}
 		}
 	}
@@ -344,6 +273,108 @@ namespace Outfitted
 			_lastLoggedFrame = UnityEngine.Time.frameCount;
 
 			if (obj is ISelectable s) ScoreDebug.ClickedOn(s);
+		}
+	}
+
+	[StaticConstructorOnStartup]
+	public static class LogSomeStuff
+	{
+		static LogSomeStuff()
+		{
+			// StatDefs
+			var defs = DefDatabase<StatDef>.AllDefsListForReading
+				.Where(def => def.minValue > def.defaultBaseValue && def.minValue >= 0f && def.defaultBaseValue >= 0f);
+			Logger.LogNL("StatDefs: (minValue > defaultBaseValue) >= 0");
+			foreach (var def in defs)
+			{
+				var dd = def.defaultBaseValue;
+				var min = def.minValue;
+				Logger.LogNL($"[{def.defName}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
+			}
+			Logger.LogNL("");
+
+			defs = DefDatabase<StatDef>.AllDefsListForReading
+				.Where(def => def.minValue > def.defaultBaseValue && (def.minValue < 0f || def.defaultBaseValue < 0f));
+			Logger.LogNL("StatDefs: (minValue > defaultBaseValue) < 0");
+			foreach (var def in defs)
+			{
+				var dd = def.defaultBaseValue;
+				var min = def.minValue;
+				Logger.LogNL($"[{def.defName}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
+			}
+			Logger.LogNL("");
+
+			defs = DefDatabase<StatDef>.AllDefsListForReading
+				.Where(def => def.minValue != def.defaultBaseValue && def.defaultBaseValue < 0f);
+			Logger.LogNL("StatDefs: (minValue != defaultBaseValue) defaultBaseValue < 0");
+			foreach (var def in defs)
+			{
+				var dd = def.defaultBaseValue;
+				var min = def.minValue;
+				Logger.LogNL($"[{def.defName}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
+			}
+			Logger.LogNL("");
+
+			//LogStatDefs();
+
+			//var defs = DefDatabase<ThingDef>.AllDefsListForReading
+			//	.Where(def => def.equippedStatOffsets != null && def.equippedStatOffsets.Count > 0);
+
+			//Logger.LogNL("Defs with equipped offset");
+			//Dictionary<string, int> qty = new Dictionary<string, int>();
+			//foreach (var def in defs)
+			//{
+			//	Logger.LogNL($"Def[{def.defName}]");
+			//	foreach (var stat in def.equippedStatOffsets)
+			//	{
+			//		var st = def.GetStatValueDef(stat.stat);
+			//		Logger.LogNL($"\tStat[{stat.stat.defName}] Cat[{stat.stat.category}] Default[{stat.stat.defaultBaseValue}] This[{st}] Equipped[{stat.value}]");
+
+			//	}
+			//	Logger.LogNL("");
+			//}
+
+
+
+		}
+		private static void LogStatDefs()
+		{
+			var stats = DefDatabase<StatDef>.AllDefsListForReading
+							.GroupBy(stat => stat.modContentPack.PackageId);
+			var list = new List<string>()
+			{
+				"ludeon.rimworld",
+				"ludeon.rimworld.royalty",
+				"ludeon.rimworld.ideology",
+				"ludeon.rimworld.biotech",
+				"ludeon.rimworld.anomaly",
+				"ludeon.rimworld.odyssey",
+				"ceteam.combatextended"
+			};
+
+			Logger.LogNL($"New StatDefs:");
+			foreach (var group in stats)
+			{
+				if (!list.Contains(group.Key))
+				{
+					Logger.LogNL($"// {group.Key}");
+					foreach (var stat in group)
+					{
+						Logger.LogNL($"[MayRequire(\"{group.Key}\")] public static StatDef {stat.defName};");
+					}
+				}
+			}
+		}
+
+		private static void ListAllStats()
+		{
+			foreach (var stat in DefDatabase<StatDef>.AllDefsListForReading)
+			{
+				//if (stat.defaultBaseValue != 0)
+				{
+					Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Default[{stat.defaultBaseValue}] Mod[{stat.modContentPack.PackageId}] ");
+				}
+			}
 		}
 	}
 }
