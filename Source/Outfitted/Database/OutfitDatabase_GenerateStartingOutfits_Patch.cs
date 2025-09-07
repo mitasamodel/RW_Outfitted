@@ -13,17 +13,23 @@ namespace Outfitted.Database
 	{
 		private static bool Prefix(OutfitDatabase __instance)
 		{
-			try
+			if (OutfittedMod.Settings.generateStartingOutfits)
 			{
-				GenerateStartingOutfits(__instance);
+				try
+				{
+					GenerateStartingOutfits(__instance);
+				}
+				catch (Exception ex)
+				{
+					Log.Error("Can't generate outfits: " + ex?.ToString());
+				}
+				return false;
 			}
-			catch (Exception ex)
-			{
-				Log.Error("Can't generate outfits: " + ex?.ToString());
-			}
-			return false;
+			else return true;
 		}
 
+		// All apparel created with RW MakeNewOutfit() method will get
+		// basic stats from Helpers.AddBasicStats().
 		internal static void GenerateStartingOutfits(OutfitDatabase db, bool vanilla = true)
 		{
 			if (vanilla)

@@ -34,6 +34,11 @@ namespace Outfitted
 		public bool sumScoresInsteadOfAverage = sumScoresInsteadOfAverage_default;
 		public bool insScoreBasedOnConditions = insScoreBasedOnConditions_default;
 
+		// Misc.
+		public const bool generateStartingOutfits_default = false;
+
+		public bool generateStartingOutfits = generateStartingOutfits_default;
+
 		/// Tune values.
 		// Offsets.
 		public const float nakedOffset_default = 2f;
@@ -66,6 +71,7 @@ namespace Outfitted
 			Scribe_Values.Look(ref disableScoreOffset, "disableScoreOffset", disableScoreOffset_default);
 			Scribe_Values.Look(ref sumScoresInsteadOfAverage, "sumScoresInsteadOfAverage", sumScoresInsteadOfAverage_default);
 			Scribe_Values.Look(ref insScoreBasedOnConditions, "insScoreBasedOnConditions", insScoreBasedOnConditions_default);
+			Scribe_Values.Look(ref generateStartingOutfits, "generateStartingOutfits", generateStartingOutfits_default);
 
 			Scribe_Values.Look(ref nakedOffset, "nakedOffset", nakedOffset_default);
 			Scribe_Values.Look(ref ideologyOffset, "ideologyOffset", nakedOffset_default);
@@ -88,6 +94,8 @@ namespace Outfitted
 			disableScoreOffset = disableScoreOffset_default;
 			sumScoresInsteadOfAverage = sumScoresInsteadOfAverage_default;
 			insScoreBasedOnConditions = insScoreBasedOnConditions_default;
+
+			generateStartingOutfits = generateStartingOutfits_default;
 		}
 
 		public void ResetTuneDefault()

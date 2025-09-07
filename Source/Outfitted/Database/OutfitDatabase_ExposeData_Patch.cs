@@ -14,12 +14,17 @@ namespace Outfitted.Database
 		{
 			if (Scribe.mode != LoadSaveMode.LoadingVars || ___outfits.Any(i => i is ExtendedOutfit))
 				return;
+
+			// Convert vanilla outfits.
 			foreach (ApparelPolicy outfit in ___outfits.ToList())
 			{
 				___outfits.Remove(outfit);
 				___outfits.Add(Helpers.GenerateBasedOnKnownVanillaOutfits(outfit));
 			}
-			OutfitDatabase_GenerateStartingOutfits_Patch.GenerateStartingOutfits(__instance, false);
+
+			// Generate additional starting outfits.
+			if (OutfittedMod.Settings.generateStartingOutfits)
+				OutfitDatabase_GenerateStartingOutfits_Patch.GenerateStartingOutfits(__instance, false);
 		}
 	}
 }

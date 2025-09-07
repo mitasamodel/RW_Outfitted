@@ -65,6 +65,13 @@ namespace Outfitted
 				"By default only the seasonal temperature on the current map affects the score for an apparel selection.\n" +
 				"This setting enable the temperature-relevant incidents (heat wave, cold snap, etc.) to be considered for scoring.");
 
+			listing.GapLine();
+			listing.CheckboxLabeled("[Outdated] Generate some starting outfits", ref OutfittedMod.Settings.generateStartingOutfits,
+				"Generate some outfits like 'Doctor', 'Cook', 'Builder' with typical priority stats.\n\n" +
+				"These outfit policies will be generated only on new game start or if game is loaded from the save " +
+				"without Outfitted mod.\n\n" +
+				"[Outdated] Current set of stats need to be re-checked.");
+
 			listing.End();
 
 			if (Utils_GUI.ResetButton(inRect, "Reset to defaults")) OutfittedMod.Settings.ResetGeneralDefault();
