@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <LanguageData>
 	
+	<NoOutfitSelected>No outfit selected</NoOutfitSelected>
 	<NoStatOptionsToShow>No stats match the filter</NoStatOptionsToShow>
 	
 	<PenaltyWornByCorpse>Penalty Worn by Corpse</PenaltyWornByCorpse>

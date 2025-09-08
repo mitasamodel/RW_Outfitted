@@ -73,9 +73,11 @@
     <Compile Include="Database\Helpers.cs" />
     <Compile Include="Debug\Debug.cs" />
     <Compile Include="Debug\DebugDeepScorePriorities.cs" />
+    <Compile Include="Dialog_Policies.cs" />
     <Compile Include="HarmonyPatches\Dialog_ManageApparelPolicies_Patches.cs" />
-    <Compile Include="Dialog_ManageApparelPolicies_DoContentsRect_Patch.cs" />
+    <Compile Include="HarmonyPatches\Dialog_ManageApparelPolicies_DoContentsRect_Patch.cs" />
     <Compile Include="HarmonyPatches\ConditionalPatches.cs" />
+    <Compile Include="HarmonyPatches\Dialog_ManagePolicies_DoWindowContents_Patch.cs" />
     <Compile Include="HarmonyPatches\JobGiver_OptimizeApparel_ApparelScoreGain_Patch.cs" />
     <Compile Include="HarmonyPatches\JobGiver_OptimizeApparel_TryGiveJob_Patch.cs" />
     <Compile Include="Logger.cs" />

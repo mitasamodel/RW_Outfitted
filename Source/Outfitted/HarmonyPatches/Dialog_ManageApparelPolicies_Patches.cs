@@ -15,7 +15,7 @@ namespace Outfitted
 		{
 			if (__instance is Dialog_ManageApparelPolicies)
 			{
-				__result = new Vector2(900f, 700f);
+				__result = new Vector2(Dialog_Policies.WindowWidth, Dialog_Policies.WindowHeight);
 				return false;
 			}
 

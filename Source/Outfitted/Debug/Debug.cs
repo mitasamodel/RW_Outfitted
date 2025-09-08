@@ -16,7 +16,7 @@ namespace Outfitted
 {
 	public static class ScoreDebug
 	{
-		internal static bool DeepScorePriorities { get; } = true;
+		internal static bool DeepScorePriorities { get; } = false;
 
 		internal static Apparel SelectedApparel { get; set; }
 		private static ExtendedOutfit _outfit;
