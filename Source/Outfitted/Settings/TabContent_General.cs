@@ -71,6 +71,8 @@ namespace Outfitted
 				"These policies are generated on new game start or on game's load if there are vanilla outfits saved " +
 				"(convert vanilla outfits).\n\n" +
 				"[Outdated] Current set of stats need to be re-checked.");
+			listing.CheckboxLabeled("Rewrite filter for existing policies", ref OutfittedMod.Settings.rewriteFilterSelectionOnGenerate,
+				"If set, then the selection filter will be rewritten by clicking the button to generate missing outfits.");
 
 			listing.End();
 

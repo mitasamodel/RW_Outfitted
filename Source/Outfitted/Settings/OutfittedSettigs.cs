@@ -36,8 +36,10 @@ namespace Outfitted
 
 		// Misc.
 		public const bool generateStartingOutfits_default = false;
+		public const bool rewriteFilterSelectionOnGenerate_default = false;
 
 		public bool generateStartingOutfits = generateStartingOutfits_default;
+		public bool rewriteFilterSelectionOnGenerate = rewriteFilterSelectionOnGenerate_default;
 
 		/// Tune values.
 		// Offsets.
@@ -72,6 +74,7 @@ namespace Outfitted
 			Scribe_Values.Look(ref sumScoresInsteadOfAverage, "sumScoresInsteadOfAverage", sumScoresInsteadOfAverage_default);
 			Scribe_Values.Look(ref insScoreBasedOnConditions, "insScoreBasedOnConditions", insScoreBasedOnConditions_default);
 			Scribe_Values.Look(ref generateStartingOutfits, "generateStartingOutfits", generateStartingOutfits_default);
+			Scribe_Values.Look(ref rewriteFilterSelectionOnGenerate, "rewriteFilterSelectionOnGenerate", rewriteFilterSelectionOnGenerate_default);
 
 			Scribe_Values.Look(ref nakedOffset, "nakedOffset", nakedOffset_default);
 			Scribe_Values.Look(ref ideologyOffset, "ideologyOffset", nakedOffset_default);
@@ -96,6 +99,7 @@ namespace Outfitted
 			insScoreBasedOnConditions = insScoreBasedOnConditions_default;
 
 			generateStartingOutfits = generateStartingOutfits_default;
+			rewriteFilterSelectionOnGenerate = rewriteFilterSelectionOnGenerate_default;
 		}
 
 		public void ResetTuneDefault()

@@ -320,7 +320,7 @@ namespace Outfitted
 		private static void ApplyEntry(ExtendedOutfit outfit, StandardOutfitEntry entry)
 		{
 			// Filter apparel if applicable.
-			if (entry.ApparelTag != null)
+			if (entry.ApparelTag != null && OutfittedMod.Settings.rewriteFilterSelectionOnGenerate)
 			{
 				outfit.filter.SetDisallowAll();
 				outfit.filter.SetAllow(SpecialThingFilterDefOf.AllowDeadmansApparel, false);
