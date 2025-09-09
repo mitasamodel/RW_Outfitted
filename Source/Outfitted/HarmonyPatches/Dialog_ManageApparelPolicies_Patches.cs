@@ -42,4 +42,13 @@ namespace Outfitted
 			}
 		}
 	}
+
+	/// <summary>
+	/// Adjust the width of originally right panel. Now it will be the middle one.
+	/// </summary>
+	[HarmonyPatch(typeof(Dialog_ManageApparelPolicies), "DoContentsRect")]
+	public static class Dialog_ManageApparelPolicies_DoContentsRect_Patch
+	{
+		public static void Prefix(ref Rect rect) => rect.width = Dialog_Policies.MiddlePanelWidth;
+	}
 }

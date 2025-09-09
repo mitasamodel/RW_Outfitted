@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using LudeonTK;
+using Outfitted.Database;
 using Outfitted.RW_JustUtils;
 using RimWorld;
 using System;
@@ -57,13 +58,21 @@ namespace Outfitted
 
 		public static void GenerateOutfitsButton(Rect inRect)
 		{
-			if ( Widgets.ButtonText(inRect, "Generate policies") )
+			TooltipHandler.TipRegion(inRect, "Will generate missing Outfitted policies and will add missing stats to existing policies.");
+			if (Widgets.ButtonText(inRect, "Generate policies"))
 			{
 				Find.WindowStack.Add(
 					Dialog_MessageBox.CreateConfirmation(
-						"Test",
-						confirmedAct: () => Messages.Message("allrighty", MessageTypeDefOf.TaskCompletion, false),
-						destructive: false
+						"This action will create missing Outfitted policies and also will extend existing policies.\n\n" +
+						"No stats in existing policies will be modified or removed. Only missing stats will be added.\n\n" +
+						"Filter selection WILL be modified based on apparel tag (vanilla behavior).",
+						confirmedAct: () =>
+						{
+							StandardOutfits.EntriesFreshStart();
+							StandardOutfits.GenerateStartingOutfits(Current.Game.outfitDatabase);
+							Messages.Message("alrighty", MessageTypeDefOf.TaskCompletion, false);
+						},
+						destructive: true
 					)
 				);
 			}
@@ -267,7 +276,7 @@ namespace Outfitted
 				else
 					Messages.Message((string)"NoStatOptionsToShow".Translate(), MessageTypeDefOf.RejectInput, false);
 			}
-			
+
 			GUI.color = Color.grey;
 			Widgets.DrawLineHorizontal(cur.x, cur.y, inRect.width);
 			GUI.color = Color.white;

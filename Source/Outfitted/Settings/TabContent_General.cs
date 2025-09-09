@@ -66,10 +66,10 @@ namespace Outfitted
 				"This setting enable the temperature-relevant incidents (heat wave, cold snap, etc.) to be considered for scoring.");
 
 			listing.GapLine();
-			listing.CheckboxLabeled("[Outdated] Generate some starting outfits", ref OutfittedMod.Settings.generateStartingOutfits,
-				"Generate some outfits like 'Doctor', 'Cook', 'Builder' with typical priority stats.\n\n" +
-				"These outfit policies will be generated only on new game start or if game is loaded from the save " +
-				"without Outfitted mod.\n\n" +
+			listing.CheckboxLabeled("[Outdated] Generate additional starting outfits", ref OutfittedMod.Settings.generateStartingOutfits,
+				"Generate additional outfits like 'Doctor', 'Cook', 'Builder' with typical priority stats.\n\n" +
+				"These policies are generated on new game start or on game's load if there are vanilla outfits saved " +
+				"(convert vanilla outfits).\n\n" +
 				"[Outdated] Current set of stats need to be re-checked.");
 
 			listing.End();

@@ -11,7 +11,7 @@ namespace Outfitted
 		public bool targetTemperaturesOverride = true;
 		public FloatRange targetTemperatures = new FloatRange(-100f, 100f);
 		public bool PenaltyWornByCorpse = true;
-		public bool AutoWorkPriorities;
+		public bool AutoWorkPriorities = false;
 		private bool _autoTemp = true;
 		public int autoTempOffset = 20;
 		private static IEnumerable<StatCategoryDef> blacklistedCategories = (IEnumerable<StatCategoryDef>)new List<StatCategoryDef>()
@@ -48,7 +48,9 @@ namespace Outfitted
 		{
 			get
 			{
-				return (IEnumerable<StatDef>)DefDatabase<StatDef>.AllDefs.Where<StatDef>((Func<StatDef, bool>)(i => !ExtendedOutfit.blacklistedCategories.Contains<StatCategoryDef>(i.category))).Except<StatDef>(ExtendedOutfit.blacklistedStats).ToList<StatDef>();
+				return DefDatabase<StatDef>.AllDefs
+					.Where(i => !blacklistedCategories.Contains(i.category))
+					.Except(blacklistedStats).ToList();
 			}
 		}
 
@@ -82,7 +84,28 @@ namespace Outfitted
 
 		public void AddStatPriority(StatDef def, float priority, float defaultPriority = float.NaN)
 		{
-			this.statPriorities.Insert(0, new StatPriority(def, priority, defaultPriority));
+			statPriorities.Insert(0, new StatPriority(def, priority, defaultPriority));
+		}
+
+		/// <summary>
+		/// Add new if not exists, other wise set if flag is true.
+		/// </summary>
+		/// <param name="def"></param>
+		/// <param name="weight"></param>
+		public void SafeSetStatPriority(StatDef def, float weight, bool modify = false)
+		{
+			bool flag = false;
+			for (int i = 0; i < statPriorities.Count; i++)
+			{
+				if (statPriorities[i].Stat == def)
+				{
+					flag = true;
+					if (modify)
+						statPriorities[i].Weight = weight;
+				}
+			}
+			if (!flag)
+				AddStatPriority(def, weight);
 		}
 
 		public void AddRange(IEnumerable<StatPriority> priorities)

@@ -6,28 +6,45 @@ using System.Text;
 using System.Threading.Tasks;
 using Verse;
 
-namespace Outfitted.Database
+namespace Outfitted
 {
-	internal class Helpers
+	internal static class DBHelpers
 	{
+		public static ExtendedOutfit ConvertVanillaOutfit(ApparelPolicy outfit)
+		{
+			if (outfit == null)
+			{
+				Logger.Log_Error("Unexpected null outfit.");
+				Verse.Log.Warning("[Outfitted] Please report it to mod author.");
+				return null;
+			}
+
+			if (outfit is ExtendedOutfit)
+			{
+#if DEBUG
+				Logger.LogNL($"[ConvertVanillaOutfit] {outfit.label} is ExtendedOutfit already. Skipping.");
+#endif
+				return outfit as ExtendedOutfit;
+			}
+
+			ExtendedOutfit exOutfit = new ExtendedOutfit(outfit);
+			return exOutfit;
+		}
+
 		internal static void AddBasicStats(ExtendedOutfit outfit)
 		{
 			// CE
 			if (ModsConfig.IsActive("CETeam.CombatExtended"))
 			{
-				outfit.AddRange(new List<StatPriority>()
-				{
-					new StatPriority(StatDefOf_CE.CarryBulk, OutfittedMod.Settings.CECurryBulk),
-					new StatPriority(StatDefOf_CE.CarryWeight, OutfittedMod.Settings.CECarryWeight)
-				});
+				outfit.SafeSetStatPriority(StatDefOf_CE.CarryBulk, OutfittedMod.Settings.CECurryBulk);
+				outfit.SafeSetStatPriority(StatDefOf_CE.CarryWeight, OutfittedMod.Settings.CECarryWeight);
 			}
 
 			// Vanilla
 			// Only if no CE presented. For CE there are better stats to be used.
 			if (!ModsConfig.IsActive("CETeam.CombatExtended"))
 			{
-				if (StatDefOf_Rimworld.Mass != null)
-					outfit.AddStatPriority(StatDefOf_Rimworld.Mass, OutfittedMod.Settings.mass);
+				outfit.SafeSetStatPriority(StatDefOf_Rimworld.Mass, OutfittedMod.Settings.mass);
 			}
 		}
 

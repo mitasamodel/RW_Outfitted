@@ -11,6 +11,10 @@ using Verse;
 
 namespace Outfitted
 {
+	/// <summary>
+	/// Patch the parent of Dialog_ManageApparelPolicies.
+	/// This is where the whole Window is being drawn.
+	/// </summary>
 	[HarmonyPatch(typeof(Dialog_ManagePolicies<ApparelPolicy>), nameof(Dialog_ManagePolicies<ApparelPolicy>.DoWindowContents))]
 	internal static class Dialog_ManagePolicies_DoWindowContents_Patch
 	{
