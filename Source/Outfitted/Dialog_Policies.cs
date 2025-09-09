@@ -287,7 +287,7 @@ namespace Outfitted
 			//Utils_GUI.DrawBox(scrollPosRect, Color.green);
 			Rect scrollContentRect = new Rect(scrollPosRect)
 			{
-				height = 30f * list.Count + 16f
+				height = (list.Count > 0 ? list.Count : 1) * 30f + 16f
 			};
 			//Utils_GUI.DrawBox(scrollContentRect, Color.red);
 
