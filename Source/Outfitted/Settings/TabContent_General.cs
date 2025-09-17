@@ -60,7 +60,7 @@ namespace Outfitted
 				"2 - armor#2, which adds armor (value=10) and move speed (value=+0.4)\n" +
 				"Armor#1 will have a raw score of +10. Armor#2 will have a raw score of (10+0.4)/2 = +5.2. Armor#1 wins.\n\n" +
 				"This option replaces the average calculation by simple sum of all values. Better armor should win.");
-			listing.CheckboxLabeled("Temperature-relevant incidents affect apparel score", ref OutfittedMod.Settings.insScoreBasedOnConditions,
+			listing.CheckboxLabeled("Temperature-relevant incidents affect apparel score", ref OutfittedMod.Settings.insScoreBasedOnMapConditions,
 				"This setting relevant only if auto-temperature is set for an apparel policy.\n\n" +
 				"By default only the seasonal temperature on the current map affects the score for an apparel selection.\n" +
 				"This setting enable the temperature-relevant incidents (heat wave, cold snap, etc.) to be considered for scoring.");

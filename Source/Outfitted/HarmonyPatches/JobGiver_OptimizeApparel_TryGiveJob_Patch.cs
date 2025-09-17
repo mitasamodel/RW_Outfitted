@@ -21,8 +21,10 @@ namespace Outfitted
 		private static readonly MethodInfo ApparelScoreRaw =
 			AccessTools.Method(typeof(JobGiver_OptimizeApparel), nameof(JobGiver_OptimizeApparel.ApparelScoreRaw));
 
+		//private static readonly MethodInfo BuildWornScore =
+		//	AccessTools.Method(typeof(Outfitted), nameof(Outfitted.BuildWornScore));
 		private static readonly MethodInfo BuildWornScore =
-			AccessTools.Method(typeof(Outfitted), nameof(Outfitted.BuildWornScore));
+			AccessTools.Method(typeof(CacheWornApparel), nameof(CacheWornApparel.GetScoreList));
 
 		private static readonly FieldInfo WornScoresField =
 		   AccessTools.Field(typeof(JobGiver_OptimizeApparel), "wornApparelScores");

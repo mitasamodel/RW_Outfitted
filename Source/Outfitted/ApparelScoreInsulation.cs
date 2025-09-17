@@ -56,7 +56,7 @@ namespace Outfitted
 					if (map != null)
 					{
 						float seasonalTemp = map.mapTemperature.SeasonalTemp;
-						float conTempOffset = OutfittedMod.Settings.insScoreBasedOnConditions ? GetTempOffset(map) : 0f;
+						float conTempOffset = OutfittedMod.Settings.insScoreBasedOnMapConditions ? GetTempOffset(map) : 0f;
 						float mapTemp = seasonalTemp + conTempOffset;
 						targetTemp = new FloatRange(mapTemp - outfit.autoTempOffset, mapTemp + outfit.autoTempOffset);
 					}

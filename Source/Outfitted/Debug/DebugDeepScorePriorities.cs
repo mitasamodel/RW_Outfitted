@@ -24,24 +24,30 @@ namespace Outfitted
 
 		public static void ShowLog()
 		{
-			if (_started)
-				_showString.Append($"[DebugDeepScorePriorities] Finished.\n");
-			Logger.Log(_showString.ToString());
-			Clear();
+			if (ScoreDebug.DeepScorePriorities)
+			{
+				if (_started)
+					_showString.Append($"[DebugDeepScorePriorities] Finished.\n");
+				Logger.Log(_showString.ToString());
+				Clear();
+			}
 		}
 
 		public static void Start(string defName)
 		{
-			var selDefName = ScoreDebug.SelectedApparel?.def?.defName;
-			if (string.IsNullOrEmpty(selDefName) || string.IsNullOrEmpty(defName)) return;
-
-			if (_started)
-				_overlap = true;
-
-			if (!_started && defName == selDefName)
+			if (ScoreDebug.DeepScorePriorities)
 			{
-				_showString.Append($"[DebugDeepScorePriorities] Started.\n");
-				_started = true;
+				var selDefName = ScoreDebug.SelectedApparel?.def?.defName;
+				if (string.IsNullOrEmpty(selDefName) || string.IsNullOrEmpty(defName)) return;
+
+				if (_started)
+					_overlap = true;
+
+				if (!_started && defName == selDefName)
+				{
+					_showString.Append($"[DebugDeepScorePriorities] Started.\n");
+					_started = true;
+				}
 			}
 		}
 

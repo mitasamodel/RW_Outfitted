@@ -1,4 +1,5 @@
-﻿using LudeonTK;
+﻿using HarmonyLib;
+using LudeonTK;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,12 @@ using Verse;
 
 namespace Outfitted
 {
+	internal sealed class CacheWornApparelEntry
+	{
+		internal int TickToUpdate { get; set; } = -1;
+		internal Dictionary<int, float> CachedScores { get; set; } = new Dictionary<int, float>();
+	}
+
 	internal static class CacheWornApparel
 	{
 		[TweakValue("Outfitted", 0, 60)]
@@ -38,10 +45,10 @@ namespace Outfitted
 				_cachedScores[pawnId] = entry;
 			}
 
-			if (!entry.CachedScores.TryGetValue(apId, out _) || entry.CachedTick < GenTicks.TicksGame)
+			if (!entry.CachedScores.TryGetValue(apId, out _) || entry.TickToUpdate < GenTicks.TicksGame)
 			{
-				entry.CachedTick = GenTicks.TicksGame + _skipTicks;
-				entry.CachedScores = Outfitted.BuildWornScoreToDict(pawn);
+				entry.TickToUpdate = GenTicks.TicksGame + _skipTicks;
+				entry.CachedScores = BuildWornScoreToDict(pawn);
 			}
 
 			return entry.CachedScores.TryGetValue(apId, out var score) ? score : 0f;
@@ -63,11 +70,52 @@ namespace Outfitted
 				listScores.Add(GetScore(pawn, ap));
 			return listScores;
 		}
-	}
 
-	internal sealed class CacheWornApparelEntry
-	{
-		internal int CachedTick { get; set; } = -1;
-		internal Dictionary<int, float> CachedScores { get; set; } = new Dictionary<int, float>();
+		public static Dictionary<int, float> BuildWornScoreToDict(Pawn pawn)
+		{
+			var worn = pawn?.apparel?.WornApparel;
+			worn ??= new List<Apparel>();
+			Dictionary<int, float> scoresDict = new Dictionary<int, float>(worn.Count);
+
+			foreach (var ap in worn)
+			{
+				if (ap == null)
+				{
+					Logger.Log_Warning("BuildWornScoreToDict: Unexpected Apparel-null in worn list.");
+					continue;
+				}
+
+				if (IsForbiddenApparel(pawn, ap))
+					scoresDict[ap.thingIDNumber] = -1000f;
+				else
+					scoresDict[ap.thingIDNumber] = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
+			}
+			return scoresDict;
+		}
+
+		/// <summary>
+		/// This is used to correctly score already worn apparel.
+		/// The original "ApparelScoreGain" doesn't apply to it, so this is how to do it.
+		/// </summary>
+		private static readonly Type ShieldType = AccessTools.TypeByName("CombatExtended.Apparel_Shield");
+		private static bool IsForbiddenApparel(Pawn pawn, Apparel ap)
+		{
+			// Vanilla check for shield belt.
+			if (ap.def == ThingDefOf.Apparel_ShieldBelt && pawn.equipment.Primary != null && pawn.equipment.Primary.def.IsWeaponUsingProjectiles)
+				return true;
+
+			// CE check for worn shields.
+			if (ModsConfig.IsActive("CETeam.CombatExtended"))
+			{
+				if (ShieldType != null && ShieldType.IsInstanceOfType(ap))
+				{
+					bool hasOneHandedWeapon = pawn?.equipment?.Primary?.def?.weaponTags?.Contains("CE_OneHandedWeapon") ?? false;
+					if (pawn?.equipment?.Primary != null && !hasOneHandedWeapon)
+						return true;
+				}
+			}
+
+			return false;
+		}
 	}
 }

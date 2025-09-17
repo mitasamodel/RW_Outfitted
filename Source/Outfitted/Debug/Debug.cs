@@ -10,13 +10,14 @@ using UnityEngine;
 using Verse;
 using CombatExtended;
 using System.Diagnostics.Eventing.Reader;
+using Outfitted.RW_JustUtils;
 
 #if DEBUG
 namespace Outfitted
 {
 	public static class ScoreDebug
 	{
-		internal static bool DeepScorePriorities { get; } = false;
+		internal static bool DeepScorePriorities { get; } = true;
 
 		internal static Apparel SelectedApparel { get; set; }
 		private static ExtendedOutfit _outfit;
@@ -27,7 +28,7 @@ namespace Outfitted
 			if (selectable is Pawn pawn)
 			{
 				// Only humanlike. Avoid animals.
-				if (!(pawn.RaceProps?.Humanlike == true))
+				if (!(pawn.RaceProps?.Humanlike == true) || !(pawn.Faction == Faction.OfPlayer))
 					return;
 
 				_selectedPawn = pawn;
@@ -61,8 +62,6 @@ namespace Outfitted
 				return;
 			}
 
-			List<float> gameScore = new List<float>();
-			gameScore = Outfitted.BuildWornScore(pawn);
 			ExtendedOutfit policy = pawn.outfits.CurrentApparelPolicy as ExtendedOutfit;
 			Map map = pawn.MapHeld ?? pawn.Map;
 			var seasonTemp = map.mapTemperature.SeasonalTemp;
@@ -282,38 +281,49 @@ namespace Outfitted
 		static LogSomeStuff()
 		{
 			// StatDefs
-			var defs = DefDatabase<StatDef>.AllDefsListForReading
-				.Where(def => def.minValue > def.defaultBaseValue && def.minValue >= 0f && def.defaultBaseValue >= 0f);
-			Logger.LogNL("StatDefs: (minValue > defaultBaseValue) >= 0");
-			foreach (var def in defs)
-			{
-				var dd = def.defaultBaseValue;
-				var min = def.minValue;
-				Logger.LogNL($"[{def.defName}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
-			}
-			Logger.LogNL("");
+			//var defs = DefDatabase<StatDef>.AllDefsListForReading
+			//	.Where(def => def.minValue > def.defaultBaseValue && def.minValue >= 0f && def.defaultBaseValue >= 0f);
+			//Logger.LogNL("StatDefs: (minValue > defaultBaseValue) >= 0");
+			//foreach (var def in defs)
+			//{
+			//	var dd = def.defaultBaseValue;
+			//	var min = def.minValue;
+			//	Logger.LogNL($"[{def.defName}] [{def.category}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
+			//}
+			//Logger.LogNL("");
 
-			defs = DefDatabase<StatDef>.AllDefsListForReading
-				.Where(def => def.minValue > def.defaultBaseValue && (def.minValue < 0f || def.defaultBaseValue < 0f));
-			Logger.LogNL("StatDefs: (minValue > defaultBaseValue) < 0");
-			foreach (var def in defs)
-			{
-				var dd = def.defaultBaseValue;
-				var min = def.minValue;
-				Logger.LogNL($"[{def.defName}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
-			}
-			Logger.LogNL("");
+			//defs = DefDatabase<StatDef>.AllDefsListForReading
+			//	.Where(def => def.minValue > def.defaultBaseValue && (def.minValue < 0f || def.defaultBaseValue < 0f));
+			//Logger.LogNL("StatDefs: (minValue > defaultBaseValue) Any < 0");
+			//foreach (var def in defs)
+			//{
+			//	var dd = def.defaultBaseValue;
+			//	var min = def.minValue;
+			//	Logger.LogNL($"[{def.defName}] [{def.category}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
+			//}
+			//Logger.LogNL("");
 
-			defs = DefDatabase<StatDef>.AllDefsListForReading
-				.Where(def => def.minValue != def.defaultBaseValue && def.defaultBaseValue < 0f);
-			Logger.LogNL("StatDefs: (minValue != defaultBaseValue) defaultBaseValue < 0");
-			foreach (var def in defs)
-			{
-				var dd = def.defaultBaseValue;
-				var min = def.minValue;
-				Logger.LogNL($"[{def.defName}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
-			}
-			Logger.LogNL("");
+			//defs = DefDatabase<StatDef>.AllDefsListForReading
+			//	.Where(def => def.minValue != def.defaultBaseValue && def.defaultBaseValue < 0f);
+			//Logger.LogNL("StatDefs: (minValue != defaultBaseValue) defaultBaseValue < 0");
+			//foreach (var def in defs)
+			//{
+			//	var dd = def.defaultBaseValue;
+			//	var min = def.minValue;
+			//	Logger.LogNL($"[{def.defName}] [{def.category}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
+			//}
+			//Logger.LogNL("");
+
+			//defs = DefDatabase<StatDef>.AllDefsListForReading.
+			//	Where(def => def.category?.ToString().ContainsIgnoreCase("Apparel") ?? false);
+			//Logger.LogNL("StatDefs: category contains 'Apparel'");
+			//foreach (var def in defs)
+			//{
+			//	var dd = def.defaultBaseValue;
+			//	var min = def.minValue;
+			//	Logger.LogNL($"[{def.defName}] [{def.category}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
+			//}
+			//Logger.LogNL("");
 
 			//LogStatDefs();
 

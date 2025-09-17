@@ -27,12 +27,12 @@ namespace Outfitted
 		public const bool disableStartScore_default = true;
 		public const bool disableScoreOffset_default = true;
 		public const bool sumScoresInsteadOfAverage_default = true;
-		public const bool insScoreBasedOnConditions_default = true;
+		public const bool insScoreBasedOnMapConditions_default = true;
 
 		public bool disableStartScore = disableStartScore_default;
 		public bool disableScoreOffset = disableScoreOffset_default;
 		public bool sumScoresInsteadOfAverage = sumScoresInsteadOfAverage_default;
-		public bool insScoreBasedOnConditions = insScoreBasedOnConditions_default;
+		public bool insScoreBasedOnMapConditions = insScoreBasedOnMapConditions_default;
 
 		// Misc.
 		public const bool generateStartingOutfits_default = false;
@@ -72,7 +72,7 @@ namespace Outfitted
 			Scribe_Values.Look(ref disableStartScore, "disableStartScore", disableStartScore_default);
 			Scribe_Values.Look(ref disableScoreOffset, "disableScoreOffset", disableScoreOffset_default);
 			Scribe_Values.Look(ref sumScoresInsteadOfAverage, "sumScoresInsteadOfAverage", sumScoresInsteadOfAverage_default);
-			Scribe_Values.Look(ref insScoreBasedOnConditions, "insScoreBasedOnConditions", insScoreBasedOnConditions_default);
+			Scribe_Values.Look(ref insScoreBasedOnMapConditions, "insScoreBasedOnConditions", insScoreBasedOnMapConditions_default);
 			Scribe_Values.Look(ref generateStartingOutfits, "generateStartingOutfits", generateStartingOutfits_default);
 			Scribe_Values.Look(ref rewriteFilterSelectionOnGenerate, "rewriteFilterSelectionOnGenerate", rewriteFilterSelectionOnGenerate_default);
 
@@ -96,7 +96,7 @@ namespace Outfitted
 			disableStartScore = disableStartScore_default;
 			disableScoreOffset = disableScoreOffset_default;
 			sumScoresInsteadOfAverage = sumScoresInsteadOfAverage_default;
-			insScoreBasedOnConditions = insScoreBasedOnConditions_default;
+			insScoreBasedOnMapConditions = insScoreBasedOnMapConditions_default;
 
 			generateStartingOutfits = generateStartingOutfits_default;
 			rewriteFilterSelectionOnGenerate = rewriteFilterSelectionOnGenerate_default;
