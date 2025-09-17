@@ -33,11 +33,19 @@ namespace Outfitted
 				if (sp?.Stat == null) continue;
 				float weight = sp.Weight;
 				float defBase = Math.Max(sp.Stat.defaultBaseValue, sp.Stat.minValue);
+
+				// For some reason vanilla RW has not-zero base stat for 'EnergyShieldEnergyMax' or 'EnergyShieldRechargeRate'.
+				// For us it is important to have any positive value (or negative based on selected weight).
+				// Therefore statbase for category 'Apparel' is always ero.
+				if (sp.Stat.category == StatCategoryDefOf.Apparel)
+					defBase = 0f;
+
 				float evalDefBase = sp.Stat.postProcessCurve?.Evaluate(defBase) ?? defBase;
 				float defAbs = Math.Abs(evalDefBase);
 				float baseValue = Math.Max(defAbs, 0.001f);
 #if DEBUG
 				DebugDeepScorePriorities.AddToLog($"\t[{apparel.def.defName}] [{sp.Stat.defName}] " +
+					$"[{sp.Stat.category}] " +
 					$"Wei[{weight:F1}] defBase[{defBase:F1}] Eval[{evalDefBase:F1}] base[{baseValue:F1}]\n");
 #endif
 				float raw = ApparelScore(apparel, sp.Stat);
