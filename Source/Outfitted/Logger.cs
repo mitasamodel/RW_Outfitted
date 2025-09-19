@@ -39,7 +39,7 @@ namespace Outfitted
 #endif
 		}
 
-		public static void LogNL(string msg)
+		public static void LogNL(string msg = "")
 		{
 #if DEBUG
 			if (!_init) Init();

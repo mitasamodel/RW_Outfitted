@@ -59,7 +59,7 @@ namespace Outfitted
 			num += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.def.apparel.scoreOffset;
 
 			// Score from appaerl itself.
-			num += ApparelScorePriorities.RawPriorities(apparel, currentApparelPolicy);
+			num += ApparelScorePriorities.RawPriorities(pawn, apparel, currentApparelPolicy);
 
 			// If Pawn need pants / shirt.
 			num += ApparelScoreNeeds.PawnNeedThis(pawn, apparel);

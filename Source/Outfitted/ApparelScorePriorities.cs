@@ -11,8 +11,12 @@ namespace Outfitted
 {
 	internal static class ApparelScorePriorities
 	{
+		private const float StatMinValue = -9999999f;
+		private const float StatMaxValue = 9999999f;
+		private const float StatRangeScore = 6.4f;		// By Max will give 100 points.
+
 		// Can be called also for equipped apparel.
-		internal static float RawPriorities(Apparel apparel, ExtendedOutfit outfit)
+		internal static float RawPriorities(Pawn pawn, Apparel apparel, ExtendedOutfit outfit)
 		{
 #if DEBUG
 			DebugDeepScorePriorities.Start(apparel.def.defName);
@@ -30,32 +34,107 @@ namespace Outfitted
 			int count = 0;
 			foreach (var sp in outfit.StatPriorities)
 			{
-				if (sp?.Stat == null) continue;
+				StatDef stat = sp.Stat;
+				if (stat == null) continue;
+
+				// Stat weight - how important stat is (positive or negative).
 				float weight = sp.Weight;
-				float defBase = Math.Max(sp.Stat.defaultBaseValue, sp.Stat.minValue);
+
+				// Range (if exists).
+				float statMin = stat.minValue;
+				float statMax = stat.maxValue;
+
+				// Base value.
+				float statBase = stat.defaultBaseValue;
+				float statBaseEval = stat.postProcessCurve?.Evaluate(statBase) ?? statBase;
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog($"\t" +
+					$"[{apparel.def.defName}] " +
+					$"[{stat.defName}] " +
+					$"[{stat.category}] " +
+					$"Wei[{weight:F1}]\n");
+				DebugDeepScorePriorities.AddToLog($"\t\t" +
+					$"Pawn[{pawn.GetStatValue(stat):F1}] " +
+					$"Base[{statBase:F1}] " +
+					$"Eval[{statBaseEval:F1}] " +
+					$"Min[{(statMin != StatMinValue ? statMin.ToString("F1") : "")}] " +
+					$"Max[{(statMax != StatMaxValue ? statMax.ToString("F1") : "")}] " +
+					$"NoStuff[{apparel.def.GetStatValueAbstract(stat, null):F1}] " +
+					$"Stuff[{apparel.def.GetStatValueAbstract(stat, apparel.Stuff):F1}] " +
+					$"Q[{apparel.GetStatValue(stat):F1}] " +
+					$"Eq[{apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat):F1}] " +
+					$"EqQ[{StatWorker.StatOffsetFromGear(apparel, stat):F1}]\n");
+
+				string sel = "";
+#endif
+				// Base to compare with.
+				
+
+				float raw = 0f;
+				float rawOffset = 0f;
+				float delta = 0f;
+				float scaledDelta = 0f;
+				float score = 0f;
+
+				// Base is zero. Apparel score is absolute.
+				if (statBase == 0f)
+				{
+#if DEBUG
+					sel = "Abs";
+#endif
+					raw = apparel.GetStatValue(stat);
+					rawOffset = StatWorker.StatOffsetFromGear(apparel, stat);
+					delta = raw + rawOffset;
+					if (statMin != StatMinValue && statMax != StatMaxValue)
+						scaledDelta = Mathf.InverseLerp(statMin, statMax, delta) * StatRangeScore;
+					else
+						scaledDelta = delta;
+					score = scaledDelta * weight * weight * weight;
+				}
+
+				sum += score;
+				count++;
+
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog($"\t\t" +
+					$"Sel[{sel}] " +
+					$"Raw[{raw:F2}] " +
+					$"Offset[{rawOffset:F2}] " +
+					$"Delta[{delta:F2}] " +
+					$"Scaled[{scaledDelta:F2}] " +
+					$"Score[{score:F2}] " +
+					$"SUM[{sum:F2}] " +
+					$"COUNT[{count}]\n");
+#endif
+
+				// Base to compare with. Most stats have direct effect: armor, shield value, etc.
+				// Non-zero will be for stats, for which Pawn has some different base value: carry capacity, tend quality, etc.
+				//float statBase = 0f;
+
+				//float defBase = Math.Max(sp.Stat.defaultBaseValue, sp.Stat.minValue);
 
 				// For some reason vanilla RW has not-zero base stat for 'EnergyShieldEnergyMax' or 'EnergyShieldRechargeRate'.
 				// For us it is important to have any positive value (or negative based on selected weight).
-				// Therefore statbase for category 'Apparel' is always ero.
-				if (sp.Stat.category == StatCategoryDefOf.Apparel)
-					defBase = 0f;
+				// Therefore statbase for category 'Apparel' is always zero.
+				//if (sp.Stat.category == StatCategoryDefOf.Apparel ||
+				//	sp.Stat.category == StatCategoryDefOf.Basics)
+				//	defBase = 0f;
 
-				float evalDefBase = sp.Stat.postProcessCurve?.Evaluate(defBase) ?? defBase;
-				float defAbs = Math.Abs(evalDefBase);
-				float baseValue = Math.Max(defAbs, 0.001f);
-#if DEBUG
-				DebugDeepScorePriorities.AddToLog($"\t[{apparel.def.defName}] [{sp.Stat.defName}] " +
-					$"[{sp.Stat.category}] " +
-					$"Wei[{weight:F1}] defBase[{defBase:F1}] Eval[{evalDefBase:F1}] base[{baseValue:F1}]\n");
-#endif
-				float raw = ApparelScore(apparel, sp.Stat);
-				float delta = (evalDefBase < 0.001f) ? raw : (raw - evalDefBase) / baseValue;
-				float score = delta * weight * weight * weight;
-				sum += score;
-				count++;
-#if DEBUG
-				DebugDeepScorePriorities.AddToLog($"Delta[{delta:F2}] Score[{score:F2}] Sum[{sum:F2}] Count [{count}]\n");
-#endif
+				//				float evalDefBase = sp.Stat.postProcessCurve?.Evaluate(statBase) ?? statBase;
+				//				float baseValue = Math.Max(Math.Abs(evalDefBase), 0.001f);
+				////#if DEBUG
+				////				DebugDeepScorePriorities.AddToLog($"\t[{apparel.def.defName}] [{sp.Stat.defName}] " +
+				////					$"[{sp.Stat.category}] " +
+				////					$"Wei[{weight:F1}] defBase[{statBase:F1}] Eval[{evalDefBase:F1}] base[{baseValue:F1}]\n");
+				////#endif
+				//				//float raw = ApparelScore(pawn, apparel, sp.Stat);
+				//				float delta = (evalDefBase < 0.001f) ? raw : (raw - evalDefBase) / baseValue;
+				//				float score = delta * weight * weight * weight;
+				//				sum += score;
+				//				count++;
+				//#if DEBUG
+				//				DebugDeepScorePriorities.AddToLog($"Delta[{delta:F2}] Score[{score:F2}] Sum[{sum:F2}] Count [{count}]\n");
+				//#endif
 			}
 
 			// Depending on setting return either sum or average.
@@ -82,17 +161,8 @@ namespace Outfitted
 		/// <param name="stat"></param>
 		/// <param name="basedOnQuality"></param>
 		/// <returns></returns>
-		public static float ApparelScore(Apparel apparel, StatDef stat, bool basedOnQuality = true)
+		public static float ApparelScore(Pawn pawn, Apparel apparel, StatDef stat, bool basedOnQuality = true)
 		{
-#if DEBUG
-			DebugDeepScorePriorities.AddToLog($"\t\tBase[{stat.defaultBaseValue:F1}] " +
-				$"Min[{stat.minValue:F1}] " +
-				$"NoStuff[{apparel.def.GetStatValueAbstract(stat, null):F1}] " +
-				$"Norm[{apparel.def.GetStatValueAbstract(stat, apparel.Stuff):F1}] " +
-				$"Q[{apparel.GetStatValue(stat):F1}] " +
-				$"Eq[{apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat):F1}] " +
-				$"EqQ[{StatWorker.StatOffsetFromGear(apparel, stat):F1}]\n");
-#endif
 			float result;
 			// Apparel provides gear offset for the stat.
 			// That means only offset depends on quality/material.
@@ -122,6 +192,15 @@ namespace Outfitted
 			// Example: armor, cold/warm insulation. Depends on gear itsef, not modifying Pawn's stats.
 			else
 			{
+				//var def = stat.defaultBaseValue;
+				//var appVal = apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
+
+				//if (apparel.def.StatBaseDefined(stat))
+				//	result = apparel.GetStatValue(stat);
+				//else if (def != appVal)
+				//	result = appVal;
+				//else
+				//	result = def;
 				result = basedOnQuality ? apparel.GetStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
 #if DEBUG
 				DebugDeepScorePriorities.AddToLog($"\t\tNormal[{result:F2}] ");

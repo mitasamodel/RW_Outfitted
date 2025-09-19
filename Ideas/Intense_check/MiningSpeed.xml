@@ -1,0 +1,38 @@
+<StatDef>
+	<defName>MiningSpeed</defName>
+	<label>mining speed</label>
+	<description>A speed at which this person mines away walls.</description>
+	<category>PawnWork</category>
+	<defaultBaseValue>1</defaultBaseValue>
+	<minValue>0.1</minValue>
+	<toStringStyle>PercentZero</toStringStyle>
+	<statFactors>
+		<li>WorkSpeedGlobal</li>
+	</statFactors>
+	<skillNeedFactors>
+		<li Class="SkillNeed_BaseBonus">
+			<skill>Mining</skill>
+			<baseValue>0.04</baseValue>
+			<bonusPerLevel>0.12</bonusPerLevel>
+		</li>
+	</skillNeedFactors>
+	<capacityFactors>
+		<li>
+			<capacity>Manipulation</capacity>
+			<weight>1</weight>
+		</li>
+		<li>
+			<capacity>Sight</capacity>
+			<weight>0.5</weight>
+			<max>1</max>
+		</li>
+	</capacityFactors>
+	<scenarioRandomizable>true</scenarioRandomizable>
+	<displayPriorityInCategory>4900</displayPriorityInCategory>
+	<parts>
+		<li Class="StatPart_Trainable" MayRequire="Ludeon.RimWorld.Odyssey">
+			<trainableDef>Dig</trainableDef>
+			<factor>0.52</factor>
+		</li>
+	</parts>
+</StatDef>

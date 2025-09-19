@@ -1,0 +1,53 @@
+<Defs>
+	<ThingDef Name="ApparelNoQualityBase" Abstract="True">
+		<thingClass>Apparel</thingClass>
+		<category>Item</category>
+		<useHitPoints>True</useHitPoints>
+		<drawGUIOverlay>true</drawGUIOverlay>
+		<statBases>
+			<Flammability>1.0</Flammability>
+			<DeteriorationRate>2</DeteriorationRate>
+			<Beauty>-3</Beauty>
+		</statBases>
+	</ThingDef>
+	<ThingDef Name="ApparelBase" ParentName="ApparelNoQualityBase" Abstract="True">
+		<comps>
+			<li>
+				<compClass>CompQuality</compClass>
+			</li>
+			<li Class="CompProperties_Styleable"/>
+		</comps>
+	</ThingDef>
+	<ThingDef ParentName="ApparelBase">
+		<defName>Apparel_ShieldBelt</defName>
+		<label>shield belt</label>
+		<description>A projectile-repulsion device. It will attempt to stop incoming projectiles or shrapnel, but does nothing against melee attacks or heat. It prevents the wearer from firing out, and shuts down instantly if hit by EMP.</description>
+		<thingClass>Apparel</thingClass>
+		<tickerType>Normal</tickerType>
+		<statBases>
+			<Mass>3</Mass>
+			<WorkToMake>14000</WorkToMake>
+			<Flammability>0.4</Flammability>
+			<EnergyShieldRechargeRate>0.195</EnergyShieldRechargeRate>
+			<EnergyShieldEnergyMax>1.65</EnergyShieldEnergyMax>
+			<EquipDelay>2</EquipDelay>
+			<Bulk>4</Bulk>
+			<WornBulk>2</WornBulk>
+		</statBases>
+		<thingCategories>
+			<li>ApparelUtility</li>
+		</thingCategories>
+		<apparel>
+			<tags>
+				<li>BeltDefense</li>
+			</tags>
+		</apparel>
+		<comps>
+			<li Class="CompProperties_Shield"/>
+		</comps>
+		<allowedArchonexusCount>1</allowedArchonexusCount>
+		<tradeTags>
+			<li>Armor</li>
+		</tradeTags>
+	</ThingDef>
+</Defs>

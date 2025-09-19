@@ -1,0 +1,43 @@
+<Defs>
+	<StatDef>
+		<defName>CookSpeed</defName>
+		<label>cooking speed</label>
+		<description>The speed at which this person cooks meals.</description>
+		<category>PawnWork</category>
+		<defaultBaseValue>0</defaultBaseValue>
+		<noSkillOffset>20</noSkillOffset>
+		<minValue>0.1</minValue>
+		<toStringStyle>PercentZero</toStringStyle>
+		<toStringStyleUnfinalized>FloatOne</toStringStyleUnfinalized>
+		<postProcessStatFactors>
+			<li>WorkSpeedGlobal</li>
+		</postProcessStatFactors>
+		<skillNeedOffsets>
+			<li Class="SkillNeed_BaseBonus">
+				<skill>Cooking</skill>
+				<baseValue>0</baseValue>
+				<bonusPerLevel>1</bonusPerLevel>
+			</li>
+		</skillNeedOffsets>
+		<capacityOffsets>
+			<li>
+				<capacity>Sight</capacity>
+				<scale>4</scale>
+				<max>1.5</max>
+			</li>
+			<li>
+				<capacity>Manipulation</capacity>
+				<scale>16</scale>
+				<max>1.5</max>
+			</li>
+		</capacityOffsets>
+		<postProcessCurve>
+			<points>
+				<li>(-20, 0.01)</li>
+				<li>(0, 0.4)</li>
+				<li>(20, 1.6)</li>
+			</points>
+		</postProcessCurve>
+		<displayPriorityInCategory>4541</displayPriorityInCategory>
+	</StatDef>
+</Defs>

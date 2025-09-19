@@ -1,16 +1,19 @@
-﻿using HarmonyLib;
+﻿using CombatExtended;
+using HarmonyLib;
+using Outfitted.RW_JustUtils;
 using RimWorld;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
-using CombatExtended;
-using System.Diagnostics.Eventing.Reader;
-using Outfitted.RW_JustUtils;
+using Verse.Noise;
 
 #if DEBUG
 namespace Outfitted
@@ -118,7 +121,7 @@ namespace Outfitted
 			if (num != 0) Logger.Log($"Base[{num:F2}] ");
 
 			// Priority stats.
-			float prio = ApparelScorePriorities.RawPriorities(ap, policy);
+			float prio = ApparelScorePriorities.RawPriorities(pawn, ap, policy);
 			Logger.Log($"Prio[{prio:F2}] ");
 			num += prio;
 
@@ -164,39 +167,6 @@ namespace Outfitted
 
 
 			Logger.LogNL("");
-		}
-
-		private static void ShowApparelStatScores(Apparel ap)
-		{
-			if (ModsConfig.IsActive("CETeam.CombatExtended"))
-			{
-				float CE_Bulk = ap.GetStatValue(StatDefOf_CE.Bulk);
-				float CE_WornBulk = ap.GetStatValue(StatDefOf_CE.WornBulk);
-				Logger.LogNL($"Ap[{ap.def.defName}] CE_Bulk[{CE_Bulk}] Worn[{CE_WornBulk}] Out[{_outfit.label}] Pawn[{_selectedPawn.Name}]");
-			}
-			else
-				Logger.LogNL($"Ap[{ap.def.defName}] Out[{_outfit.label}] Pawn[{_selectedPawn.Name}]");
-
-			foreach (var stat in _outfit.StatPriorities)
-			{
-				var baseStatQ = ap.GetStatValue(stat.Stat);
-				var baseStat = ap.def.GetStatValueAbstract(stat.Stat, null);
-				var wearStat = ap.def.equippedStatOffsets.GetStatOffsetFromList(stat.Stat);
-				float wearStatQ = StatWorker.StatOffsetFromGear(ap, stat.Stat);
-
-
-				Logger.LogNL($"\t-{stat.Stat.defName} " +
-					$"Def[{stat.Stat.defaultBaseValue}] " +
-					$"Pure[{baseStat}] " +
-					$"Q[{baseStatQ}] " +
-					$"Eq[{wearStat}] " +
-					$"EqQ[{wearStatQ}] " +
-					$"Sum[{baseStat + wearStat}] " +
-					$"SumQ[{baseStatQ + wearStat}] " +
-					$"Sum_Q[{baseStat + wearStatQ}] "
-				);
-				Logger.LogNL($"\tScore: {ApparelScorePriorities.ApparelScore(ap, stat.Stat)}");
-			}
 		}
 	}
 
@@ -280,73 +250,124 @@ namespace Outfitted
 	{
 		static LogSomeStuff()
 		{
-			// StatDefs
-			//var defs = DefDatabase<StatDef>.AllDefsListForReading
-			//	.Where(def => def.minValue > def.defaultBaseValue && def.minValue >= 0f && def.defaultBaseValue >= 0f);
-			//Logger.LogNL("StatDefs: (minValue > defaultBaseValue) >= 0");
-			//foreach (var def in defs)
-			//{
-			//	var dd = def.defaultBaseValue;
-			//	var min = def.minValue;
-			//	Logger.LogNL($"[{def.defName}] [{def.category}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
-			//}
-			//Logger.LogNL("");
+			//LogApparelStatModifierPredicate(sm => sm.stat.defaultBaseValue != 0, "modifiers with non-zero base.");
+			//LogAllApparelComps();
+			//LogStatPredicate(def => def.statFactors != null, "statFactors exist:", def => def.statFactors);
+			//LogStatPredicate(def => def.parts != null, "parts exist:", def => def.parts);
+			//LogStatPredicate(
+			//	def => def.workerClass != null && !(def.workerClass == typeof(RimWorld.StatWorker)),
+			//	"workers (except RimWorld.StatWorker)",
+			//	def => new[] { def.workerClass });
 
-			//defs = DefDatabase<StatDef>.AllDefsListForReading
-			//	.Where(def => def.minValue > def.defaultBaseValue && (def.minValue < 0f || def.defaultBaseValue < 0f));
-			//Logger.LogNL("StatDefs: (minValue > defaultBaseValue) Any < 0");
-			//foreach (var def in defs)
-			//{
-			//	var dd = def.defaultBaseValue;
-			//	var min = def.minValue;
-			//	Logger.LogNL($"[{def.defName}] [{def.category}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
-			//}
-			//Logger.LogNL("");
-
-			//defs = DefDatabase<StatDef>.AllDefsListForReading
-			//	.Where(def => def.minValue != def.defaultBaseValue && def.defaultBaseValue < 0f);
-			//Logger.LogNL("StatDefs: (minValue != defaultBaseValue) defaultBaseValue < 0");
-			//foreach (var def in defs)
-			//{
-			//	var dd = def.defaultBaseValue;
-			//	var min = def.minValue;
-			//	Logger.LogNL($"[{def.defName}] [{def.category}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
-			//}
-			//Logger.LogNL("");
-
-			//defs = DefDatabase<StatDef>.AllDefsListForReading.
-			//	Where(def => def.category?.ToString().ContainsIgnoreCase("Apparel") ?? false);
-			//Logger.LogNL("StatDefs: category contains 'Apparel'");
-			//foreach (var def in defs)
-			//{
-			//	var dd = def.defaultBaseValue;
-			//	var min = def.minValue;
-			//	Logger.LogNL($"[{def.defName}] [{def.category}] Base[{dd}] Min[{min}] Select[{Math.Max(dd, min)}]");
-			//}
-			//Logger.LogNL("");
-
-			//LogStatDefs();
-
-			//var defs = DefDatabase<ThingDef>.AllDefsListForReading
-			//	.Where(def => def.equippedStatOffsets != null && def.equippedStatOffsets.Count > 0);
-
-			//Logger.LogNL("Defs with equipped offset");
-			//Dictionary<string, int> qty = new Dictionary<string, int>();
-			//foreach (var def in defs)
-			//{
-			//	Logger.LogNL($"Def[{def.defName}]");
-			//	foreach (var stat in def.equippedStatOffsets)
-			//	{
-			//		var st = def.GetStatValueDef(stat.stat);
-			//		Logger.LogNL($"\tStat[{stat.stat.defName}] Cat[{stat.stat.category}] Default[{stat.stat.defaultBaseValue}] This[{st}] Equipped[{stat.value}]");
-
-			//	}
-			//	Logger.LogNL("");
-			//}
-
+			LogStatPredicate(def => def.defaultBaseValue == 0f, "zero base");
+			//LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsNonPawnImportant, "'BasicsNonPawnImportant' cat.");
+			//LogStatPredicate(def => def.category == StatCategoryDefOf.Basics, "'Basics' cat.");
+			//LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsPawn, "'BasicsPawn' cat.");
+			//LogStatPredicate(def => def.category?.ToString().ContainsIgnoreCase("pawn") ?? false, "has 'pawn' in cat name.");
 
 
 		}
+
+		private static void LogAllApparelComps()
+		{
+			var hashset = new HashSet<string>();
+			var things = DefDatabase<ThingDef>.AllDefsListForReading
+				.Where(def => def.IsApparel && def.comps != null);
+
+
+			foreach (var thing in things)
+			{
+				foreach (var comp in thing.comps)
+				{
+					hashset.Add(comp.compClass.Name);
+				}
+			}
+			Logger.LogNL($"All apparel comps:");
+			foreach (var item in hashset)
+			{
+				Logger.LogNL($"{item}");
+			}
+			Logger.LogNL();
+		}
+
+		private static void LogApparelStatPredicate(Func<StatModifier, bool> predicate, string str = null)
+		{
+			var defs = DefDatabase<ThingDef>.AllDefsListForReading
+				.Where(def => def.IsApparel &&
+					def.statBases != null &&
+					def.statBases.Any(predicate));
+
+			Logger.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
+			foreach (var def in defs)
+			{
+				Logger.LogNL($"[{def.defName}]");
+				foreach (var sm in def.statBases.Where(predicate))
+				{
+					var dd = sm.stat.defaultBaseValue;
+					var min = sm.stat.minValue;
+					Logger.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
+				}
+			}
+			Logger.LogNL("");
+		}
+
+		private static void LogApparelStatModifierPredicate(Func<StatModifier, bool> predicate, string str = null)
+		{
+			var defs = DefDatabase<ThingDef>.AllDefsListForReading
+				.Where(def => def.IsApparel &&
+					def.equippedStatOffsets != null &&
+					def.equippedStatOffsets.Any(predicate));
+
+			Logger.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
+			foreach (var def in defs)
+			{
+				Logger.LogNL($"[{def.defName}]");
+				foreach (var sm in def.equippedStatOffsets.Where(predicate))
+				{
+					var dd = sm.stat.defaultBaseValue;
+					var min = sm.stat.minValue;
+					Logger.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
+				}
+			}
+			Logger.LogNL("");
+		}
+
+		private static void LogStatPredicate(
+			Func<StatDef, bool> predicate,
+			string str = null,
+			Func<StatDef, IEnumerable> selector = null)
+		{
+			var defs = DefDatabase<StatDef>.AllDefsListForReading
+				.Where(predicate);
+			Logger.LogNL($"StatDefs: {str ?? predicate.ToString()}");
+			foreach (var def in defs)
+			{
+				var dd = def.defaultBaseValue;
+				var min = def.minValue;
+				var max = def.maxValue;
+				var eval = def.postProcessCurve?.Evaluate(dd) ?? dd;
+				Logger.LogNL($"" +
+					$"[{def.defName}] " +
+					$"[{def.category}] " +
+					$"Base[{dd}] " +
+					$"Eval[{eval}] " +
+					$"Min[{min}] " +
+					$"Max[{max}] " +
+					$"Select[{Math.Max(dd, min)}]");
+
+				// Additional items to log for each def.
+				if (selector != null)
+				{
+					var items = selector(def);
+					Logger.Log("\t");
+					foreach (var item in items)
+						Logger.Log($"[{item}] ");
+					Logger.LogNL();
+				}
+			}
+			Logger.LogNL("");
+		}
+
 		private static void LogStatDefs()
 		{
 			var stats = DefDatabase<StatDef>.AllDefsListForReading
