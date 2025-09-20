@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 using Verse.Noise;
+using Logger = Outfitted.RW_JustUtils.Logger;
 
 #if DEBUG
 namespace Outfitted
@@ -58,11 +59,11 @@ namespace Outfitted
 
 		private static void ShowScoreWornApparel(Pawn pawn)
 		{
-			RW_JustUtils.LoggerMy.LogNL($"[{pawn.Name}] Apparel score:");
+			Logger.LogNL($"[{pawn.Name}] Apparel score:");
 			List<Apparel> wornApparel = pawn?.apparel?.WornApparel;
 			if (wornApparel == null || wornApparel.Count == 0)
 			{
-				RW_JustUtils.LoggerMy.LogNL($"No apparel");
+				Logger.LogNL($"No apparel");
 				return;
 			}
 
@@ -70,12 +71,12 @@ namespace Outfitted
 			Map map = pawn.MapHeld ?? pawn.Map;
 			var seasonTemp = map.mapTemperature.SeasonalTemp;
 			var tempOffset = GetTempOffset(map);
-			RW_JustUtils.LoggerMy.LogNL($"SeasonalTemp [{seasonTemp}] Offset [{tempOffset}] Final [{seasonTemp + tempOffset}]");
+			Logger.LogNL($"SeasonalTemp [{seasonTemp}] Offset [{tempOffset}] Final [{seasonTemp + tempOffset}]");
 			foreach (var ap in wornApparel)
 			{
 				ShowScoreApp(ap, pawn, policy, whatIfNotWorn: true);
 			}
-			RW_JustUtils.LoggerMy.LogNL($"\tComfort: Min[{pawn.ComfortableTemperatureRange().min}] Max[{pawn.ComfortableTemperatureRange().max}]");
+			Logger.LogNL($"\tComfort: Min[{pawn.ComfortableTemperatureRange().min}] Max[{pawn.ComfortableTemperatureRange().max}]");
 		}
 
 		private static float GetTempOffset(Map map)
@@ -87,7 +88,7 @@ namespace Outfitted
 			foreach (var condition in conditions)
 			{
 				temp += condition.TemperatureOffset();
-				RW_JustUtils.LoggerMy.LogNL($"[{condition.def.defName}] [{condition.TemperatureOffset()}] [{condition.def.temperatureOffset}]");
+				Logger.LogNL($"[{condition.def.defName}] [{condition.TemperatureOffset()}] [{condition.def.temperatureOffset}]");
 			}
 			//GameConditionDefOf
 			return temp;
@@ -98,9 +99,9 @@ namespace Outfitted
 			if (ap == null || pawn == null || policy == null) return;
 
 			if (!whatIfNotWorn)
-				RW_JustUtils.LoggerMy.Log($"\tDef[{ap.def?.defName}] ");
+				Logger.Log($"\tDef[{ap.def?.defName}] ");
 			else
-				RW_JustUtils.LoggerMy.Log($"\tDef[{ap.def?.defName}] ");
+				Logger.Log($"\tDef[{ap.def?.defName}] ");
 
 			float totalRaw = 0f;
 			if (whatIfNotWorn)
@@ -109,38 +110,38 @@ namespace Outfitted
 					totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
 			}
 			else totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
-			RW_JustUtils.LoggerMy.Log($"RWScore[{totalRaw:F2}] ");
+			Logger.Log($"RWScore[{totalRaw:F2}] ");
 
 			var wornScore = CacheWornApparel.GetScoreList(pawn);
 			if (!whatIfNotWorn)
-				RW_JustUtils.LoggerMy.Log($"RWGain[{JobGiver_OptimizeApparel.ApparelScoreGain(pawn, ap, wornScore):F2}] ");
+				Logger.Log($"RWGain[{JobGiver_OptimizeApparel.ApparelScoreGain(pawn, ap, wornScore):F2}] ");
 
 			float num = 0f;
 
 			num += OutfittedMod.Settings.disableStartScore ? 0f : 0.1f;
 			num += OutfittedMod.Settings.disableScoreOffset ? 0f : ap.def.apparel.scoreOffset;
-			if (num != 0) RW_JustUtils.LoggerMy.Log($"Base[{num:F2}] ");
+			if (num != 0) Logger.Log($"Base[{num:F2}] ");
 
 			// Priority stats.
 			float prio = ApparelScorePriorities.RawPriorities(pawn, ap, policy);
-			RW_JustUtils.LoggerMy.Log($"Prio[{prio:F2}] ");
+			Logger.Log($"Prio[{prio:F2}] ");
 			num += prio;
 
 			// Pawn need this.
 			float need = ApparelScoreNeeds.PawnNeedThis(pawn, ap);
-			RW_JustUtils.LoggerMy.Log($"Need[{need:F2}] ");
+			Logger.Log($"Need[{need:F2}] ");
 			num += need;
 
 			// Ideology
 			float ideo = ApparelScoreNeeds.PawnNeedIdeology(pawn, ap);
-			if (ideo != 0) RW_JustUtils.LoggerMy.Log($"Ideo[{ideo:F2}] ");
+			if (ideo != 0) Logger.Log($"Ideo[{ideo:F2}] ");
 			num += ideo;
 
 			// Auto work.
 			float autoWork = 0f;
 			if (policy.AutoWorkPriorities)
 				autoWork += Outfitted.ApparelScoreAutoWorkPriorities(pawn, ap);
-			if (autoWork != 0) RW_JustUtils.LoggerMy.Log($"Work[{autoWork:F2}] ");
+			if (autoWork != 0) Logger.Log($"Work[{autoWork:F2}] ");
 			num += autoWork;
 
 			// HP.
@@ -150,24 +151,24 @@ namespace Outfitted
 				hp = (float)ap.HitPoints / ap.MaxHitPoints;
 				num *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate(Mathf.Clamp01(hp));
 			}
-			if (hp != 1) RW_JustUtils.LoggerMy.Log($"HP[{hp:F2}] Num[{num:F2}] ");
+			if (hp != 1) Logger.Log($"HP[{hp:F2}] Num[{num:F2}] ");
 
 			// Special score offset.
 			float offset = OutfittedMod.Settings.disableScoreOffset ? 0 : ap.GetSpecialApparelScoreOffset();
 			num += offset;
-			if (offset != 0) RW_JustUtils.LoggerMy.Log($"Offset[{offset:F2}] ");
+			if (offset != 0) Logger.Log($"Offset[{offset:F2}] ");
 
 			// Insulation.
 			float insulation = ApparelScoreInsulation.RawInsulation(pawn, ap, policy, NeededWarmth.Any);
 			num += insulation;
-			RW_JustUtils.LoggerMy.Log($"Ins[{insulation:F2}] ");
+			Logger.Log($"Ins[{insulation:F2}] ");
 
 			// Corpse.
 			num = ApparelScoreNeeds.ModifiedWornByCorpse(pawn, ap, policy, num);
-			RW_JustUtils.LoggerMy.Log($"Final[{num:F2}] ");
+			Logger.Log($"Final[{num:F2}] ");
 
 
-			RW_JustUtils.LoggerMy.LogNL("");
+			Logger.LogNL("");
 		}
 	}
 
@@ -251,10 +252,26 @@ namespace Outfitted
 	{
 		static LogSomeStuff()
 		{
-			LogStatPredicate(
-				stat => stat.postProcessCurve != null && 
-					stat.postProcessCurve.Evaluate(stat.defaultBaseValue) != stat.defaultBaseValue,
-				"Stats with postProcessCurve:");
+			//// Stats with postProcessCurve.
+			//LogStatPredicate(
+			//	stat => stat.postProcessCurve != null &&
+			//		stat.postProcessCurve.Evaluate(stat.defaultBaseValue) != stat.defaultBaseValue,
+			//	"Stats with postProcessCurve:");
+
+			//LogStatPredicate(stat => stat.statFactors != null, "Stats with statFactors", stat => stat.statFactors);
+
+			//// Apparels with comps.
+			//// Exclude some.
+			//static bool filter(CompProperties comp) =>
+			//	!(Comp(comp) == "RimWorld.CompProperties_Forbiddable" ||
+			//	Comp(comp) == "Verse.CompColorable" ||
+			//	Comp(comp) == "RimWorld.CompQuality" ||
+			//	Comp(comp) == "RimWorld.CompProperties_Styleable" ||
+			//	Comp(comp) == "RimWorld.CompProperties_Biocodable");
+			//LogApparelPredicate(
+			//	def => def.comps != null && def.comps.Any(filter),
+			//	"Apparel with comps",
+			//	def => def.comps.Where(filter).Select(comp => Comp(comp)));
 
 			//LogStatPredicate(stat => stat.cacheable == true, "cacheable stats");
 			//LogStatPredicate(stat => stat.immutable == true, "immutable stats");
@@ -266,7 +283,6 @@ namespace Outfitted
 
 			//LogApparelStatModifierPredicate(sm => sm.stat.defaultBaseValue != 0, "modifiers with non-zero base.");
 			//LogAllApparelComps();
-			//LogStatPredicate(def => def.statFactors != null, "statFactors exist:", def => def.statFactors);
 			//LogStatPredicate(def => def.parts != null, "parts exist:", def => def.parts);
 
 			//LogStatPredicate(
@@ -336,51 +352,72 @@ namespace Outfitted
 			//LogStatPredicate(def => def.defaultBaseValue == 0f, "zero base");
 			//LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsNonPawnImportant, "'BasicsNonPawnImportant' cat.");
 			//LogStatPredicate(def => def.category == StatCategoryDefOf.Basics, "'Basics' cat.");
-			//LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsPawn, "'BasicsPawn' cat.");
+			LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsPawn, "'BasicsPawn' cat.");
 			//LogStatPredicate(def => def.category?.ToString().ContainsIgnoreCase("pawn") ?? false, "has 'pawn' in cat name.");
 		}
 
-		private static void LogAllApparelComps()
+		private static void LogApparelPredicate(
+			Func<ThingDef, bool> predicate,
+			string str = null,
+			Func<ThingDef, IEnumerable> selector = null)
 		{
-			var hashset = new HashSet<string>();
-			var things = DefDatabase<ThingDef>.AllDefsListForReading
-				.Where(def => def.IsApparel && def.comps != null);
+			var defs = DefDatabase<ThingDef>.AllDefsListForReading
+				.Where(def => def.IsApparel && predicate(def));
 
-
-			foreach (var thing in things)
+			Logger.LogNL(str);
+			foreach (var def in defs)
 			{
-				foreach (var comp in thing.comps)
+				Logger.LogNL($"[{def.defName}]");
+
+				if (selector != null)
 				{
-					hashset.Add(comp.compClass.Name);
+					var items = selector(def);
+					Logger.Log("\t");
+					foreach (var item in items)
+						Logger.Log($"[{item}] ");
+					Logger.LogNL();
 				}
 			}
-			LoggerMy.LogNL($"All apparel comps:");
-			foreach (var item in hashset)
-			{
-				LoggerMy.LogNL($"{item}");
-			}
-			LoggerMy.LogNL();
 		}
 
-		private static void LogApparelStatPredicate(Func<StatModifier, bool> predicate, string str = null)
+		/// <summary>
+		/// Helper to work with both comps XML inputs.
+		/// </summary>
+		public static string Comp(CompProperties cp)
+		{
+			if (cp == null) return "null";
+
+			var propsType = cp.GetType();
+			var propsTypeName = propsType.FullName; // e.g., "RimWorld.CompProperties_Styleable"
+			var compClassName = cp.compClass?.FullName ?? "null"; // e.g., "Verse.CompQuality"
+
+			// If XML used <li><compClass>...</compClass></li>, the props object is the base type.
+			if (propsType == typeof(CompProperties))
+				return $"{compClassName}";
+
+			// If XML used Class="CompProperties_Whatever", the runtime type is the derived props class.
+			return $"{propsTypeName}";
+		}
+
+		private static void LogApparelStatBasesPredicate(Func<StatModifier, bool> predicate, string str = null)
 		{
 			var defs = DefDatabase<ThingDef>.AllDefsListForReading
 				.Where(def => def.IsApparel &&
 					def.statBases != null &&
 					def.statBases.Any(predicate));
 
-			LoggerMy.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
+			Logger.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
 			foreach (var def in defs)
 			{
-				LoggerMy.LogNL($"[{def.defName}]");
+				Logger.LogNL($"[{def.defName}]");
 				foreach (var sm in def.statBases.Where(predicate))
 				{
 					var dd = sm.stat.defaultBaseValue;
 					var min = sm.stat.minValue;
-					LoggerMy.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
+					Logger.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
 				}
 			}
-			LoggerMy.LogNL("");
+			Logger.LogNL("");
 		}
 
 		private static void LogApparelStatModifierPredicate(Func<StatModifier, bool> predicate, string str = null)
@@ -390,18 +427,18 @@ namespace Outfitted
 					def.equippedStatOffsets != null &&
 					def.equippedStatOffsets.Any(predicate));
 
-			LoggerMy.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
+			Logger.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
 			foreach (var def in defs)
 			{
-				LoggerMy.LogNL($"[{def.defName}]");
+				Logger.LogNL($"[{def.defName}]");
 				foreach (var sm in def.equippedStatOffsets.Where(predicate))
 				{
 					var dd = sm.stat.defaultBaseValue;
 					var min = sm.stat.minValue;
-					LoggerMy.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
+					Logger.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
 				}
 			}
-			LoggerMy.LogNL("");
+			Logger.LogNL("");
 		}
 
 		private static void LogStatPredicate(
@@ -411,33 +448,32 @@ namespace Outfitted
 		{
 			var defs = DefDatabase<StatDef>.AllDefsListForReading
 				.Where(predicate);
-			LoggerMy.LogNL($"StatDefs: {str ?? predicate.ToString()}");
+			Logger.LogNL($"StatDefs: {str ?? predicate.ToString()}");
 			foreach (var def in defs)
 			{
 				var dd = def.defaultBaseValue;
 				var min = def.minValue;
 				var max = def.maxValue;
 				var eval = def.postProcessCurve?.Evaluate(dd) ?? dd;
-				LoggerMy.LogNL($"" +
+				Logger.LogNL($"" +
 					$"[{def.defName}] " +
 					$"[{def.category}] " +
 					$"Base[{dd}] " +
 					$"Eval[{eval}] " +
 					$"Min[{min}] " +
-					$"Max[{max}] " +
-					$"Select[{Math.Max(dd, min)}]");
+					$"Max[{max}] ");
 
 				// Additional items to log for each def.
 				if (selector != null)
 				{
 					var items = selector(def);
-					LoggerMy.Log("\t");
+					Logger.Log("\t");
 					foreach (var item in items)
-						LoggerMy.Log($"[{item}] ");
-					LoggerMy.LogNL();
+						Logger.Log($"[{item}] ");
+					Logger.LogNL();
 				}
 			}
-			LoggerMy.LogNL("");
+			Logger.LogNL("");
 		}
 
 		private static void LogApparels_Predicate(
@@ -449,10 +485,10 @@ namespace Outfitted
 
 			var defs = DefDatabase<ThingDef>.AllDefsListForReading
 				.Where(def => def.IsApparel && predicate(def));
-			LoggerMy.LogNL($"Apparels: {str ?? predicate.ToString()}");
+			Logger.LogNL($"Apparels: {str ?? predicate.ToString()}");
 			foreach (var def in defs)
 			{
-				LoggerMy.LogNL($"" +
+				Logger.LogNL($"" +
 					$"[{def.defName}] " +
 					$"[{def.category}] ");
 
@@ -460,13 +496,13 @@ namespace Outfitted
 				if (selector != null)
 				{
 					var items = selector(def) ?? Array.Empty<object>();
-					LoggerMy.Log("\t");
+					Logger.Log("\t");
 					foreach (var item in items)
-						LoggerMy.Log($"[{item}] ");
-					LoggerMy.LogNL();
+						Logger.Log($"[{item}] ");
+					Logger.LogNL();
 				}
 			}
-			LoggerMy.LogNL("");
+			Logger.LogNL("");
 		}
 
 		private static void LogStatDefs()
@@ -484,15 +520,15 @@ namespace Outfitted
 				"ceteam.combatextended"
 			};
 
-			LoggerMy.LogNL($"New StatDefs:");
+			Logger.LogNL($"New StatDefs:");
 			foreach (var group in stats)
 			{
 				if (!list.Contains(group.Key))
 				{
-					LoggerMy.LogNL($"// {group.Key}");
+					Logger.LogNL($"// {group.Key}");
 					foreach (var stat in group)
 					{
-						LoggerMy.LogNL($"[MayRequire(\"{group.Key}\")] public static StatDef {stat.defName};");
+						Logger.LogNL($"[MayRequire(\"{group.Key}\")] public static StatDef {stat.defName};");
 					}
 				}
 			}
@@ -504,7 +540,7 @@ namespace Outfitted
 			{
 				//if (stat.defaultBaseValue != 0)
 				{
-					LoggerMy.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Default[{stat.defaultBaseValue}] Mod[{stat.modContentPack.PackageId}] ");
+					Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Default[{stat.defaultBaseValue}] Mod[{stat.modContentPack.PackageId}] ");
 				}
 			}
 		}

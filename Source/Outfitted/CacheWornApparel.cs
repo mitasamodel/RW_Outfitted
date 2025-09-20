@@ -82,7 +82,7 @@ namespace Outfitted
 			{
 				if (ap == null)
 				{
-					LoggerMy.Log_Warning("BuildWornScoreToDict: Unexpected Apparel-null in worn list.");
+					Logger.Log_Warning("BuildWornScoreToDict: Unexpected Apparel-null in worn list.");
 					continue;
 				}
 

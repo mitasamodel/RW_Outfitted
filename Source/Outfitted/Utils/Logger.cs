@@ -10,7 +10,7 @@ using Verse;
 
 namespace Outfitted.RW_JustUtils
 {
-	public static class LoggerMy
+	public static class Logger
 	{
 		private const string loggerFile = "Outfitted.log";
 		private const string loggerModName = "Outfitted";
@@ -63,6 +63,13 @@ namespace Outfitted.RW_JustUtils
 		public static void Log_Error(string str)
 		{
 			Verse.Log.Error($"[{loggerModName}] " + str);
+#if DEBUG
+			LogNL(str);
+#endif
+		}
+		public static void Log_ErrorOnce(string str, int num)
+		{
+			Verse.Log.ErrorOnce($"[{loggerModName}] " + str, num);
 #if DEBUG
 			LogNL(str);
 #endif

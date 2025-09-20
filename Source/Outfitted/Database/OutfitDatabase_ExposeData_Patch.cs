@@ -34,14 +34,14 @@ namespace Outfitted
 					}
 				}
 #if DEBUG
-				LoggerMy.LogNL($"[OutfitDatabase_ExposeData_Patch] Game loaded. Converted {cnt} vanilla outfits.");
+				Logger.LogNL($"[OutfitDatabase_ExposeData_Patch] Game loaded. Converted {cnt} vanilla outfits.");
 #endif
 
 				// Generate additional starting outfits if there were vanilla outfits.
 				if (flag && OutfittedMod.Settings.generateStartingOutfits)
 				{
 #if DEBUG
-					LoggerMy.LogNL("[OutfitDatabase_ExposeData_Patch] Generate starting outfits.");
+					Logger.LogNL("[OutfitDatabase_ExposeData_Patch] Generate starting outfits.");
 #endif
 					StandardOutfits.GenerateStartingOutfits(__instance, false);
 				}

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
+using Logger = Outfitted.RW_JustUtils.Logger;
 
 namespace Outfitted
 {
@@ -29,7 +30,7 @@ namespace Outfitted
 		static Outfitted()
 		{
 #if DEBUG
-			LoggerMy.Init();
+			Logger.Init();
 #endif
 			isSaveStorageSettingsEnabled = ModLister.GetActiveModWithIdentifier("savestoragesettings.kv.rw") != null;
 			var harmony = new Harmony("rimworld.outfitted");
@@ -124,7 +125,7 @@ namespace Outfitted
 			{
 				if (ap == null)
 				{
-					LoggerMy.Log_Warning("BuildWornScore: Unexpected Apparel-null in worn list.");
+					Logger.Log_Warning("BuildWornScore: Unexpected Apparel-null in worn list.");
 					wornScores.Add(0f);
 				}
 				else

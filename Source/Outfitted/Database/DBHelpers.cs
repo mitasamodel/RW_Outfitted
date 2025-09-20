@@ -15,7 +15,7 @@ namespace Outfitted
 		{
 			if (outfit == null)
 			{
-				LoggerMy.Log_Error("Unexpected null outfit.");
+				Logger.Log_Error("Unexpected null outfit.");
 				Verse.Log.Warning("[Outfitted] Please report it to mod author.");
 				return null;
 			}
@@ -23,7 +23,7 @@ namespace Outfitted
 			if (outfit is ExtendedOutfit)
 			{
 #if DEBUG
-				LoggerMy.LogNL($"[ConvertVanillaOutfit] {outfit.label} is ExtendedOutfit already. Skipping.");
+				Logger.LogNL($"[ConvertVanillaOutfit] {outfit.label} is ExtendedOutfit already. Skipping.");
 #endif
 				return outfit as ExtendedOutfit;
 			}

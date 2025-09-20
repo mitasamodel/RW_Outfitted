@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using Logger = Outfitted.RW_JustUtils.Logger;
 
 namespace Outfitted
 {
@@ -422,7 +423,7 @@ namespace Outfitted
 					var itemModName = item.modContentPack?.Name ?? "<UNKNOWN>";
 #if DEBUG
 					if (itemModId == "<UNKNOWN>")
-						LoggerMy.LogNL($"[DrawApparelStats]: modContentPack is null for item [{item.label ?? item.defName}].");
+						Logger.LogNL($"[DrawApparelStats]: modContentPack is null for item [{item.label ?? item.defName}].");
 
 #endif
 					if (displayedModId == null || displayedModId != itemModId)

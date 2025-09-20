@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using Logger = Outfitted.RW_JustUtils.Logger;
+
 
 namespace Outfitted
 {
@@ -42,11 +44,11 @@ namespace Outfitted
 			float num1;
 			if (outfit.targetTemperaturesOverride)
 			{
-				if (deepLogger) RW_JustUtils.LoggerMy.LogNL($"[{apparel.def.defName}]");
+				if (deepLogger) Logger.LogNL($"[{apparel.def.defName}]");
 
 				// Current comfortable temperature.
 				FloatRange curComfTemp = pawn.ComfortableTemperatureRange();
-				if (deepLogger) RW_JustUtils.LoggerMy.LogNL($"curComfTemp min[{curComfTemp.min}] max[{curComfTemp.max}]");
+				if (deepLogger) Logger.LogNL($"curComfTemp min[{curComfTemp.min}] max[{curComfTemp.max}]");
 
 				// Target temperature.
 				FloatRange targetTemp;
@@ -69,7 +71,7 @@ namespace Outfitted
 				}
 				else
 					targetTemp = outfit.targetTemperatures;
-				if (deepLogger) RW_JustUtils.LoggerMy.LogNL($"targetTemp min[{targetTemp.min}] max[{targetTemp.max}]");
+				if (deepLogger) Logger.LogNL($"targetTemp min[{targetTemp.min}] max[{targetTemp.max}]");
 
 				// Conflict insulation.
 				FloatRange conflictsIns = new FloatRange(0f, 0f);
@@ -85,23 +87,23 @@ namespace Outfitted
 						}
 					}
 				}
-				if (deepLogger) RW_JustUtils.LoggerMy.LogNL($"conflictsIns min[{conflictsIns.min}] max[{conflictsIns.max}]");
+				if (deepLogger) Logger.LogNL($"conflictsIns min[{conflictsIns.min}] max[{conflictsIns.max}]");
 
 				// Remove stats from conflicting insulation.
 				// The same is done for already worn apparel too to get its proper score.
 				curComfTemp.min -= conflictsIns.min;
 				curComfTemp.max -= conflictsIns.max;
-				if (deepLogger) RW_JustUtils.LoggerMy.LogNL($"Adjust curComfTemp min[{curComfTemp.min}] max[{curComfTemp.max}]");
+				if (deepLogger) Logger.LogNL($"Adjust curComfTemp min[{curComfTemp.min}] max[{curComfTemp.max}]");
 
 				// Add new apparel.
 				FloatRange newApparelInsulation = GetInsulationStats(apparel);
-				if (deepLogger) RW_JustUtils.LoggerMy.LogNL($"newApparelInsulation min[{newApparelInsulation.min}] max[{newApparelInsulation.max}]");
+				if (deepLogger) Logger.LogNL($"newApparelInsulation min[{newApparelInsulation.min}] max[{newApparelInsulation.max}]");
 
 				// New apparel insulation.
 				FloatRange newComfTemp = curComfTemp;
 				newComfTemp.min += newApparelInsulation.min;
 				newComfTemp.max += newApparelInsulation.max;
-				if (deepLogger) RW_JustUtils.LoggerMy.LogNL($"Add newComfTemp min[{newComfTemp.min}] max[{newComfTemp.max}]");
+				if (deepLogger) Logger.LogNL($"Add newComfTemp min[{newComfTemp.min}] max[{newComfTemp.max}]");
 
 				FloatRange curNeed = new FloatRange(
 					Mathf.Max(curComfTemp.min - targetTemp.min, 0.0f),

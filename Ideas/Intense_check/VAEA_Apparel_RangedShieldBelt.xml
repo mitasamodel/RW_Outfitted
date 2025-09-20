@@ -1,0 +1,70 @@
+<Defs>
+	<ThingDef Name="ApparelNoQualityBase" Abstract="True">
+		<thingClass>Apparel</thingClass>
+		<category>Item</category>
+		<useHitPoints>True</useHitPoints>
+		<drawGUIOverlay>true</drawGUIOverlay>
+		<statBases>
+			<Flammability>1.0</Flammability>
+			<DeteriorationRate>2</DeteriorationRate>
+			<Beauty>-3</Beauty>
+		</statBases>
+	</ThingDef>
+	<ThingDef Name="ApparelBase" ParentName="ApparelNoQualityBase" Abstract="True">
+		<comps>
+			<li>
+				<compClass>CompQuality</compClass>
+			</li>
+			<li Class="CompProperties_Styleable"/>
+		</comps>
+	</ThingDef>
+	
+	<ThingDef ParentName="ApparelBase">
+		<defName>VAEA_Apparel_RangedShieldBelt</defName>
+		<label>ranged shield belt</label>
+		<description>A projectile-repulsion device. It will attempt to stop incoming projectiles or shrapnel, but does nothing against melee attacks or heat. It doesn't prevent the wearer from firing out, and shuts down instantly if hit by EMP.</description>
+		<thingClass>Apparel</thingClass>
+		<tickerType>Normal</tickerType>
+		<statBases>
+			<Mass>3</Mass>
+			<WorkToMake>14000</WorkToMake>
+			<Flammability>0.4</Flammability>
+			<EnergyShieldRechargeRate>0.195</EnergyShieldRechargeRate>
+			<EnergyShieldEnergyMax>1.35</EnergyShieldEnergyMax>
+			<EquipDelay>2</EquipDelay>
+			<Bulk>4</Bulk>
+			<WornBulk>2</WornBulk>
+		</statBases>
+		<thingCategories>
+			<li>ApparelUtility</li>
+		</thingCategories>
+		<tradeability>Sellable</tradeability>
+		<tradeTags>
+			<li>Armor</li>
+		</tradeTags>
+		<generateAllowChance>0.15</generateAllowChance>
+		<apparel>
+			<careIfWornByCorpse>false</careIfWornByCorpse>
+			<careIfDamaged>false</careIfDamaged>
+			<countsAsClothingForNudity>false</countsAsClothingForNudity>
+			<bodyPartGroups>
+				<li>Waist</li>
+			</bodyPartGroups>
+			<layers>
+				<li>Belt</li>
+			</layers>
+			<tags>
+				<li>VAEA_Utility_Industrial</li>
+				<li>VAEA_Utility_Spacer</li>
+				<li>BeltDefensePop</li>
+				<li>BeltRangedShield</li>
+				<li>BeltDefense</li>
+			</tags>
+		</apparel>
+		<comps>
+			<li Class="CompProperties_Shield">
+				<blocksRangedWeapons>false</blocksRangedWeapons>
+			</li>
+		</comps>
+	</ThingDef>
+</Defs>

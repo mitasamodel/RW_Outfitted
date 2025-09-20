@@ -29,7 +29,7 @@ namespace Outfitted
 			{
 				if (_started)
 					_showString.Append($"[DebugDeepScorePriorities] Finished.\n");
-				LoggerMy.Log(_showString.ToString());
+				Logger.Log(_showString.ToString());
 				Clear();
 			}
 		}

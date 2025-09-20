@@ -310,7 +310,7 @@ namespace Outfitted
 				if (outfit.label == entry.Label)
 				{
 #if DEBUG
-					LoggerMy.LogNL($"[ApplyStandardOutfit] Existed outfit {entry.Label}. Modifying.");
+					Logger.LogNL($"[ApplyStandardOutfit] Existed outfit {entry.Label}. Modifying.");
 #endif
 					entry.Used = true;
 					ApplyEntry(outfit, entry);
@@ -343,14 +343,14 @@ namespace Outfitted
 		{
 			if (!(AccessTools.Field(typeof(OutfitDatabase), "outfits")?.GetValue(db) is List<ApparelPolicy> outfits))
 			{
-				LoggerMy.Log_Error("[GenerateStartingOutfits] Unexpected non-ApparelPolicy field.");
+				Logger.Log_Error("[GenerateStartingOutfits] Unexpected non-ApparelPolicy field.");
 				Verse.Log.Warning("[Outfitted] Please report it to mod author.");
 				return;
 			}
 
 			if (outfits == null)
 			{
-				LoggerMy.Log_Error("[GenerateStartingOutfits] Unexpected null outfits list.");
+				Logger.Log_Error("[GenerateStartingOutfits] Unexpected null outfits list.");
 				Verse.Log.Warning("[Outfitted] Please report it to mod author.");
 				return;
 			}
@@ -368,7 +368,7 @@ namespace Outfitted
 				if (!entry.Used)
 				{
 #if DEBUG
-					LoggerMy.LogNL($"[GenerateStartingOutfits] New outfit {entry.Label}.");
+					Logger.LogNL($"[GenerateStartingOutfits] New outfit {entry.Label}.");
 #endif
 					var outfit = db.MakeNewOutfit() as ExtendedOutfit;
 					outfit.label = entry.Label;
