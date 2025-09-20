@@ -80,7 +80,8 @@
     <Compile Include="HarmonyPatches\Dialog_ManagePolicies_DoWindowContents_Patch.cs" />
     <Compile Include="HarmonyPatches\JobGiver_OptimizeApparel_ApparelScoreGain_Patch.cs" />
     <Compile Include="HarmonyPatches\JobGiver_OptimizeApparel_TryGiveJob_Patch.cs" />
-    <Compile Include="Logger.cs" />
+    <Compile Include="HarmonyPatches\StatWorker_GetBaseValueFor_Patch.cs" />
+    <Compile Include="HarmonyPatches\ThingWithComps_Destroy_Patch.cs" />
     <Compile Include="OutfittedGameComponent.cs" />
     <Compile Include="Settings\ITabHost.cs" />
     <Compile Include="Settings\ITabView.cs" />
@@ -90,8 +91,10 @@
     <Compile Include="Settings\TabContent_Tune.cs" />
     <Compile Include="Settings\TabContent_General.cs" />
     <Compile Include="StatDefOf.cs" />
+    <Compile Include="StatWorkerOutfitted.cs" />
     <Compile Include="Utils\FloatMenuPreserveOrder.cs" />
     <Compile Include="Utils\Listing_StandardExtensions.cs" />
+    <Compile Include="Utils\LoggerMy.cs" />
     <Compile Include="Utils\RectExtensions.cs" />
     <Compile Include="Utils\Utils.cs" />
     <Compile Include="Utils\Utils_GUI.cs" />

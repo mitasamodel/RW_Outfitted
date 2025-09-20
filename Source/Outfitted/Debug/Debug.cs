@@ -18,9 +18,10 @@ using Verse.Noise;
 #if DEBUG
 namespace Outfitted
 {
-	public static class ScoreDebug
+	public static class MyDebug
 	{
 		internal static bool DeepScorePriorities { get; } = true;
+		internal static bool ApparelStatsCache { get; } = true;
 
 		internal static Apparel SelectedApparel { get; set; }
 		private static ExtendedOutfit _outfit;
@@ -57,11 +58,11 @@ namespace Outfitted
 
 		private static void ShowScoreWornApparel(Pawn pawn)
 		{
-			Logger.LogNL($"[{pawn.Name}] Apparel score:");
+			RW_JustUtils.LoggerMy.LogNL($"[{pawn.Name}] Apparel score:");
 			List<Apparel> wornApparel = pawn?.apparel?.WornApparel;
 			if (wornApparel == null || wornApparel.Count == 0)
 			{
-				Logger.LogNL($"No apparel");
+				RW_JustUtils.LoggerMy.LogNL($"No apparel");
 				return;
 			}
 
@@ -69,12 +70,12 @@ namespace Outfitted
 			Map map = pawn.MapHeld ?? pawn.Map;
 			var seasonTemp = map.mapTemperature.SeasonalTemp;
 			var tempOffset = GetTempOffset(map);
-			Logger.LogNL($"SeasonalTemp [{seasonTemp}] Offset [{tempOffset}] Final [{seasonTemp + tempOffset}]");
+			RW_JustUtils.LoggerMy.LogNL($"SeasonalTemp [{seasonTemp}] Offset [{tempOffset}] Final [{seasonTemp + tempOffset}]");
 			foreach (var ap in wornApparel)
 			{
 				ShowScoreApp(ap, pawn, policy, whatIfNotWorn: true);
 			}
-			Logger.LogNL($"\tComfort: Min[{pawn.ComfortableTemperatureRange().min}] Max[{pawn.ComfortableTemperatureRange().max}]");
+			RW_JustUtils.LoggerMy.LogNL($"\tComfort: Min[{pawn.ComfortableTemperatureRange().min}] Max[{pawn.ComfortableTemperatureRange().max}]");
 		}
 
 		private static float GetTempOffset(Map map)
@@ -86,7 +87,7 @@ namespace Outfitted
 			foreach (var condition in conditions)
 			{
 				temp += condition.TemperatureOffset();
-				Logger.LogNL($"[{condition.def.defName}] [{condition.TemperatureOffset()}] [{condition.def.temperatureOffset}]");
+				RW_JustUtils.LoggerMy.LogNL($"[{condition.def.defName}] [{condition.TemperatureOffset()}] [{condition.def.temperatureOffset}]");
 			}
 			//GameConditionDefOf
 			return temp;
@@ -97,9 +98,9 @@ namespace Outfitted
 			if (ap == null || pawn == null || policy == null) return;
 
 			if (!whatIfNotWorn)
-				Logger.Log($"\tDef[{ap.def?.defName}] ");
+				RW_JustUtils.LoggerMy.Log($"\tDef[{ap.def?.defName}] ");
 			else
-				Logger.Log($"\tDef[{ap.def?.defName}] ");
+				RW_JustUtils.LoggerMy.Log($"\tDef[{ap.def?.defName}] ");
 
 			float totalRaw = 0f;
 			if (whatIfNotWorn)
@@ -108,38 +109,38 @@ namespace Outfitted
 					totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
 			}
 			else totalRaw = JobGiver_OptimizeApparel.ApparelScoreRaw(pawn, ap);
-			Logger.Log($"RWScore[{totalRaw:F2}] ");
+			RW_JustUtils.LoggerMy.Log($"RWScore[{totalRaw:F2}] ");
 
 			var wornScore = CacheWornApparel.GetScoreList(pawn);
 			if (!whatIfNotWorn)
-				Logger.Log($"RWGain[{JobGiver_OptimizeApparel.ApparelScoreGain(pawn, ap, wornScore):F2}] ");
+				RW_JustUtils.LoggerMy.Log($"RWGain[{JobGiver_OptimizeApparel.ApparelScoreGain(pawn, ap, wornScore):F2}] ");
 
 			float num = 0f;
 
 			num += OutfittedMod.Settings.disableStartScore ? 0f : 0.1f;
 			num += OutfittedMod.Settings.disableScoreOffset ? 0f : ap.def.apparel.scoreOffset;
-			if (num != 0) Logger.Log($"Base[{num:F2}] ");
+			if (num != 0) RW_JustUtils.LoggerMy.Log($"Base[{num:F2}] ");
 
 			// Priority stats.
 			float prio = ApparelScorePriorities.RawPriorities(pawn, ap, policy);
-			Logger.Log($"Prio[{prio:F2}] ");
+			RW_JustUtils.LoggerMy.Log($"Prio[{prio:F2}] ");
 			num += prio;
 
 			// Pawn need this.
 			float need = ApparelScoreNeeds.PawnNeedThis(pawn, ap);
-			Logger.Log($"Need[{need:F2}] ");
+			RW_JustUtils.LoggerMy.Log($"Need[{need:F2}] ");
 			num += need;
 
 			// Ideology
 			float ideo = ApparelScoreNeeds.PawnNeedIdeology(pawn, ap);
-			if (ideo != 0) Logger.Log($"Ideo[{ideo:F2}] ");
+			if (ideo != 0) RW_JustUtils.LoggerMy.Log($"Ideo[{ideo:F2}] ");
 			num += ideo;
 
 			// Auto work.
 			float autoWork = 0f;
 			if (policy.AutoWorkPriorities)
 				autoWork += Outfitted.ApparelScoreAutoWorkPriorities(pawn, ap);
-			if (autoWork != 0) Logger.Log($"Work[{autoWork:F2}] ");
+			if (autoWork != 0) RW_JustUtils.LoggerMy.Log($"Work[{autoWork:F2}] ");
 			num += autoWork;
 
 			// HP.
@@ -149,24 +150,24 @@ namespace Outfitted
 				hp = (float)ap.HitPoints / ap.MaxHitPoints;
 				num *= Outfitted.HitPointsPercentScoreFactorCurve.Evaluate(Mathf.Clamp01(hp));
 			}
-			if (hp != 1) Logger.Log($"HP[{hp:F2}] Num[{num:F2}] ");
+			if (hp != 1) RW_JustUtils.LoggerMy.Log($"HP[{hp:F2}] Num[{num:F2}] ");
 
 			// Special score offset.
 			float offset = OutfittedMod.Settings.disableScoreOffset ? 0 : ap.GetSpecialApparelScoreOffset();
 			num += offset;
-			if (offset != 0) Logger.Log($"Offset[{offset:F2}] ");
+			if (offset != 0) RW_JustUtils.LoggerMy.Log($"Offset[{offset:F2}] ");
 
 			// Insulation.
 			float insulation = ApparelScoreInsulation.RawInsulation(pawn, ap, policy, NeededWarmth.Any);
 			num += insulation;
-			Logger.Log($"Ins[{insulation:F2}] ");
+			RW_JustUtils.LoggerMy.Log($"Ins[{insulation:F2}] ");
 
 			// Corpse.
 			num = ApparelScoreNeeds.ModifiedWornByCorpse(pawn, ap, policy, num);
-			Logger.Log($"Final[{num:F2}] ");
+			RW_JustUtils.LoggerMy.Log($"Final[{num:F2}] ");
 
 
-			Logger.LogNL("");
+			RW_JustUtils.LoggerMy.LogNL("");
 		}
 	}
 
@@ -241,7 +242,7 @@ namespace Outfitted
 			if (UnityEngine.Time.frameCount == _lastLoggedFrame) return;
 			_lastLoggedFrame = UnityEngine.Time.frameCount;
 
-			if (obj is ISelectable s) ScoreDebug.ClickedOn(s);
+			if (obj is ISelectable s) MyDebug.ClickedOn(s);
 		}
 	}
 
@@ -250,22 +251,93 @@ namespace Outfitted
 	{
 		static LogSomeStuff()
 		{
+			LogStatPredicate(
+				stat => stat.postProcessCurve != null && 
+					stat.postProcessCurve.Evaluate(stat.defaultBaseValue) != stat.defaultBaseValue,
+				"Stats with postProcessCurve:");
+
+			//LogStatPredicate(stat => stat.cacheable == true, "cacheable stats");
+			//LogStatPredicate(stat => stat.immutable == true, "immutable stats");
+
+			//// PostProcessed value differs from defaultBase.
+			//LogStatPredicate(def =>
+			//	def.postProcessCurve != null &&
+			//	def.defaultBaseValue != def.postProcessCurve.Evaluate(def.defaultBaseValue), "eval differ from base:");
+
 			//LogApparelStatModifierPredicate(sm => sm.stat.defaultBaseValue != 0, "modifiers with non-zero base.");
 			//LogAllApparelComps();
 			//LogStatPredicate(def => def.statFactors != null, "statFactors exist:", def => def.statFactors);
 			//LogStatPredicate(def => def.parts != null, "parts exist:", def => def.parts);
+
 			//LogStatPredicate(
 			//	def => def.workerClass != null && !(def.workerClass == typeof(RimWorld.StatWorker)),
 			//	"workers (except RimWorld.StatWorker)",
 			//	def => new[] { def.workerClass });
 
-			LogStatPredicate(def => def.defaultBaseValue == 0f, "zero base");
+			//// Log all Apparels, where defaultBase > statBase.
+			//// Exclude some (already noted).
+			//{
+			//	static bool filter(StatModifier sb) =>
+			//		sb.stat.defaultBaseValue != 0f &&
+			//		sb.stat.defaultBaseValue > sb.value &&
+			//		!(sb.stat.defName == "MaxHitPoints" ||
+			//			sb.stat.defName == "Mass" ||
+			//			sb.stat.defName == "EquipDelay");
+			//	LogApparels_Predicate(
+			//		def => def.statBases != null &&
+			//			def.statBases.Any(sb => filter(sb)),
+			//		"Apparels: statBase < defaultBase",
+			//		def => def.statBases
+			//			.Where(sb => filter(sb))
+			//			.Select(sb => $"" +
+			//			$"{sb.stat.defName} " +
+			//			$"V[{sb.value}] " +
+			//			$"VEval[{sb.stat.postProcessCurve.Evaluate(sb.value)}] " +
+			//			$"B[{sb.stat.defaultBaseValue}] " +
+			//			$"Eval[{sb.stat.postProcessCurve.Evaluate(sb.stat.defaultBaseValue)}] " +
+			//			$"Cat[{sb.stat.category}]"));
+			//}
+
+			//// Check evaluated values.
+			//{
+			//	static bool filter(StatModifier sb) =>
+			//		sb.stat.postProcessCurve != null &&
+			//		(sb.stat.defaultBaseValue != sb.stat.postProcessCurve.Evaluate(sb.stat.defaultBaseValue) ||
+			//			sb.value != sb.stat.postProcessCurve.Evaluate(sb.value));
+			//	LogApparels_Predicate(
+			//		def => def.statBases != null &&
+			//			def.statBases.Any(sb => filter(sb)),
+			//		"Apparels: val != eval",
+			//		def => def.statBases
+			//			.Where(sb => filter(sb))
+			//			.Select(sb => $"" +
+			//				$"{sb.stat.defName} " +
+			//				$"V[{sb.value}] " +
+			//				$"VEval[{sb.stat.postProcessCurve.Evaluate(sb.value)}] " +
+			//				$"B[{sb.stat.defaultBaseValue}] " +
+			//				$"BEval[{sb.stat.postProcessCurve.Evaluate(sb.stat.defaultBaseValue)}] " +
+			//				$"Cat[{sb.stat.category}]"));
+
+			//	LogApparels_Predicate(
+			//		def => def.equippedStatOffsets != null &&
+			//			def.equippedStatOffsets.Any(sb => filter(sb)),
+			//		"Apparels: Eq val != eval",
+			//		def => def.equippedStatOffsets
+			//			.Where(sb => filter(sb))
+			//			.Select(sb => $"" +
+			//				$"{sb.stat.defName} " +
+			//				$"V[{sb.value}] " +
+			//				$"VEval[{sb.stat.postProcessCurve.Evaluate(sb.value)}] " +
+			//				$"B[{sb.stat.defaultBaseValue}] " +
+			//				$"BEval[{sb.stat.postProcessCurve.Evaluate(sb.stat.defaultBaseValue)}] " +
+			//				$"Cat[{sb.stat.category}]"));
+			//}
+
+			//LogStatPredicate(def => def.defaultBaseValue == 0f, "zero base");
 			//LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsNonPawnImportant, "'BasicsNonPawnImportant' cat.");
 			//LogStatPredicate(def => def.category == StatCategoryDefOf.Basics, "'Basics' cat.");
 			//LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsPawn, "'BasicsPawn' cat.");
 			//LogStatPredicate(def => def.category?.ToString().ContainsIgnoreCase("pawn") ?? false, "has 'pawn' in cat name.");
-
-
 		}
 
 		private static void LogAllApparelComps()
@@ -282,12 +354,12 @@ namespace Outfitted
 					hashset.Add(comp.compClass.Name);
 				}
 			}
-			Logger.LogNL($"All apparel comps:");
+			LoggerMy.LogNL($"All apparel comps:");
 			foreach (var item in hashset)
 			{
-				Logger.LogNL($"{item}");
+				LoggerMy.LogNL($"{item}");
 			}
-			Logger.LogNL();
+			LoggerMy.LogNL();
 		}
 
 		private static void LogApparelStatPredicate(Func<StatModifier, bool> predicate, string str = null)
@@ -297,18 +369,18 @@ namespace Outfitted
 					def.statBases != null &&
 					def.statBases.Any(predicate));
 
-			Logger.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
+			LoggerMy.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
 			foreach (var def in defs)
 			{
-				Logger.LogNL($"[{def.defName}]");
+				LoggerMy.LogNL($"[{def.defName}]");
 				foreach (var sm in def.statBases.Where(predicate))
 				{
 					var dd = sm.stat.defaultBaseValue;
 					var min = sm.stat.minValue;
-					Logger.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
+					LoggerMy.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
 				}
 			}
-			Logger.LogNL("");
+			LoggerMy.LogNL("");
 		}
 
 		private static void LogApparelStatModifierPredicate(Func<StatModifier, bool> predicate, string str = null)
@@ -318,18 +390,18 @@ namespace Outfitted
 					def.equippedStatOffsets != null &&
 					def.equippedStatOffsets.Any(predicate));
 
-			Logger.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
+			LoggerMy.LogNL($"StatModifiers: {str ?? predicate.ToString()}");
 			foreach (var def in defs)
 			{
-				Logger.LogNL($"[{def.defName}]");
+				LoggerMy.LogNL($"[{def.defName}]");
 				foreach (var sm in def.equippedStatOffsets.Where(predicate))
 				{
 					var dd = sm.stat.defaultBaseValue;
 					var min = sm.stat.minValue;
-					Logger.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
+					LoggerMy.LogNL($"\t[{sm.stat.defName}] [{sm.stat.category}] Value[{sm.value}] Base[{dd}] Min[{min}]");
 				}
 			}
-			Logger.LogNL("");
+			LoggerMy.LogNL("");
 		}
 
 		private static void LogStatPredicate(
@@ -339,14 +411,14 @@ namespace Outfitted
 		{
 			var defs = DefDatabase<StatDef>.AllDefsListForReading
 				.Where(predicate);
-			Logger.LogNL($"StatDefs: {str ?? predicate.ToString()}");
+			LoggerMy.LogNL($"StatDefs: {str ?? predicate.ToString()}");
 			foreach (var def in defs)
 			{
 				var dd = def.defaultBaseValue;
 				var min = def.minValue;
 				var max = def.maxValue;
 				var eval = def.postProcessCurve?.Evaluate(dd) ?? dd;
-				Logger.LogNL($"" +
+				LoggerMy.LogNL($"" +
 					$"[{def.defName}] " +
 					$"[{def.category}] " +
 					$"Base[{dd}] " +
@@ -359,13 +431,42 @@ namespace Outfitted
 				if (selector != null)
 				{
 					var items = selector(def);
-					Logger.Log("\t");
+					LoggerMy.Log("\t");
 					foreach (var item in items)
-						Logger.Log($"[{item}] ");
-					Logger.LogNL();
+						LoggerMy.Log($"[{item}] ");
+					LoggerMy.LogNL();
 				}
 			}
-			Logger.LogNL("");
+			LoggerMy.LogNL("");
+		}
+
+		private static void LogApparels_Predicate(
+			Func<ThingDef, bool> predicate,
+			string str = null,
+			Func<ThingDef, IEnumerable> selector = null)
+		{
+			if (predicate == null) throw new ArgumentNullException(nameof(predicate));
+
+			var defs = DefDatabase<ThingDef>.AllDefsListForReading
+				.Where(def => def.IsApparel && predicate(def));
+			LoggerMy.LogNL($"Apparels: {str ?? predicate.ToString()}");
+			foreach (var def in defs)
+			{
+				LoggerMy.LogNL($"" +
+					$"[{def.defName}] " +
+					$"[{def.category}] ");
+
+				// Additional items to log for each def.
+				if (selector != null)
+				{
+					var items = selector(def) ?? Array.Empty<object>();
+					LoggerMy.Log("\t");
+					foreach (var item in items)
+						LoggerMy.Log($"[{item}] ");
+					LoggerMy.LogNL();
+				}
+			}
+			LoggerMy.LogNL("");
 		}
 
 		private static void LogStatDefs()
@@ -383,15 +484,15 @@ namespace Outfitted
 				"ceteam.combatextended"
 			};
 
-			Logger.LogNL($"New StatDefs:");
+			LoggerMy.LogNL($"New StatDefs:");
 			foreach (var group in stats)
 			{
 				if (!list.Contains(group.Key))
 				{
-					Logger.LogNL($"// {group.Key}");
+					LoggerMy.LogNL($"// {group.Key}");
 					foreach (var stat in group)
 					{
-						Logger.LogNL($"[MayRequire(\"{group.Key}\")] public static StatDef {stat.defName};");
+						LoggerMy.LogNL($"[MayRequire(\"{group.Key}\")] public static StatDef {stat.defName};");
 					}
 				}
 			}
@@ -403,7 +504,7 @@ namespace Outfitted
 			{
 				//if (stat.defaultBaseValue != 0)
 				{
-					Logger.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Default[{stat.defaultBaseValue}] Mod[{stat.modContentPack.PackageId}] ");
+					LoggerMy.LogNL($"Stat [{stat.defName}] Cat[{stat.category}] Default[{stat.defaultBaseValue}] Mod[{stat.modContentPack.PackageId}] ");
 				}
 			}
 		}

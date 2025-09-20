@@ -1,9 +1,9 @@
-Def[Apparel_ShieldBelt] RWScore[2.40] RWGain[23.98] Prio[2.40] Need[0.00] Ins[0.00] Final[2.40] 
+Def[VAEA_Apparel_RangedShieldBelt] RWScore[0.73] RWGain[7.27] Prio[0.73] Need[0.00] Ins[0.00] Final[0.73] 
 [DebugDeepScorePriorities] Started.
-	[Apparel_ShieldBelt] [MedicalQualityMax] [BasicsNonPawnImportant] Wei[1.3] defBase[0.0] Eval[0.0] base[0.0]
-		Pawn[1.0] Base[1.0] Min[0.0] NoStuff[1.0] Sruff[1.0] Q[1.0] Eq[0.0] EqQ[0.0]
-		Normal[1.00] CE_Adjusted[1.00] Delta[1.00] Score[2.40] Sum[2.40] Count [1]
-		Pawn[0.0] Base[0.0] Min[0.0] NoStuff[0.0] Sruff[0.0] Q[0.0] Eq[0.0] EqQ[0.0]
-	[Apparel_ShieldBelt] [ArmorRating_Sharp] [Apparel] Wei[1.4] defBase[0.0] Eval[0.0] base[0.0]
-		Normal[0.00] CE_Adjusted[0.00] Delta[0.00] Score[0.00] Sum[2.40] Count [2]
+	[VAEA_Apparel_RangedShieldBelt] [CarryBulk] [BasicsPawn] Wei[1.1]
+		Pawn[20.0] Base[20.0] Eval[20.0] Min[] Max[] NoStuff[20.0] Stuff[20.0] Q[29.0] Eq[0.0] EqQ[0.0]
+		Sel[Else] Raw[0.00] Offset[0.00] Delta[0.00] Scaled[0.00] Score[0.00] SUM[0.00] COUNT[1]
+	[VAEA_Apparel_RangedShieldBelt] [CookSpeed] [PawnWork] Wei[1.2]
+		Pawn[0.5] Base[0.0] Eval[0.4] Min[0.1] Max[] NoStuff[0.4] Stuff[0.4] Q[0.4] Eq[0.0] EqQ[0.0]
+		Sel[Abs] Raw[0.40] Offset[0.00] Delta[0.40] Scaled[0.40] Score[0.73] SUM[0.73] COUNT[2]
 [DebugDeepScorePriorities] Finished.

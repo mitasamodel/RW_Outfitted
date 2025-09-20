@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using Outfitted.RW_JustUtils;
 
 namespace Outfitted
 {
@@ -81,7 +82,7 @@ namespace Outfitted
 			{
 				if (ap == null)
 				{
-					Logger.Log_Warning("BuildWornScoreToDict: Unexpected Apparel-null in worn list.");
+					LoggerMy.Log_Warning("BuildWornScoreToDict: Unexpected Apparel-null in worn list.");
 					continue;
 				}
 

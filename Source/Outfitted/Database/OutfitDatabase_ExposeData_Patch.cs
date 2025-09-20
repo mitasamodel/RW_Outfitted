@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
+using Outfitted.RW_JustUtils;
 
 namespace Outfitted
 {
@@ -33,14 +34,14 @@ namespace Outfitted
 					}
 				}
 #if DEBUG
-				Logger.LogNL($"[OutfitDatabase_ExposeData_Patch] Game loaded. Converted {cnt} vanilla outfits.");
+				LoggerMy.LogNL($"[OutfitDatabase_ExposeData_Patch] Game loaded. Converted {cnt} vanilla outfits.");
 #endif
 
 				// Generate additional starting outfits if there were vanilla outfits.
 				if (flag && OutfittedMod.Settings.generateStartingOutfits)
 				{
 #if DEBUG
-					Logger.LogNL("[OutfitDatabase_ExposeData_Patch] Generate starting outfits.");
+					LoggerMy.LogNL("[OutfitDatabase_ExposeData_Patch] Generate starting outfits.");
 #endif
 					StandardOutfits.GenerateStartingOutfits(__instance, false);
 				}

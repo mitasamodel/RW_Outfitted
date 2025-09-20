@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Outfitted.RW_JustUtils;
 
 namespace Outfitted
 {
@@ -16,7 +17,7 @@ namespace Outfitted
 
 		public static void AddToLog(string str)
 		{
-			if (ScoreDebug.DeepScorePriorities && !_overlap && _started)
+			if (MyDebug.DeepScorePriorities && !_overlap && _started)
 			{
 				_showString.Append(str);
 			}
@@ -24,20 +25,20 @@ namespace Outfitted
 
 		public static void ShowLog()
 		{
-			if (ScoreDebug.DeepScorePriorities)
+			if (MyDebug.DeepScorePriorities)
 			{
 				if (_started)
 					_showString.Append($"[DebugDeepScorePriorities] Finished.\n");
-				Logger.Log(_showString.ToString());
+				LoggerMy.Log(_showString.ToString());
 				Clear();
 			}
 		}
 
 		public static void Start(string defName)
 		{
-			if (ScoreDebug.DeepScorePriorities)
+			if (MyDebug.DeepScorePriorities)
 			{
-				var selDefName = ScoreDebug.SelectedApparel?.def?.defName;
+				var selDefName = MyDebug.SelectedApparel?.def?.defName;
 				if (string.IsNullOrEmpty(selDefName) || string.IsNullOrEmpty(defName)) return;
 
 				if (_started)

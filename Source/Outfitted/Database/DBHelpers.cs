@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Verse;
+using Outfitted.RW_JustUtils;
 
 namespace Outfitted
 {
@@ -14,7 +15,7 @@ namespace Outfitted
 		{
 			if (outfit == null)
 			{
-				Logger.Log_Error("Unexpected null outfit.");
+				LoggerMy.Log_Error("Unexpected null outfit.");
 				Verse.Log.Warning("[Outfitted] Please report it to mod author.");
 				return null;
 			}
@@ -22,7 +23,7 @@ namespace Outfitted
 			if (outfit is ExtendedOutfit)
 			{
 #if DEBUG
-				Logger.LogNL($"[ConvertVanillaOutfit] {outfit.label} is ExtendedOutfit already. Skipping.");
+				LoggerMy.LogNL($"[ConvertVanillaOutfit] {outfit.label} is ExtendedOutfit already. Skipping.");
 #endif
 				return outfit as ExtendedOutfit;
 			}

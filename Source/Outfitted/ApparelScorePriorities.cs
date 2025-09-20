@@ -13,7 +13,9 @@ namespace Outfitted
 	{
 		private const float StatMinValue = -9999999f;
 		private const float StatMaxValue = 9999999f;
-		private const float StatRangeScore = 6.4f;		// By Max will give 100 points.
+		private const float StatRangeScore = 6.4f;      // By Max will give 100 points.
+		internal static readonly HashSet<(Apparel apparel, StatDef statDef)> GetStatForApparelIdNoDefault = 
+			new HashSet<(Apparel apparel, StatDef statDef)>();
 
 		// Can be called also for equipped apparel.
 		internal static float RawPriorities(Pawn pawn, Apparel apparel, ExtendedOutfit outfit)
@@ -21,7 +23,6 @@ namespace Outfitted
 #if DEBUG
 			DebugDeepScorePriorities.Start(apparel.def.defName);
 #endif
-
 			if (!outfit.StatPriorities.Any())
 			{
 #if DEBUG
@@ -67,9 +68,6 @@ namespace Outfitted
 
 				string sel = "";
 #endif
-				// Base to compare with.
-				
-
 				float raw = 0f;
 				float rawOffset = 0f;
 				float delta = 0f;
@@ -84,14 +82,30 @@ namespace Outfitted
 #endif
 					raw = apparel.GetStatValue(stat);
 					rawOffset = StatWorker.StatOffsetFromGear(apparel, stat);
-					delta = raw + rawOffset;
-					if (statMin != StatMinValue && statMax != StatMaxValue)
-						scaledDelta = Mathf.InverseLerp(statMin, statMax, delta) * StatRangeScore;
-					else
-						scaledDelta = delta;
-					score = scaledDelta * weight * weight * weight;
+				}
+				else
+				{
+#if DEBUG
+					sel = "Else";
+#endif
+					GetStatForApparelIdNoDefault.Add((apparel, stat));
+					try
+					{
+						raw = apparel.GetStatValue(stat);
+					}
+					finally
+					{
+						GetStatForApparelIdNoDefault.Remove((apparel, stat));
+					}
+					rawOffset = StatWorker.StatOffsetFromGear(apparel, stat);
 				}
 
+				delta = raw + rawOffset;
+				if (statMin != StatMinValue && statMax != StatMaxValue)
+					scaledDelta = Mathf.InverseLerp(statMin, statMax, delta) * StatRangeScore;
+				else
+					scaledDelta = delta;
+				score = scaledDelta * weight * weight * weight;
 				sum += score;
 				count++;
 

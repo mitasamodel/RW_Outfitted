@@ -422,7 +422,7 @@ namespace Outfitted
 					var itemModName = item.modContentPack?.Name ?? "<UNKNOWN>";
 #if DEBUG
 					if (itemModId == "<UNKNOWN>")
-						Logger.LogNL($"[DrawApparelStats]: modContentPack is null for item [{item.label ?? item.defName}].");
+						LoggerMy.LogNL($"[DrawApparelStats]: modContentPack is null for item [{item.label ?? item.defName}].");
 
 #endif
 					if (displayedModId == null || displayedModId != itemModId)
