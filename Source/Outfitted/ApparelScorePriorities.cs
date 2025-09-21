@@ -12,8 +12,8 @@ namespace Outfitted
 {
 	internal static class ApparelScorePriorities
 	{
-		private const float StatMinValue = -9999999f;
-		private const float StatMaxValue = 9999999f;
+		private const float AbsoluteStatMinValue = -9999999f;
+		private const float AbsoluteStatMaxValue = 9999999f;
 		private const float StatRangeScore = 6.4f;      // By Max will give 100 points.
 
 		// Can be called also for equipped apparel.
@@ -59,8 +59,8 @@ namespace Outfitted
 					$"Pawn[{pawnStat:F1}] " +
 					$"Base[{statBase:F1}] " +
 					$"Eval[{statBaseEval:F1}] " +
-					$"Min[{(statMin != StatMinValue ? statMin.ToString("F1") : "")}] " +
-					$"Max[{(statMax != StatMaxValue ? statMax.ToString("F1") : "")}] " +
+					$"Min[{(statMin != AbsoluteStatMinValue ? statMin.ToString("F1") : "")}] " +
+					$"Max[{(statMax != AbsoluteStatMaxValue ? statMax.ToString("F1") : "")}] " +
 					$"NoStuff[{apparel.def.GetStatValueAbstract(stat, null):F1}] " +
 					$"Stuff[{apparel.def.GetStatValueAbstract(stat, apparel.Stuff):F1}] " +
 					$"Raw[{raw:F1}] " +
@@ -84,7 +84,7 @@ namespace Outfitted
 				}
 
 				float scaledDelta = normalized;
-				if (statMin != StatMinValue && statMax != StatMaxValue)
+				if (statMin != AbsoluteStatMinValue && statMax != AbsoluteStatMaxValue)
 				{
 					if (normalized < statMin || normalized > statMax)
 					{
