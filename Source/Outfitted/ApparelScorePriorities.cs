@@ -74,8 +74,13 @@ namespace Outfitted
 					// We need te decrease the stat by the full scale to get correct ratio.
 					if (isWorn)
 						pawnStat -= delta;
-					// How much this apparel benefits however is depends on some mods adjustments.
+					// How much this apparel benefits, however, does depend on some mods adjustments.
 					normalized = pawnStat != 0 ? modsAdjusted / pawnStat : modsAdjusted;
+
+					// Here will be a slight error caused by Pawn's postprocess curve. But this error is really small
+					// and it will provide slightly higher rating for already worn apparel, so no endless loops.
+					// Example: weight capacity depends on Pawn's health (postprocess).
+					// It applays reduction AFTER all stats summarized (e.g. 95% from total 140).
 				}
 
 				float scaledDelta = normalized;
