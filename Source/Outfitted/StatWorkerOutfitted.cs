@@ -12,6 +12,8 @@ namespace Outfitted
 {
 	/// <summary>
 	/// Replace for original StatWorker.
+	/// Intended for apparel scores only. Do not reuse for any other purpose.
+	/// 
 	/// Reasons:
 	/// 1. Original worker assigns stat.defaultBaseValue for everything even if apparel doesn't have this stat.
 	/// 2. Some apparel has real stat smaller, than defaultBaseValue (e.g. shield recharge rate) and therefore
@@ -37,7 +39,7 @@ namespace Outfitted
 		/// Vanilla caches stats only if stat.cacheable is true.
 		/// For our purposes (score) we can cache all stats and recache them in some intervals if needed.
 		/// </summary>
-		public static float GetStatValue(this Apparel apparel, StatDef stat)
+		public static float GetOutfittedStatValue(this Apparel apparel, StatDef stat)
 		{
 #if DEBUG
 			if (apparel == null) throw new ArgumentNullException(nameof(apparel));
@@ -101,11 +103,12 @@ namespace Outfitted
 		/// </summary>
 		private static float GetBaseValue(Apparel apparel, StatDef stat)
 		{
-			if (apparel.def.statBases != null)
+			List<StatModifier> sbList = apparel.def.statBases;
+			if (sbList != null)
 			{
-				for (int i = 0; i < apparel.def.statBases.Count; i++)
+				for (int i = 0; i < sbList.Count; i++)
 				{
-					var sb = apparel.def.statBases[i];
+					var sb = sbList[i];
 					if (sb.stat == stat)
 					{
 						return sb.value;
@@ -138,19 +141,19 @@ namespace Outfitted
 		/// </summary>
 		private static float ApplyParts(Apparel apparel, StatDef stat, float value)
 		{
-			if (stat.parts != null)
+			var parts = stat.parts;
+			if (parts == null || parts.Count == 0) return value;
+
+			StatRequest sr = StatRequest.For(apparel);
+			foreach (var part in parts)
 			{
-				foreach ( var part in stat.parts)
-				{
-					part.TransformValue(StatRequest.For(apparel), ref value);
-				}
+				part.TransformValue(sr, ref value);
 			}
 			return value;
 		}
 
 		/// <summary>
-		/// Called when an apparel is destroyed.
-		/// TODO: this must be called on Thing.Destroy / PostDestroy -> Harmony patch needed. 
+		/// Called when an apparel is destroyed via Harmony patch: ThingWithComps.Destroy
 		/// </summary>
 		public static void ClearCacheFor(Apparel apparel)
 		{
@@ -174,6 +177,9 @@ namespace Outfitted
 			_statCache.Remove(apparel.thingIDNumber);
 		}
 
+		/// <summary>
+		/// Called on save load: WorldComponent -> FinalizeInit.
+		/// </summary>
 		public static void ClearAllCaches()
 		{
 #if DEBUG

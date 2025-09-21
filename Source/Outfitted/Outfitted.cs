@@ -90,7 +90,7 @@ namespace Outfitted
 		internal static float ApparelScoreAutoWorkPriorities(Pawn pawn, Apparel apparel)
 		{
 			return WorkPriorities.WorktypeStatPriorities(pawn)
-				.Select(sp => (apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetStatValue(sp.Stat) - sp.Stat.defaultBaseValue) * sp.Weight).Sum();
+				.Select(sp => (apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetOutfittedStatValue(sp.Stat) - sp.Stat.defaultBaseValue) * sp.Weight).Sum();
 		}
 
 		internal static void Notify_OutfitChanged(int id)

@@ -1,7 +1,34 @@
-<ThingDef ParentName="ApparelBase">
-    <defName>VAEA_Apparel_RangedShieldBelt</defName> 
- <comps>
-      <li Class="CompProperties_Shield">
-        <blocksRangedWeapons>false</blocksRangedWeapons>
-      </li>
-    </comps>
+[Caxigoabruabru 'Cócroiton' Cócroiton] Apparel score:
+[EMIField] [0] [-10]
+SeasonalTemp [21.39884] Offset [0] Final [21.39884]
+	Def[RNApparel_Pants_BearGryllsSurvivor] RWScore[1.96] Prio[-0.04] Need[2.00] HP[0.95] Num[1.96] Ins[0.00] Final[1.96] 
+	Def[Apparel_MiningVest] RWScore[1.19] Prio[0.69] Need[0.00] HP[0.98] Num[0.69] Ins[0.50] Final[1.19] 
+	Def[RHApparel_SafarilandPoliceBelt_Beretta] RWScore[0.10] Prio[0.10] Need[0.00] HP[0.65] Num[0.10] Ins[0.00] Final[0.10] 
+	Def[CE_Apparel_TacVest] RWScore[0.17] Prio[0.17] Need[0.00] HP[0.77] Num[0.17] Ins[0.00] Final[0.17] 
+	Def[RHApparel_USMC_ChestRig] RWScore[0.11] Prio[0.11] Need[0.00] HP[0.68] Num[0.11] Ins[0.00] Final[0.11] 
+	Def[REP_BW_LargeBackpack] RWScore[0.43] Prio[0.43] Need[0.00] HP[0.80] Num[0.43] Ins[0.00] Final[0.43] 
+	Comfort: Min[-9.29] Max[38.89]
+Def[Apparel_ArmorCataphractPrestige] RWScore[1.44] RWGain[0.25] Prio[0.94] Need[0.00] HP[0.63] Num[0.94] Ins[0.50] Final[1.44] 
+[DebugDeepScorePriorities] Started.
+	[Apparel_ArmorCataphractPrestige] [MiningYield] [PawnWork] Wei[2.5]
+		Pawn[0.8] Base[1.0] Eval[1.0] Min[0.0] Max[1.3] NoStuff[1.0] Stuff[1.0] Raw[0.0] Eq[0.0]
+		CE_Adjusted[0.00]
+		Raw[0.00] Offset[0.00] Delta[0.00] Adj[0.00] Scaled[0.00] Norm[0.00] Score[0.00] SUM[0.00] COUNT[1]
+	[Apparel_ArmorCataphractPrestige] [MiningSpeed] [PawnWork] Wei[2.5]
+		Pawn[0.4] Base[1.0] Eval[1.0] Min[0.1] Max[] NoStuff[1.0] Stuff[1.0] Raw[0.0] Eq[0.0]
+		CE_Adjusted[0.00]
+		Raw[0.00] Offset[0.00] Delta[0.00] Adj[0.00] Scaled[0.00] Norm[0.00] Score[0.00] SUM[0.00] COUNT[2]
+	[Apparel_ArmorCataphractPrestige] [CarryBulk] [BasicsPawn] Wei[1.2]
+		Pawn[150.0] Base[20.0] Eval[20.0] Min[] Max[] NoStuff[20.0] Stuff[20.0] Raw[0.0] Eq[20.0]
+		CE_Adjusted[5.00]
+		Raw[0.00] Offset[20.00] Delta[20.00] Adj[5.00] Scaled[0.03] Norm[0.03] Score[0.05] SUM[0.05] COUNT[3]
+	[Apparel_ArmorCataphractPrestige] [MoveSpeed] [BasicsPawn] Wei[1.3]
+		Pawn[4.0] Base[3.0] Eval[3.0] Min[0.2] Max[] NoStuff[3.0] Stuff[3.0] Raw[0.0] Eq[0.0]
+		CE_Adjusted[0.00]
+		Raw[0.00] Offset[0.00] Delta[0.00] Adj[0.00] Scaled[0.00] Norm[0.00] Score[0.00] SUM[0.05] COUNT[4]
+	[Apparel_ArmorCataphractPrestige] [CarryWeight] [BasicsPawn] Wei[1.2]
+		Pawn[38.0] Base[40.0] Eval[40.0] Min[] Max[] NoStuff[40.0] Stuff[40.0] Raw[0.0] Eq[100.0]
+		CE_Adjusted[20.00]
+		Raw[0.00] Offset[100.00] Delta[100.00] Adj[20.00] Scaled[0.53] Norm[0.53] Score[0.89] SUM[0.94] COUNT[5]
+[DebugDeepScorePriorities] Finished.
+

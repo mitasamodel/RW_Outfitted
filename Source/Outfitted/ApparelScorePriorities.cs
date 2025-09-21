@@ -46,7 +46,7 @@ namespace Outfitted
 
 				// Stats.
 				float pawnStat = pawn.GetStatValue(stat);
-				float raw = apparel.GetStatValue(stat);
+				float raw = apparel.GetOutfittedStatValue(stat);
 				float rawOffset = StatWorker.StatOffsetFromGear(apparel, stat);
 #if DEBUG
 				float statBase = stat.defaultBaseValue;
@@ -110,9 +110,9 @@ namespace Outfitted
 			if (ModsConfig.IsActive("CETeam.CombatExtended"))
 			{
 				if (stat == StatDefOf_CE.CarryBulk)
-					value -= apparel.GetStatValue(StatDefOf_CE.WornBulk);
+					value -= apparel.GetOutfittedStatValue(StatDefOf_CE.WornBulk);
 				else if (stat == StatDefOf_CE.CarryWeight)
-					value -= apparel.GetStatValue(StatDefOf_Rimworld.Mass);
+					value -= apparel.GetOutfittedStatValue(StatDefOf_Rimworld.Mass);
 #if DEBUG
 				DebugDeepScorePriorities.AddToLog($"\t\tCE_Adjusted[{value:F2}]\n");
 #endif
@@ -169,7 +169,7 @@ namespace Outfitted
 				//	result = appVal;
 				//else
 				//	result = def;
-				result = basedOnQuality ? apparel.GetStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
+				result = basedOnQuality ? apparel.GetOutfittedStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
 #if DEBUG
 				DebugDeepScorePriorities.AddToLog($"\t\tNormal[{result:F2}] ");
 #endif
@@ -179,9 +179,9 @@ namespace Outfitted
 			if (ModsConfig.IsActive("CETeam.CombatExtended"))
 			{
 				if (stat == StatDefOf_CE.CarryBulk)
-					result -= apparel.GetStatValue(StatDefOf_CE.WornBulk);
+					result -= apparel.GetOutfittedStatValue(StatDefOf_CE.WornBulk);
 				else if (stat == StatDefOf_CE.CarryWeight)
-					result -= apparel.GetStatValue(StatDefOf_Rimworld.Mass);
+					result -= apparel.GetOutfittedStatValue(StatDefOf_Rimworld.Mass);
 #if DEBUG
 				DebugDeepScorePriorities.AddToLog($"CE_Adjusted[{result:F2}] ");
 #endif

@@ -121,11 +121,11 @@ namespace Outfitted
 				switch (neededWarmth)
 				{
 					case NeededWarmth.Warm:
-						float statValue1 = apparel.GetStatValue(StatDefOf.Insulation_Heat);
+						float statValue1 = apparel.GetOutfittedStatValue(StatDefOf.Insulation_Heat);
 						num1 = InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue1);
 						break;
 					case NeededWarmth.Cool:
-						float statValue2 = apparel.GetStatValue(StatDefOf.Insulation_Cold);
+						float statValue2 = apparel.GetOutfittedStatValue(StatDefOf.Insulation_Cold);
 						num1 = InsulationTemperatureScoreFactorCurve_Need.Evaluate(statValue2);
 						break;
 					default:
@@ -156,7 +156,7 @@ namespace Outfitted
 
 		private static FloatRange GetInsulationStats(Apparel apparel)
 		{
-			return new FloatRange(-apparel.GetStatValue(StatDefOf.Insulation_Cold), apparel.GetStatValue(StatDefOf.Insulation_Heat));
+			return new FloatRange(-apparel.GetOutfittedStatValue(StatDefOf.Insulation_Cold), apparel.GetOutfittedStatValue(StatDefOf.Insulation_Heat));
 		}
 	}
 }
