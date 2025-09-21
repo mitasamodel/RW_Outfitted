@@ -22,7 +22,7 @@ namespace Outfitted
 #if DEBUG
 			DebugDeepScorePriorities.Start(apparel.def.defName);
 #endif
-			if (!outfit.StatPriorities.Any())
+			if (outfit.StatPriorities.Count == 0)
 			{
 #if DEBUG
 				DebugDeepScorePriorities.AddToLog("\tNo StatPriorities.\n");
@@ -30,15 +30,14 @@ namespace Outfitted
 				return 0f;
 			}
 
+			bool isWorn = apparel.Wearer == pawn;
 			float sum = 0f;
 			int count = 0;
 			foreach (var sp in outfit.StatPriorities)
 			{
 				StatDef stat = sp.Stat;
-				if (stat == null) continue;
-
-				// Stat weight - how important stat is (positive or negative).
 				float weight = sp.Weight;
+				if (stat == null || weight == 0f) continue;
 
 				// Range (if exists).
 				float statMin = stat.minValue;
@@ -71,13 +70,22 @@ namespace Outfitted
 				float modsAdjusted = AdjustForMods(apparel, stat, delta);
 				float normalized = modsAdjusted;
 				if (stat.category == StatCategoryDefOf.BasicsPawn)
+				{
+					// We need te decrease the stat by the full scale to get correct ratio.
+					if (isWorn)
+						pawnStat -= delta;
+					// How much this apparel benefits however is depends on some mods adjustments.
 					normalized = pawnStat != 0 ? modsAdjusted / pawnStat : modsAdjusted;
+				}
 
 				float scaledDelta = normalized;
 				if (statMin != StatMinValue && statMax != StatMaxValue)
 				{
 					if (normalized < statMin || normalized > statMax)
-						Logger.Log_ErrorOnce($"Is out of bounds [min, max][{apparel.def.defName}][{stat.defName}][{normalized}]", 0xaecde);
+					{
+						int hash = Gen.HashCombineInt(Gen.HashCombineInt(apparel.thingIDNumber, stat.index), 0xaecde);
+						Logger.Log_ErrorOnce($"Is out of bounds [min, max][{apparel.def.defName}][{stat.defName}][{normalized}]", hash);
+					}
 					else
 						scaledDelta = Mathf.InverseLerp(statMin, statMax, normalized) * StatRangeScore;
 				}
@@ -120,75 +128,7 @@ namespace Outfitted
 			return value;
 		}
 
-		/// <summary>
-		/// Score based on effect of apparel.
-		/// Example: CE's default CarryBulk is never 0 (it is 20) and "normal" formula will return higher than 20 for all "good" items
-		/// even if this item does not modify CarryBulk (it is checked in StatOffsetFromGear instead).
-		/// </summary>
-		/// <param name="apparel"></param>
-		/// <param name="stat"></param>
-		/// <param name="basedOnQuality"></param>
-		/// <returns></returns>
-		public static float ApparelScore(Pawn pawn, Apparel apparel, StatDef stat, bool basedOnQuality = true)
-		{
-			float result;
-			// Apparel provides gear offset for the stat.
-			// That means only offset depends on quality/material.
-			// Base value comes from stat default.
-			if (DefHasEquippedOffset(apparel.def, stat))
-			{
-				result = basedOnQuality ? StatWorker.StatOffsetFromGear(apparel, stat) : apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat);
-				result += stat.defaultBaseValue;
-#if DEBUG
-				DebugDeepScorePriorities.AddToLog($"\t\tEquipped[{result:F2}] ");
-#endif
-			}
-
-			// Pawn-category stats with no equipped offset (example: CarryBulk with no offset).
-			// Apparel itself doesn't provide any bonus.
-			// Stat is always here "default", but to be safe, take it from apparel, not from stat itself.
-			else if (stat.category == StatCategoryDefOf.BasicsPawn)
-			{
-				result = apparel.def.GetStatValueAbstract(stat, null);
-#if DEBUG
-				DebugDeepScorePriorities.AddToLog($"\t\tPawn-category[{result:F2}] ");
-#endif
-			}
-
-			// All other.
-			// Stat is not default; it is defined not as gear offset, but as stat itself.
-			// Example: armor, cold/warm insulation. Depends on gear itsef, not modifying Pawn's stats.
-			else
-			{
-				//var def = stat.defaultBaseValue;
-				//var appVal = apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
-
-				//if (apparel.def.StatBaseDefined(stat))
-				//	result = apparel.GetStatValue(stat);
-				//else if (def != appVal)
-				//	result = appVal;
-				//else
-				//	result = def;
-				result = basedOnQuality ? apparel.GetOutfittedStatValue(stat) : apparel.def.GetStatValueAbstract(stat, apparel.Stuff);
-#if DEBUG
-				DebugDeepScorePriorities.AddToLog($"\t\tNormal[{result:F2}] ");
-#endif
-			}
-
-			// CE: CarryBulk -> WornBulk; CarryWeight -> Mass
-			if (ModsConfig.IsActive("CETeam.CombatExtended"))
-			{
-				if (stat == StatDefOf_CE.CarryBulk)
-					result -= apparel.GetOutfittedStatValue(StatDefOf_CE.WornBulk);
-				else if (stat == StatDefOf_CE.CarryWeight)
-					result -= apparel.GetOutfittedStatValue(StatDefOf_Rimworld.Mass);
-#if DEBUG
-				DebugDeepScorePriorities.AddToLog($"CE_Adjusted[{result:F2}] ");
-#endif
-			}
-
-			return result;
-		}
+		//private static float 
 
 		// Check if ThingDef has stat modifier applied when equipped.
 		private static bool DefHasEquippedOffset(ThingDef def, StatDef stat)
