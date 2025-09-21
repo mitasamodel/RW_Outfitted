@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
+using Logger = Outfitted.RW_JustUtils.Logger;
 
 namespace Outfitted
 {
@@ -14,8 +15,6 @@ namespace Outfitted
 		private const float StatMinValue = -9999999f;
 		private const float StatMaxValue = 9999999f;
 		private const float StatRangeScore = 6.4f;      // By Max will give 100 points.
-		internal static readonly HashSet<(Apparel apparel, StatDef statDef)> GetStatForApparelIdNoDefault = 
-			new HashSet<(Apparel apparel, StatDef statDef)>();
 
 		// Can be called also for equipped apparel.
 		internal static float RawPriorities(Pawn pawn, Apparel apparel, ExtendedOutfit outfit)
@@ -45,125 +44,80 @@ namespace Outfitted
 				float statMin = stat.minValue;
 				float statMax = stat.maxValue;
 
-				// Base value.
+				// Stats.
+				float pawnStat = pawn.GetStatValue(stat);
+				float raw = apparel.GetStatValue(stat);
+				float rawOffset = StatWorker.StatOffsetFromGear(apparel, stat);
+#if DEBUG
 				float statBase = stat.defaultBaseValue;
 				float statBaseEval = stat.postProcessCurve?.Evaluate(statBase) ?? statBase;
-#if DEBUG
 				DebugDeepScorePriorities.AddToLog($"\t" +
 					$"[{apparel.def.defName}] " +
 					$"[{stat.defName}] " +
 					$"[{stat.category}] " +
 					$"Wei[{weight:F1}]\n");
 				DebugDeepScorePriorities.AddToLog($"\t\t" +
-					$"Pawn[{pawn.GetStatValue(stat):F1}] " +
+					$"Pawn[{pawnStat:F1}] " +
 					$"Base[{statBase:F1}] " +
 					$"Eval[{statBaseEval:F1}] " +
 					$"Min[{(statMin != StatMinValue ? statMin.ToString("F1") : "")}] " +
 					$"Max[{(statMax != StatMaxValue ? statMax.ToString("F1") : "")}] " +
 					$"NoStuff[{apparel.def.GetStatValueAbstract(stat, null):F1}] " +
 					$"Stuff[{apparel.def.GetStatValueAbstract(stat, apparel.Stuff):F1}] " +
-					$"Q[{apparel.GetStatValue(stat):F1}] " +
-					$"Eq[{apparel.def.equippedStatOffsets.GetStatOffsetFromList(stat):F1}] " +
-					$"EqQ[{StatWorker.StatOffsetFromGear(apparel, stat):F1}]\n");
-
-				string sel = "";
+					$"Raw[{raw:F1}] " +
+					$"Eq[{rawOffset:F1}]\n");
 #endif
-				float raw = 0f;
-				float rawOffset = 0f;
-				float delta = 0f;
-				float scaledDelta = 0f;
-				float score = 0f;
+				float delta = raw + rawOffset;
+				float modsAdjusted = AdjustForMods(apparel, stat, delta);
+				float normalized = modsAdjusted;
+				if (stat.category == StatCategoryDefOf.BasicsPawn)
+					normalized = pawnStat != 0 ? modsAdjusted / pawnStat : modsAdjusted;
 
-				// Base is zero. Apparel score is absolute.
-				if (statBase == 0f)
-				{
-#if DEBUG
-					sel = "Abs";
-#endif
-					raw = apparel.GetStatValue(stat);
-					rawOffset = StatWorker.StatOffsetFromGear(apparel, stat);
-				}
-				else
-				{
-#if DEBUG
-					sel = "Else";
-#endif
-					GetStatForApparelIdNoDefault.Add((apparel, stat));
-					try
-					{
-						raw = apparel.GetStatValue(stat);
-					}
-					finally
-					{
-						GetStatForApparelIdNoDefault.Remove((apparel, stat));
-					}
-					rawOffset = StatWorker.StatOffsetFromGear(apparel, stat);
-				}
-
-				delta = raw + rawOffset;
+				float scaledDelta = normalized;
 				if (statMin != StatMinValue && statMax != StatMaxValue)
-					scaledDelta = Mathf.InverseLerp(statMin, statMax, delta) * StatRangeScore;
-				else
-					scaledDelta = delta;
-				score = scaledDelta * weight * weight * weight;
+				{
+					if (normalized < statMin || normalized > statMax)
+						Logger.Log_ErrorOnce($"Is out of bounds [min, max][{apparel.def.defName}][{stat.defName}][{normalized}]", 0xaecde);
+					else
+						scaledDelta = Mathf.InverseLerp(statMin, statMax, normalized) * StatRangeScore;
+				}
+
+				float score = scaledDelta * weight * weight * weight;
 				sum += score;
 				count++;
 
 #if DEBUG
 				DebugDeepScorePriorities.AddToLog($"\t\t" +
-					$"Sel[{sel}] " +
 					$"Raw[{raw:F2}] " +
 					$"Offset[{rawOffset:F2}] " +
 					$"Delta[{delta:F2}] " +
+					$"Adj[{modsAdjusted:F2}] " +
+					$"NormP[{normalized:F2}] " +
 					$"Scaled[{scaledDelta:F2}] " +
 					$"Score[{score:F2}] " +
 					$"SUM[{sum:F2}] " +
 					$"COUNT[{count}]\n");
 #endif
-
-				// Base to compare with. Most stats have direct effect: armor, shield value, etc.
-				// Non-zero will be for stats, for which Pawn has some different base value: carry capacity, tend quality, etc.
-				//float statBase = 0f;
-
-				//float defBase = Math.Max(sp.Stat.defaultBaseValue, sp.Stat.minValue);
-
-				// For some reason vanilla RW has not-zero base stat for 'EnergyShieldEnergyMax' or 'EnergyShieldRechargeRate'.
-				// For us it is important to have any positive value (or negative based on selected weight).
-				// Therefore statbase for category 'Apparel' is always zero.
-				//if (sp.Stat.category == StatCategoryDefOf.Apparel ||
-				//	sp.Stat.category == StatCategoryDefOf.Basics)
-				//	defBase = 0f;
-
-				//				float evalDefBase = sp.Stat.postProcessCurve?.Evaluate(statBase) ?? statBase;
-				//				float baseValue = Math.Max(Math.Abs(evalDefBase), 0.001f);
-				////#if DEBUG
-				////				DebugDeepScorePriorities.AddToLog($"\t[{apparel.def.defName}] [{sp.Stat.defName}] " +
-				////					$"[{sp.Stat.category}] " +
-				////					$"Wei[{weight:F1}] defBase[{statBase:F1}] Eval[{evalDefBase:F1}] base[{baseValue:F1}]\n");
-				////#endif
-				//				//float raw = ApparelScore(pawn, apparel, sp.Stat);
-				//				float delta = (evalDefBase < 0.001f) ? raw : (raw - evalDefBase) / baseValue;
-				//				float score = delta * weight * weight * weight;
-				//				sum += score;
-				//				count++;
-				//#if DEBUG
-				//				DebugDeepScorePriorities.AddToLog($"Delta[{delta:F2}] Score[{score:F2}] Sum[{sum:F2}] Count [{count}]\n");
-				//#endif
 			}
 
 			// Depending on setting return either sum or average.
 			return OutfittedMod.Settings.sumScoresInsteadOfAverage ? sum : (count == 0 ? 0f : sum / count);
+		}
 
-			//// Original
-			//return !outfit.StatPriorities.Any<StatPriority>() ? 0.0f : outfit.StatPriorities.Select(sp => new
-			//{
-			//	weight = sp.Weight,
-			//	value = apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetStatValue(sp.Stat),
-			//	def = sp.Stat.defaultBaseValue
-			//})
-			//	.Average(sp => (
-			//		(double)Math.Abs(sp.def) < 0.001 ? sp.value : (sp.value - sp.def) / Math.Abs(sp.def)) * Mathf.Pow(sp.weight, 3f)
-			//	);
+		private static float AdjustForMods(Apparel apparel, StatDef stat, float value)
+		{
+			// CE: CarryBulk -> WornBulk; CarryWeight -> Mass
+			if (ModsConfig.IsActive("CETeam.CombatExtended"))
+			{
+				if (stat == StatDefOf_CE.CarryBulk)
+					value -= apparel.GetStatValue(StatDefOf_CE.WornBulk);
+				else if (stat == StatDefOf_CE.CarryWeight)
+					value -= apparel.GetStatValue(StatDefOf_Rimworld.Mass);
+#if DEBUG
+				DebugDeepScorePriorities.AddToLog($"\t\tCE_Adjusted[{value:F2}]\n");
+#endif
+			}
+			return value;
 		}
 
 		/// <summary>

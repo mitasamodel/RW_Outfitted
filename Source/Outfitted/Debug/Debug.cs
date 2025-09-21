@@ -353,6 +353,7 @@ namespace Outfitted
 			//LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsNonPawnImportant, "'BasicsNonPawnImportant' cat.");
 			//LogStatPredicate(def => def.category == StatCategoryDefOf.Basics, "'Basics' cat.");
 			LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsPawn, "'BasicsPawn' cat.");
+			LogStatPredicate(def => def.category == StatCategoryDefOf.BasicsPawnImportant, "'BasicsPawnImportant' cat.");
 			//LogStatPredicate(def => def.category?.ToString().ContainsIgnoreCase("pawn") ?? false, "has 'pawn' in cat name.");
 		}
 
