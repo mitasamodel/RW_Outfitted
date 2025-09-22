@@ -24,12 +24,26 @@ namespace Outfitted
 				MyDebug.debugDeepScoreWork.AddToLog($"\tPrio[{sp.Stat.defName}] Wei[{sp.Weight}]\n");
 			}
 #endif
+			bool isWorn = apparel.Wearer == pawn;
+			float sum = 0f;
+			int count = 0;
+			foreach (StatPriority sp in spList)
+			{
+				float scaledDelta = ApparelScore.GetFinalDelta(pawn, apparel, sp, isWorn);
+				float score = scaledDelta * sp.Weight;
+				sum += score;
+				count++;
+#if DEBUG
+				MyDebug.debugDeepScorePriorities.AddToLog(
+					$"Score[{score:F2}] " +
+					$"SUM[{sum:F2}] " +
+					$"COUNT[{count}]\n");
+#endif
+			}
+			//float result = WorkPriorities.WorktypeStatPriorities(pawn)
+			//	.Select(sp => (apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetOutfittedStatValue(sp.Stat) - sp.Stat.defaultBaseValue) * sp.Weight).Sum();
 
-
-			float result = WorkPriorities.WorktypeStatPriorities(pawn)
-				.Select(sp => (apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetOutfittedStatValue(sp.Stat) - sp.Stat.defaultBaseValue) * sp.Weight).Sum();
-
-			return result;
+			return sum;
 		}
 	}
 }
