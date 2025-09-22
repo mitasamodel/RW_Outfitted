@@ -5,38 +5,43 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Outfitted.RW_JustUtils;
+using System.Security.Policy;
 
 namespace Outfitted
 {
 #if DEBUG
-	internal static class DebugDeepScorePriorities
+	internal class DebugDeepScorePriorities
 	{
-		private static bool _started = false;
-		private static bool _overlap = false;
-		private static readonly StringBuilder _showString = new StringBuilder();
+		private bool _started = false;
+		private bool _overlap = false;
+		private readonly StringBuilder _showString = new StringBuilder();
+		public string Name { get; set; } = "DebugDeepScore";
+		public bool Enabled { get; set; } = false;
 
-		public static void AddToLog(string str)
+		internal DebugDeepScorePriorities()	{ }
+
+		public void AddToLog(string str)
 		{
-			if (MyDebug.DeepScorePriorities && !_overlap && _started)
+			if (Enabled && !_overlap && _started)
 			{
 				_showString.Append(str);
 			}
 		}
 
-		public static void ShowLog()
+		public void ShowLog()
 		{
-			if (MyDebug.DeepScorePriorities)
+			if (Enabled)
 			{
 				if (_started)
-					_showString.Append($"[DebugDeepScorePriorities] Finished.\n");
+					_showString.Append($"[{Name}] Finished.\n");
 				Logger.Log(_showString.ToString());
 				Clear();
 			}
 		}
 
-		public static void Start(string defName)
+		public void Start(string defName)
 		{
-			if (MyDebug.DeepScorePriorities)
+			if (Enabled)
 			{
 				var selDefName = MyDebug.SelectedApparel?.def?.defName;
 				if (string.IsNullOrEmpty(selDefName) || string.IsNullOrEmpty(defName)) return;
@@ -46,13 +51,13 @@ namespace Outfitted
 
 				if (!_started && defName == selDefName)
 				{
-					_showString.Append($"[DebugDeepScorePriorities] Started.\n");
+					_showString.Append($"[{Name}] Started.\n");
 					_started = true;
 				}
 			}
 		}
 
-		public static void Clear()
+		public void Clear()
 		{
 			_started = false;
 			_overlap = false;

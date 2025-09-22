@@ -57,10 +57,10 @@ namespace Outfitted
 			// Starting score.
 			float num = OutfittedMod.Settings.disableStartScore ? 0f : 0.1f;
 
-			// Score offset.
+			// Apparel's score offset.
 			num += OutfittedMod.Settings.disableScoreOffset ? 0f : apparel.def.apparel.scoreOffset;
 
-			// Score from appaerl itself.
+			// Score from apparel itself.
 			num += ApparelScorePriorities.RawPriorities(pawn, apparel, currentApparelPolicy);
 
 			// If Pawn need pants / shirt.
@@ -70,7 +70,7 @@ namespace Outfitted
 			num += ApparelScoreNeeds.PawnNeedIdeology(pawn, apparel);
 
 			if (currentApparelPolicy.AutoWorkPriorities)
-				num += ApparelScoreAutoWorkPriorities(pawn, apparel);
+				num += ApparelScoreWork.ApparelScoreAutoWorkPriorities(pawn, apparel);
 
 			if (apparel.def.useHitPoints)
 			{
@@ -85,12 +85,6 @@ namespace Outfitted
 
 			num = ApparelScoreNeeds.ModifiedWornByCorpse(pawn, apparel, currentApparelPolicy, num);
 			return num;
-		}
-
-		internal static float ApparelScoreAutoWorkPriorities(Pawn pawn, Apparel apparel)
-		{
-			return WorkPriorities.WorktypeStatPriorities(pawn)
-				.Select(sp => (apparel.def.equippedStatOffsets.GetStatOffsetFromList(sp.Stat) + apparel.GetOutfittedStatValue(sp.Stat) - sp.Stat.defaultBaseValue) * sp.Weight).Sum();
 		}
 
 		internal static void Notify_OutfitChanged(int id)

@@ -21,7 +21,17 @@ namespace Outfitted
 {
 	public static class MyDebug
 	{
-		internal static bool DeepScorePriorities { get; } = true;
+		internal static DebugDeepScorePriorities debugDeepScorePriorities = new DebugDeepScorePriorities()
+		{
+			Enabled = true,
+			Name = "DebugDeepScorePriorities"
+		};
+		internal static DebugDeepScorePriorities debugDeepScoreWork = new DebugDeepScorePriorities()
+		{
+			Enabled = true,
+			Name = "DebugDeepScoreWork"
+		};
+
 		internal static bool ApparelStatsCache { get; } = true;
 
 		internal static Apparel SelectedApparel { get; set; }
@@ -40,16 +50,20 @@ namespace Outfitted
 				if (pawn.outfits.CurrentApparelPolicy is ExtendedOutfit outfit)
 					_outfit = outfit;
 
-				DebugDeepScorePriorities.Clear();
+				debugDeepScorePriorities.Clear();
+				debugDeepScoreWork.Clear();
 				ShowScoreWornApparel(pawn);
-				DebugDeepScorePriorities.ShowLog();
+				debugDeepScoreWork.ShowLog();
+				debugDeepScorePriorities.ShowLog();
 			}
 			else if (selectable is Apparel apparel)
 			{
 				SelectedApparel = apparel;
-				DebugDeepScorePriorities.Clear();
+				debugDeepScorePriorities.Clear();
+				debugDeepScoreWork.Clear();
 				ShowScoreApp(SelectedApparel, _selectedPawn, _outfit);
-				DebugDeepScorePriorities.ShowLog();
+				debugDeepScoreWork.ShowLog();
+				debugDeepScorePriorities.ShowLog();
 			}
 
 			if (SelectedApparel == null || _outfit == null || _selectedPawn == null) return;
@@ -140,7 +154,7 @@ namespace Outfitted
 			// Auto work.
 			float autoWork = 0f;
 			if (policy.AutoWorkPriorities)
-				autoWork += Outfitted.ApparelScoreAutoWorkPriorities(pawn, ap);
+				autoWork += ApparelScoreWork.ApparelScoreAutoWorkPriorities(pawn, ap);
 			if (autoWork != 0) Logger.Log($"Work[{autoWork:F2}] ");
 			num += autoWork;
 

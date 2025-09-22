@@ -66,6 +66,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApparelScore.cs" />
+    <Compile Include="ApparelScoreWork.cs" />
     <Compile Include="ApparelScoreInsulation.cs" />
     <Compile Include="ApparelScoreNeeds.cs" />
     <Compile Include="ApparelScorePriorities.cs" />
